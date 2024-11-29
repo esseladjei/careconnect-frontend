@@ -1,5 +1,5 @@
 import ClientProfile from "@/components/ClientProfile";
-
+type Params = Promise<{ slug: string }>;
 async function fetchClient(id: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/clients/${id}`, {
     cache: "no-store", // Disable caching for dynamic data
@@ -11,7 +11,7 @@ async function fetchClient(id: string) {
   return data.careconnect
 }
 
-export default async function ProfilePage({ params }: { params: { slug: string } }) {
+export default async function ProfilePage({ params }: { params: Params}) {
   const { slug } = await params;
   const client = await fetchClient(slug);
   return (
