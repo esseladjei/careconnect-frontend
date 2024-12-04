@@ -11,7 +11,7 @@ function DashboardPage() {
               <div className="card">
                 <div className="card-body">
                   <div className="sm:flex block justify-between mb-5">
-                    <h4 className="text-gray-600 text-lg font-semibold sm:mb-0 mb-2">Sales Overview</h4>
+                    <h4 className="text-gray-600 text-lg font-semibold sm:mb-0 mb-2">Practitioner Overview</h4>
                     <select name="cars" id="cars" className=" border-gray-400 text-gray-500 rounded-md text-sm border-[1px] focus:ring-0 sm:w-auto w-full">
                       <option value="volvo">March2023</option>
                       <option value="saab">April2023</option>

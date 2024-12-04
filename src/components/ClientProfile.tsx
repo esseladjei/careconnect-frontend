@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 import { ClientsProps } from '../../types/typesdefinitions';
 
 const ClientProfile: React.FC<ClientsProps> = ({ client }) => {
@@ -14,11 +15,18 @@ const ClientProfile: React.FC<ClientsProps> = ({ client }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus(null);
+    const token = Cookies.get('token')
+
+    if (!token) {
+      router.replace('/') // If no token is found, redirect to login page
+      return
+    }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/clients/${client.clientId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/clients/${client.clientId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });

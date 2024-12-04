@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from "@/context/AuthContext";
 import { SignUpType, FormData } from '../../types/typesdefinitions';
 import SignUpMessage from './SignUpMessage';
 import { signUp } from '@/actions/authentication';
@@ -19,13 +20,15 @@ const SignUp: React.FC = () => {
   }
   const [signUpData, setSignUpData] = useState<SignUpType>(userData);
   const [verifyPassword, setVerifyPassword] = useState<string>('');
-  const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+  const [formErrors, setFormErrors] = useState<Partial<FormData>| any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const { setAuthState } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
     // Validate form data using Zod schema
     try {
       const validatedFields = formSchema.safeParse({
@@ -38,10 +41,10 @@ const SignUp: React.FC = () => {
       })
       // If any form fields are invalid, return early
       if (!validatedFields.success) {
-        let errors: Partial<FormData> = {
+        const errors: Partial<FormData> = {
           errors: validatedFields.error.flatten().fieldErrors
         };
-        setFormErrors((prevError) => ({
+        setFormErrors((prevError:  Partial<FormData>) => ({
           ...prevError,
           ...errors
         })); // Show validation errors
@@ -52,14 +55,15 @@ const SignUp: React.FC = () => {
       setFormErrors({}); // Clear errors if valid
       // Handle successful submission
       const signUpUser = await signUp(signUpData);
-      const id: string = signUpUser.clientId || signUpUser.practitionerId;
-      const accountOption = signUpUser.accountOption;
+      const { role, token, id } = signUpUser;;
+      setAuthState(signUpUser);
+      document.cookie = `token=${token};  path=/;  samesite=strict`
       setIsSubmitting(false); // Reset submission state
       // 5. Redirect user
-      router.push(`/profile/${accountOption}/${id}`);
+      router.push(`/profile/${role}/${id}`);
 
-    } catch (err) {
-      throw new Error('unable to submit')
+    } catch (error: unknown) {
+      throw new Error(`${error}`);
     }
   }
   const handleVerifyPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +72,7 @@ const SignUp: React.FC = () => {
   }
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
-    setFormErrors((prevState) => ({
+    setFormErrors((prevState: Partial<FormData>) => ({
       ...prevState,
       errors: {
         [name]: null
@@ -200,7 +204,7 @@ const SignUp: React.FC = () => {
                     <div>
                       <p>Password must:</p>
                       <ul>
-                        {formErrors.errors.confirmPassword.map((error) => (
+                        {formErrors.errors.confirmPassword.map((error: any) => (
                           <li key={error} className="text-red-500">- {error}</li>
                         ))}
                       </ul>
@@ -276,7 +280,7 @@ const SignUp: React.FC = () => {
                   <button className="inline-block shrink-0 rounded-md border border-blue-600
                    bg-blue-600  px-12 py-3 text-sm font-medium text-white transition w-full md:w-auto
                     hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-                    /* disabled={isSubmitting} */
+                     disabled={isSubmitting}
                     type="submit"
                   >
                     Create an account
