@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useAuth } from "@/context/AuthContext";
-import { User, AuthUser } from '../../types/typesdefinitions';
+import { User, AuthState } from '../../types/typesdefinitions';
 
-const getProfile = async (token: string, user: AuthUser) => {
+const getProfile = async (token: string, user: AuthState) => {
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/${user.role}/${user.id}`, {
     headers: {
