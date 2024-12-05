@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import Image from 'next/image';
 
 function Home() {
   return (
@@ -273,7 +274,7 @@ function Home() {
           <div className="card overflow-hidden">
             <div className="relative">
               <a href="javascript:void(0)">
-                <img src="/images/products/product-1.jpg" alt="product_img" className="w-full" />
+                <Image src="/images/products/product-1.jpg" alt="product_img"  className="w-full" ></Image>
               </a>
               <a href="javascript:void(0)" className="bg-blue-600 w-8 h-8 flex justify-center items-center text-white rounded-full absolute bottom-0 right-0 mr-4 -mb-3">
                 <i className="ti ti-basket text-base"></i>
@@ -321,7 +322,7 @@ function Home() {
           <div className="card overflow-hidden">
             <div className="relative">
               <a href="javascript:void(0)">
-                <img src="/images/products/product-2.jpg" alt="product_img" className="w-full" />
+                <Image src="/images/products/product-2.jpg" alt="product_img" className="w-full" ></Image>
               </a>
               <a href="javascript:void(0)" className="bg-blue-600 w-8 h-8 flex justify-center items-center text-white rounded-full absolute bottom-0 right-0 mr-4 -mb-3">
                 <i className="ti ti-basket text-base"></i>
@@ -369,7 +370,7 @@ function Home() {
           <div className="card overflow-hidden">
             <div className="relative">
               <a href="javascript:void(0)">
-                <img src="/images/products/product-3.jpg" alt="product_img" className="w-full" />
+                <Image src="/images/products/product-3.jpg" alt="product_img" className="w-full"></Image>
               </a>
               <a href="javascript:void(0)" className="bg-blue-600 w-8 h-8 flex justify-center items-center text-white rounded-full absolute bottom-0 right-0 mr-4 -mb-3">
                 <i className="ti ti-basket text-base"></i>
@@ -417,7 +418,7 @@ function Home() {
           <div className="card overflow-hidden">
             <div className="relative">
               <a href="javascript:void(0)">
-                <img src="/images/products/product-4.jpg" alt="product_img" className="w-full" />
+                <Image src="/images/products/product-4.jpg" alt="product_img" className="w-full"></Image>
               </a>
               <a href="javascript:void(0)" className="bg-blue-600 w-8 h-8 flex justify-center items-center text-white rounded-full absolute bottom-0 right-0 mr-4 -mb-3">
                 <i className="ti ti-basket text-base"></i>

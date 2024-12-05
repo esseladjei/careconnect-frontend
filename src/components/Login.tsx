@@ -1,9 +1,13 @@
 'use client';
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react';
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { setItem } from '@/utils/localStorage';
+
 const Login: React.FC = () => {
-  const router = useRouter()
+  const { setAuthState } = useAuth();
+  const router = useRouter();
   const [status, setStatus] = useState<string | null>(null);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -24,7 +28,7 @@ const Login: React.FC = () => {
       password
     }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/account/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,13 +36,19 @@ const Login: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        throw new Error("Login failed");
+      if (!response.ok) {
+        const failedResponse = await response.json();
+        throw new Error(`Login failed, ${failedResponse.careconnect.message}`);
       }
       setStatus("Success! Login successfull");
-      router.push('/dashboard')
+      const { careconnect } = await response.json();
+      const { token } = careconnect;
+      setItem('authstate', careconnect);
+      setAuthState(careconnect);
+      document.cookie = `token=${token};  path=/; samesite=strict`
+      router.push(`/dashboard`)
     } catch (error: unknown) {
-      setStatus(`Error: ${error}`);
+      setStatus(`${error}`);
     }
   };
   return (
@@ -157,7 +167,7 @@ const Login: React.FC = () => {
                 Sign in
               </button>
             </div>
-            {status && <p>{status}</p>}
+            {status && <p className="text-red-500">{status}</p>}
           </form>
         </div>
       </div>
