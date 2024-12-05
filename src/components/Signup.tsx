@@ -179,7 +179,7 @@ const SignUp: React.FC = () => {
                     <div>
                       <p>Password must:</p>
                       <ul>
-                        {formErrors.errors.password.map((error) => (
+                        {formErrors.errors.password.map((error:any) => (
                           <li key={error} className="text-red-500">- {error}</li>
                         ))}
                       </ul>

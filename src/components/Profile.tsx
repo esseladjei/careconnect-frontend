@@ -1,28 +1,76 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import { PractitionerProps } from '../../types/typesdefinitions';
+import { useAuth } from "@/context/AuthContext";
+import { User, AuthUser } from '../../types/typesdefinitions';
 
-const PractitionerProfile: React.FC<PractitionerProps> = ({ practitioner }) => {
-  const router = useRouter()
-  const [formData, setFormData] = useState(practitioner);
+const getProfile = async (token: string, user: AuthUser) => {
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/${user.role}/${user.id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      "authorization": `Bearer ${token}`,
+    },
+    cache: "no-store", // Disable caching for dynamic data
+  });
+  if (!res.ok) {
+    const failedRes = await res.json();
+    throw new Error(`Failed to fetch data ${failedRes.message}`);
+  }
+  const data = await res.json();
+  return data.careconnect
+}
+
+const Profile: React.FC = () => {
+  const intialFormData = {
+    firstname: '',
+    lastname: '',
+    gender: '',
+    email: '',
+    phonenumber: '',
+    address: '',
+    bio: '',
+    othername: '',
+    profession: '',
+    id:'',
+    dateofbirth:null,
+    isActive:0,
+    profilePictureUrl:''
+  }
+  const router = useRouter();
+  const { authState } = useAuth();
+  const [formData, setFormData] = useState<User>(intialFormData);
   const [status, setStatus] = useState<string | null>(null);
+  const token = Cookies.get('token');
+  useEffect(() => {
+    /* if (!authState) {
+      return router.push("/test");
+    } */
+    async function fetch() {
+      if (!authState || !token) return;
+      const profile = await getProfile(token, authState);
+      setFormData(profile);
+    }
+    fetch();
+  }, [token, authState, router])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement & HTMLSelectElement & HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    console.log(id, value)
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus(null);
-    const token = Cookies.get('token')
-
     if (!token) {
       router.replace('/') // If no token is found, redirect to login page
       return
     }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/practitioners/${practitioner.practitionerId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/${authState?.role}/${authState?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -34,10 +82,10 @@ const PractitionerProfile: React.FC<PractitionerProps> = ({ practitioner }) => {
       if (!res.ok) {
         throw new Error("Failed to update practitioner");
       }
-      setStatus("Success! practitioner updated.");
+      setStatus("Success! Profile updated.");
       router.push('/dashboard')
     } catch (error: unknown) {
-      setStatus(`Error: Could not update practitioner. ${error}`);
+      setStatus(`Error: Could not update profile. ${error}`);
     }
   };
   return (
@@ -96,8 +144,8 @@ const PractitionerProfile: React.FC<PractitionerProps> = ({ practitioner }) => {
                 </div>
                 <div>
                   <select
-                    name="HeadlineAct"
-                    id="HeadlineAct"
+                    name="gender"
+                    id="gender"
                     className="mt-1.5 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm"
                     required
                     value={formData?.gender || ''}
@@ -186,4 +234,4 @@ const PractitionerProfile: React.FC<PractitionerProps> = ({ practitioner }) => {
     </>
   )
 }
-export default PractitionerProfile;
+export default Profile;

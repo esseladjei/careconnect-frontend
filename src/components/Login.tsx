@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { setItem } from '@/utils/localStorage';
 
 const Login: React.FC = () => {
   const { setAuthState } = useAuth();
@@ -36,15 +37,16 @@ const Login: React.FC = () => {
       });
 
       if (!response.ok) {
-       const failedResponse =  await response.json();
-       throw new Error(`Login failed, ${failedResponse.careconnect.message}`);
+        const failedResponse = await response.json();
+        throw new Error(`Login failed, ${failedResponse.careconnect.message}`);
       }
       setStatus("Success! Login successfull");
       const { careconnect } = await response.json();
-      const { role, token } = careconnect;
+      const { token } = careconnect;
+      setItem('authstate', careconnect);
       setAuthState(careconnect);
       document.cookie = `token=${token};  path=/; samesite=strict`
-      router.push(`/dashboard/${role}`)
+      router.push(`/dashboard`)
     } catch (error: unknown) {
       setStatus(`${error}`);
     }

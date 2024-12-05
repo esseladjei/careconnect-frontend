@@ -1,30 +1,21 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-
-type AuthState = {
-  token: string;
-  id: string;
-  role: string;
-};
-
-type AuthContextType = {
-  authState: AuthState | null;
-  setAuthState: (state: AuthState | null) => void;
-};
+import { getItem, setItem } from "@/utils/localStorage";
+import { AuthContextType, AuthState } from "../../types/typesdefinitions";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const getInitialState = () => {
-  const currentUser = localStorage.getItem("authstate");
-  return currentUser ? JSON.parse(currentUser) : null
-}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authState, setAuthState] = useState<AuthState | null>(getInitialState);
+  const [authState, setAuthState] = useState<AuthState | null>(null);
+  
+  useEffect(() => {
+    const item = getItem<AuthState>('authstate');
+    setAuthState(item);
+  }, [])
+
   useEffect(() => {
     if (authState) {
-      localStorage.setItem("authstate", JSON.stringify(authState));
-    } else {
-      localStorage.removeItem("authstate"); // Clean up if logged out
+      setItem<AuthState>('authstate', authState);
     }
   }, [authState]);
 

@@ -1,6 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 
+
+
 function DashboardPage() {
   return (
     <section id='dashboard'>

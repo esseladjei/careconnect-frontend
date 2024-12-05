@@ -2,24 +2,29 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import DropDown from './Dropdown';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
-import DropDown from './Dropdown';
+import { getItem, removeFromLocalStorage } from '@/utils/localStorage';
+import { AuthState } from '../../types/typesdefinitions';
 
 function Header() {
   const { authState, setAuthState } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (!authState) {
-
+    const persistedUser = getItem<AuthState>('authstate');
+    if (!persistedUser) {
       router.push("/"); // Redirect if no authState
     }
-  }, [authState, router]);
+  }, [router]);
+
   const handleLogout = () => {
     setAuthState(null); // Clears state
-    localStorage.removeItem('authstate')
+    removeFromLocalStorage('authstate');
     document.cookie = "token=; path=/; domain=example.com; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+    router.push("/"); 
   };
+
   return (
     <header>
       <nav className="relative container mx-auto p-6">
@@ -33,14 +38,13 @@ function Header() {
           <div className="hidden md:flex space-x-6">
             {authState && (
               <>
-                <Link href={`/dashboard/${authState.role}/${authState.id}`} className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">
+                <Link href={`/dashboard`} className="p-3 rounded-md w-auto flex items-center hover:bg-gray-100 hover:text-gray-700">
                   Dashboard
                 </Link>
               </>
             )}
-        
-            <Link href="/aboutus" className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">
-                  About Us
+            <Link href="/aboutus" className="p-3 rounded-md w-auto flex items-center hover:bg-gray-100 hover:text-gray-700">
+              About Us
             </Link>
             {authState && (<DropDown onLogout={handleLogout} user={authState} />)}
           </div>
