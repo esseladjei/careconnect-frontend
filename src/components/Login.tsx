@@ -1,9 +1,9 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { setItem } from '@/utils/localStorage';
+import { setItem } from '@/actions/localStorage';
 
 const Login: React.FC = () => {
   const { setAuthState } = useAuth();

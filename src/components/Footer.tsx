@@ -42,14 +42,6 @@ function Footer() {
         </div>
 
         <div className="flex flex-col justify-between">
-          <form>
-            <div className="flex space-x-3">
-              <input type="text" className="flex-1 px-4 rounded-full focus:outline-none" placeholder="Updated in your inbox" />
-              <button className="px-6 py-2 text-white rounded-full bg-cyanBlue hover:bg-cyanBlueLight focus:outline-none">
-                Go
-              </button>
-            </div>
-          </form>
           <div className="hidden text-white md:block">
             Copyright &copy; 2022, All Rights Reserved
           </div>

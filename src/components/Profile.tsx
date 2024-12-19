@@ -44,9 +44,6 @@ const Profile: React.FC = () => {
   const [status, setStatus] = useState<string | null>(null);
   const token = Cookies.get('token');
   useEffect(() => {
-    /* if (!authState) {
-      return router.push("/test");
-    } */
     async function fetch() {
       if (!authState || !token) return;
       const profile = await getProfile(token, authState);

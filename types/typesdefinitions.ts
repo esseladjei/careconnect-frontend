@@ -58,4 +58,49 @@ export type FormData = | {
     role: string,
     token: string
   }
+ }
+
+export interface CardProp {
+  practitioner: FilteredPractioner
+}
+ 
+ interface FilteredPractioner {
+     title: string;
+     practitionerId: string;
+     firstname: string;
+     lastname: string;
+     gender: string;
+     location: string;
+     availability: string;
+     appointment_type: string;
+     year_of_experience: string;
+     specialisations: {
+      specialisationId: string;
+      name?:string
+     }[];
+     profession: string;
+     profilePictureUrl: string;
+     bio:string
+ }
+   export interface FilteredPractitioners {
+     data: FilteredPractioner[];
+     total: number;
+     page: number;
+     pages: number;
+  }
+
+export interface SpecialisationsProps  {
+  specialisationId: string;
+  name: string;
+}
+
+export interface FiltersProps {
+  'appointment_type': string;
+  'availability': string[]
+  'fee'?: [number, number];
+  'specialisations': SpecialisationsProps[];
+}
+
+export interface FilterBoxProps {
+  onFilter: (filter: FiltersProps) => void;
 }

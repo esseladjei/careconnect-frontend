@@ -1,13 +1,13 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { getItem, setItem } from "@/utils/localStorage";
+import { getItem, setItem } from "@/actions/localStorage";
 import { AuthContextType, AuthState } from "../../types/typesdefinitions";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState | null>(null);
-  
+
   useEffect(() => {
     const item = getItem<AuthState>('authstate');
     setAuthState(item);

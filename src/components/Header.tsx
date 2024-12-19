@@ -5,7 +5,7 @@ import Link from 'next/link';
 import DropDown from './Dropdown';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
-import { getItem, removeFromLocalStorage } from '@/utils/localStorage';
+import { getItem, removeFromLocalStorage } from '@/actions/localStorage';
 import { AuthState } from '../../types/typesdefinitions';
 
 function Header() {
@@ -22,7 +22,7 @@ function Header() {
     setAuthState(null); // Clears state
     removeFromLocalStorage('authstate');
     document.cookie = "token=; path=/; domain=example.com; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-    router.push("/"); 
+    router.push("/");
   };
 
   return (
@@ -39,10 +39,10 @@ function Header() {
             {authState && (
               <>
                 <Link href={`/dashboard`} className="p-2 rounded-md w-auto gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600">
-                   <span className="ti-dashboard text-xl"></span>
-                   <span> Dashboard</span>
+                  <span className="ti-dashboard text-xl"></span>
+                  <span> Dashboard</span>
                 </Link>
-                <Link href={`/`} className="p-2 rounded-md w-auto  gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600" title="Find a doctor">
+                <Link href={`/findpractitioner`} className="p-2 rounded-md w-auto  gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600" title="Find a doctor">
                   <span className='ti-support'></span>
                   <span>Find a practitioner</span>
                 </Link>
@@ -50,7 +50,7 @@ function Header() {
             )}
             <Link href="/aboutus" className="p-2 rounded-md w-auto  gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600">
               <span className='ti-help-alt'></span>
-              <span>About Us</span> 
+              <span>About Us</span>
             </Link>
             {authState && (<DropDown onLogout={handleLogout} user={authState} />)}
           </div>

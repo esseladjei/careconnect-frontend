@@ -11,7 +11,7 @@ const DropDown: React.FC<DropDownMenuProps> = ({ onLogout, user }) => {
 
   // Function to close the dropdown
   const handleMouseLeave = () => {
-    setIsOpen(true);
+    setIsOpen(false);
   };
   const handleLogout = () => {
     onLogout()
