@@ -80,7 +80,8 @@ export interface CardProp {
      }[];
      profession: string;
      profilePictureUrl: string;
-     bio:string
+   bio: string;
+   fee: number;
  }
    export interface FilteredPractitioners {
      data: FilteredPractioner[];
@@ -88,7 +89,9 @@ export interface CardProp {
      page: number;
      pages: number;
   }
-
+ export interface HandleFilterParams {
+    [key: string]: any;
+  }
 export interface SpecialisationsProps  {
   specialisationId: string;
   name: string;

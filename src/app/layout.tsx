@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-import "./globals.css";
 import { Plus_Jakarta_Sans, Roboto } from 'next/font/google';
-
+import { ToastContainer } from "react-toastify";
+import AutoLogoutWrapper from "@/components/AuthLogout";
+import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
@@ -28,8 +29,9 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
         <AuthProvider >
           <Header />
           <section className="p-8 my-auto dark: bg-gray-200">
-            {children}
+            <AutoLogoutWrapper> {children} </AutoLogoutWrapper>
           </section>
+          <ToastContainer />
           <Footer />
         </AuthProvider>
       </body>

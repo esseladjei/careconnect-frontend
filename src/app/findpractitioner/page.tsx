@@ -1,36 +1,52 @@
 'use client';
 import Card from '@/components/Cards';
 import FilterBox from '@/components/Filter';
-import SearchBar from '@/components/SearchBar'
-import React, { useEffect, useState } from 'react'
+import SearchBar from '@/components/SearchBar';
 import Cookies from 'js-cookie';
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { fetchPractitioners } from '@/actions/fetch';
-import { FilteredPractitioners } from '../../../types/typesdefinitions';
+import { HandleFilterParams, FilteredPractitioners } from '../../../types/typesdefinitions';
 import NoResultsCard from '@/components/NoResultsCard';
+
 function FindPage() {
-  const [results, setResults] = useState<FilteredPractitioners>({});
+  const [results, setResults] = useState<FilteredPractitioners | undefined>({
+    data: [],
+    total: 0,
+    page: 1,
+    pages: 0,
+  });
   const token = Cookies.get('token');
+  const defaultFilters = useMemo(() => ({
+    'appointment_type': 'flexible',
+    'availability': ['private_clinic'],
+    'fee': [0, 1000],
+    'specialisations': [],
+  }), []);
   useEffect(() => {
     (async () => {
-      const practitioners = await fetchPractitioners({ availability: 'private_clinic', }, token);
+      const practitioners = await fetchPractitioners(defaultFilters, token);
       setResults(practitioners)
     })();
-  }, [token])
+  }, [token, defaultFilters])
 
-  const handleSearch = async (query: string) => {
-    /*  if (!query) return;
-    const practitioners = await fetchPractitioners({ location: query, availability: 'private_clinic', }, token);
-    setResults(practitioners) */
-  };
-  const handleFilter = async (filters) => {
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query) return;
+    const practitioners = await fetchPractitioners({ location: query, ...defaultFilters }, token);
+    setResults(practitioners);
+  }, [token, defaultFilters]);
+
+  const handleFilter = useCallback(async (filters: HandleFilterParams) => {
     const practitioners = await fetchPractitioners(filters, token);
-    setResults(practitioners)
-  }
-  const handleFind = async (queries: Record<string, any>) => {
+    setResults(practitioners);
+  }, [token]);
+
+  const handleFind = useCallback(async (queries: Record<string, any>) => {
     if (!queries) return;
     const practitioners = await fetchPractitioners(queries, token);
     setResults(practitioners)
-  }
+  }, [token]);
+
+
   return (
     <div className="container max-w-7xl center mx-auto p-4 flex flex-col space-y-4 bg-white">
       {/* Search Bar */}
@@ -40,20 +56,18 @@ function FindPage() {
         </div>
       </div>
 
-
-
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row lg:space-x-4">
         {/* Filter Section */}
         <div className="filter w-full lg:w-1/3 bg-gray-100 p-4 rounded">
-          <FilterBox onFilter={handleFilter}/>
+          <FilterBox onFilter={handleFilter} />
         </div>
 
         {/* Results Section */}
         <div className="results w-full lg:w-2/3 bg-gray-100 p-4 rounded">
-          {results?.data?.length > 0 ? (
+          {results && results.data.length > 0 ? (
             <div className='card-results py-1'>
-              {results.data?.map((result, index) => (
+              {results.data.map((result, index) => (
                 <Card key={index} practitioner={result} />
               ))}
             </div>

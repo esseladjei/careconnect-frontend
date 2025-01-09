@@ -6,59 +6,47 @@ import Cookies from 'js-cookie';
 
 const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
   const token = Cookies.get('token');
-  const [specialisations, setSpecialisations] = useState<SpecialisationsProps[]>([])
+  const [specialisations, setSpecialisations] = useState<SpecialisationsProps[]>([]);
   const [filters, setFilters] = useState<FiltersProps>({
     'appointment_type': 'flexible',
-    'availability': ['telephone'],
+    'availability': ['private_clinic'],
     'fee': [0, 100.00],
     'specialisations': [],
-  })
+  });
+  const [loading, setLoading] = useState(true);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, name, value, checked, dataset } = event.target;
 
     setFilters((prevFilters) => {
       let updatedFilters = { ...prevFilters };
-      if (name === 'fee') {
-        // Handle fee update (convert to number)
-        // Check if it's a range update (dataset identifies min or max)
-        if (dataset.type === 'min' || dataset.type === 'max') {
-          const [minFee, maxFee] = Array.isArray(prevFilters.fee) ? prevFilters.fee : [0, 0];
-          const updatedRange: [number, number] = dataset.type === 'min'
-            ? [Number(value), maxFee]
-            : [minFee, Number(value)];
-          updatedFilters = { ...prevFilters, fee: updatedRange };
-        }
-      } else if (name === 'appointment_type') {
-        // Handle appointment_type array updat
-        updatedFilters = { ...prevFilters, [name]: value };
-      } else if (name === 'availability') {
-        // Handle appointment_type array update
-        const updatedTypes = checked
-          ? [...prevFilters.availability, value] // Add value if checked
-          : prevFilters.availability.filter((type) => type !== value); // Remove value if unchecked
-
-        updatedFilters = {
-          ...prevFilters,
-          availability: updatedTypes,
-        };
-
-      } else if (name === 'specialisation') {
-        // Handle appointment_type array update
-        const key = id.split('specialisation_')[1];
-        const updatedTypes = checked
-          ? [...prevFilters.specialisations, { specialisationId: key, name: value }] // Add value if checked
-          : prevFilters.specialisations.filter((type) => type.name !== value); // Remove value if unchecked
-
-        updatedFilters = {
-          ...prevFilters,
-          specialisations: updatedTypes,
-        };
-      } else {
-        // Default case for other filters
-        updatedFilters = {
-          ...prevFilters,
-          [name]: value,
-        };
+      switch (name) {
+        case 'fee':
+          if (dataset.type === 'min' || dataset.type === 'max') {
+            const [minFee, maxFee] = Array.isArray(prevFilters.fee) ? prevFilters.fee : [0, 0];
+            const updatedRange: [number, number] = dataset.type === 'min'
+              ? [Number(value), maxFee]
+              : [minFee, Number(value)];
+            updatedFilters = { ...prevFilters, fee: updatedRange };
+          }
+          break;
+        case 'appointment_type':
+          updatedFilters = { ...prevFilters, [name]: value };
+          break;
+        case 'availability':
+          const updatedAvailability = checked
+            ? [...prevFilters.availability, value]
+            : prevFilters.availability.filter((type) => type !== value);
+          updatedFilters = { ...prevFilters, availability: updatedAvailability };
+          break;
+        case 'specialisation':
+          const key = id.split('specialisation_')[1];
+          const updatedSpecialisations = checked
+            ? [...prevFilters.specialisations, { specialisationId: key, name: value }]
+            : prevFilters.specialisations.filter((type) => type.name !== value);
+          updatedFilters = { ...prevFilters, specialisations: updatedSpecialisations };
+          break;
+        default:
+          updatedFilters = { ...prevFilters, [name]: value };
       }
       onFilter(updatedFilters);
       return updatedFilters;
@@ -67,11 +55,17 @@ const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
   };
   useEffect(() => {
     (async () => {
-      const specs = await fetchSpecialisations(token);
-      setSpecialisations(specs);
+      setLoading(true);
+      try {
+        const specs = await fetchSpecialisations(token);
+        setSpecialisations(specs);
+      } catch (error) {
+        console.error('Failed to fetch specialisations:', error);
+      } finally {
+        setLoading(false);
+      }
     })();
-  },[])
-
+  }, [token]);
   return (
     <div className="space-y-2" >
       <details className="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden" open >
@@ -253,13 +247,13 @@ const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
 
           <ul className="space-y-1 border-t border-gray-200 p-4">
             <li>
-              <label htmlFor="officevisit" className="inline-flex items-center gap-2">
+              <label htmlFor="office" className="inline-flex items-center gap-2">
                 <input type="checkbox"
-                  id="officevisit"
+                  id="office"
                   className="size-5 rounded border-gray-300"
                   name="availability"
-                  value="officevisit"
-                  checked={filters.availability?.includes('officevisit')}
+                  value="office"
+                  checked={filters.availability?.includes('office')}
                   onChange={handleFilterChange}
                 />
                 <span className="text-sm font-medium text-gray-700">Office visit</span>
@@ -376,26 +370,31 @@ const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
           </header>
 
           <ul className="space-y-1 border-t border-gray-200 p-4">
-            {specialisations.length > 0 ? (
+            {
+              loading ? (
+                <div className="flex justify-center items-center">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent border-r-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                specialisations.length > 0 ? (
+                  specialisations.map((specialisation: SpecialisationsProps,) => (
+                    <li key={specialisation.specialisationId}>
+                      <label htmlFor={`specialisation_${specialisation.specialisationId}`} className="inline-flex items-center gap-2">
+                        <input type="checkbox"
+                          id={`specialisation_${specialisation.specialisationId}`}
+                          className="size-5 rounded border-gray-300"
+                          name="specialisation"
+                          value={specialisation.name}
+                          checked={filters.specialisations.some(spec => spec.name === specialisation.name)} // Check if the value is in the array
+                          onChange={handleFilterChange}
+                        />
+                        <span className="text-sm font-medium text-gray-700">{specialisation.name}</span>
+                      </label>
+                    </li>
+                  ))
 
-              specialisations.map((specialisation: SpecialisationsProps,) => (
-                <li key={specialisation.specialisationId}>
-                  <label htmlFor={`specialisation_${specialisation.specialisationId}`} className="inline-flex items-center gap-2">
-                    <input type="checkbox"
-                      id={`specialisation_${specialisation.specialisationId}`}
-                      className="size-5 rounded border-gray-300"
-                      name="specialisation"
-                      value={specialisation.name}
-                      checked={filters.specialisations.some(spec => spec.name === specialisation.name)} // Check if the value is in the array
-                      onChange={handleFilterChange}
-                    />
-                    <span className="text-sm font-medium text-gray-700">{specialisation.name}</span>
-                  </label>
-                </li>
-              ))
-
-            ) : (<p>No specilisation</p>)
-            }
+                ) : (<p>No specilisation</p>)
+              )}
           </ul>
         </div>
       </details>

@@ -23,11 +23,16 @@ const Card: React.FC<CardProp> = ({ practitioner }) => {
       {/*  <!-- Main Content --> */}
       <div className="flex-1">
         {/*  <!-- Header --> */}
-        <div className="border-b pb-4 mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">{practitioner.lastname} {practitioner.firstname}</h2>
-          <p className="text-gray-500">{practitioner.location} | <span className="font-semibold">{practitioner.year_of_experience} Years of Experience</span></p>
+        <div className="flex items-center justify-between border-b pb-4 mb-4">
+          <div className="">
+            <h2 className="text-2xl font-bold text-gray-800">{practitioner.lastname} {practitioner.firstname}</h2>
+            <p className="text-gray-500">{practitioner.location} | <span className="font-semibold">{practitioner.year_of_experience} Years of Experience</span></p>
+          </div>
+          <div>
+            <p className="text-gray-700 ">Fees in GH¢.</p>
+            <p className="text-1xl font-bold text-gray-800">GH¢ {practitioner.fee}</p>
+          </div>
         </div>
-
         {/*  <!-- Details Section --> */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-sm">
           {/*  <!-- Location --> */}
@@ -42,30 +47,30 @@ const Card: React.FC<CardProp> = ({ practitioner }) => {
             <p><span className="font-semibold">Experience:</span> {practitioner.year_of_experience}  Years</p>
           </div>
 
-    
+
           {/*  <!-- Availability --> */}
           <div className="flex items-start gap-2">
             <span className="text-purple-500">📅</span>
-            <p className="capitalize"><span className="font-semibold ">Availability:</span> {practitioner.availability.toString()}</p>
+            <p className="capitalize"><span className="font-semibold ">Availability:</span> {practitioner.availability?.toString()}</p>
           </div>
 
           {/*  <!-- Appointment Options --> */}
           <div className="flex items-center gap-2">
             <span className="text-yellow-500">🕒</span>
-            <p className="capitalize"><span className="font-semibold ">Appointment:</span>{practitioner.appointment_type.toString()}</p>
+            <p className="capitalize"><span className="font-semibold ">Appointment:</span>{practitioner.appointment_type?.toString()}</p>
           </div>
 
         </div>
         <div className="grid grid-cols-1  gap-4 mt-6 text-gray-700 text-sm">
-        {/*  <!-- Specialisations --> */}
-        <div className="flex items-start gap-2">
-          <span className="text-red-500">🩺</span>
-          <p>
-            <span className="font-semibold">Specialisations:</span>
-            {practitioner.specialisations.map((spec) => (
-              <span key={spec.specialisationId} className="inline-block bg-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs mr-1">{spec.name !=='' ? spec.name : 'General Doctor'}</span>
-            ))}
-          </p>
+          {/*  <!-- Specialisations --> */}
+          <div className="flex items-start gap-2">
+            <span className="text-red-500">🩺</span>
+            <p>
+              <span className="font-semibold">Specialisations:</span>
+              {practitioner.specialisations?.map((spec) => (
+                <span key={spec.specialisationId} className="inline-block bg-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs mr-1">{spec.name !== '' ? spec.name : 'General Doctor'}</span>
+              ))} 
+            </p>
           </div>
         </div>
         {/*  <!-- Footer (CTA Buttons) --> */}
