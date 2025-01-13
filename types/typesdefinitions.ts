@@ -125,3 +125,7 @@ export interface SpecialisationsResponse {
   success: true;
   data: SpecialisationsProps[];
 }
+export interface FilteredPractitionersResponse {
+  success: true;
+  data: FilteredPractitioners;
+}

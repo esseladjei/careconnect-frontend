@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from 'next/headers';
-import { FilteredPractitioners,LocationSuggestionsResponse, ErrorProps, SpecialisationsResponse } from '../../types/typesdefinitions';
+import {LocationSuggestionsResponse, ErrorProps, SpecialisationsResponse, FilteredPractitionersResponse } from '../../types/typesdefinitions';
 export default async function getToken() { 
   const cookieStore = await cookies()
   const token = cookieStore.get('token')?.value;
@@ -51,7 +51,7 @@ export const fetchSuggestions = async (queriesObject:  Record<string, any>, toke
     return { success: false, error: errorMessage };
   }
 };
-export const fetchPractitioners = async (queriesObject: Record<string, any>, token: string | undefined): Promise<FilteredPractitioners | ErrorProps> => {
+export const fetchPractitioners = async (queriesObject: Record<string, any>, token: string | undefined): Promise<FilteredPractitionersResponse | ErrorProps> => {
   try {
     // Replace with your actual API endpoint
     const queryString = await generateQueryString(queriesObject)
@@ -69,7 +69,7 @@ export const fetchPractitioners = async (queriesObject: Record<string, any>, tok
       return { success: false, error: `Fetching practitioner failed, ${message}` };
     }
     const data = await response.json();
-    return data.careconnect;
+    return { success: true, data: data.careconnect };
   } catch (error:any) {
     const errorMessage = error.message || "An unexpected error occurred.";
     console.error(errorMessage);

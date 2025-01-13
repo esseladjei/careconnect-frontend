@@ -3,13 +3,14 @@ import Card from '@/components/Cards';
 import FilterBox from '@/components/Filter';
 import SearchBar from '@/components/SearchBar';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { fetchPractitioners } from '@/actions/fetch';
 import { HandleFilterParams, FilteredPractitioners } from '../../../types/typesdefinitions';
 import NoResultsCard from '@/components/NoResultsCard';
 
 function FindPage() {
-  const [results, setResults] = useState<FilteredPractitioners | undefined>({
+  const [results, setResults] = useState<FilteredPractitioners>({
     data: [],
     total: 0,
     page: 1,
@@ -25,25 +26,41 @@ function FindPage() {
   useEffect(() => {
     (async () => {
       const practitioners = await fetchPractitioners(defaultFilters, token);
-      setResults(practitioners)
+      if (practitioners.success) {
+        setResults(practitioners.data)
+      } else {
+        toast.error(practitioners.error);
+      }
     })();
   }, [token, defaultFilters])
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query) return;
     const practitioners = await fetchPractitioners({ location: query, ...defaultFilters }, token);
-    setResults(practitioners);
+    if (practitioners.success) {
+      setResults(practitioners.data)
+    } else {
+      toast.error(practitioners.error);
+    }
   }, [token, defaultFilters]);
 
   const handleFilter = useCallback(async (filters: HandleFilterParams) => {
     const practitioners = await fetchPractitioners(filters, token);
-    setResults(practitioners);
+    if (practitioners.success) {
+      setResults(practitioners.data)
+    } else {
+      toast.error(practitioners.error);
+    }
   }, [token]);
 
   const handleFind = useCallback(async (queries: Record<string, any>) => {
     if (!queries) return;
     const practitioners = await fetchPractitioners(queries, token);
-    setResults(practitioners)
+    if (practitioners.success) {
+      setResults(practitioners.data)
+    } else {
+      toast.error(practitioners.error);
+    }
   }, [token]);
 
 
