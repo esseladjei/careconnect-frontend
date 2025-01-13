@@ -49,11 +49,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFind }) => {
     onSearch(location);
 
   };
-  const handleFind = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFind = () => {
     const queries = {
       location: query,
       availability: 'video',
-      
     }
     onFind(queries);
   };
