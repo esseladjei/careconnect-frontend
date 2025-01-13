@@ -1,7 +1,6 @@
 'use server'
 import { cookies } from 'next/headers';
-import handleError from './handleError';
-import { FilteredPractitioners, SpecialisationsProps } from '../../types/typesdefinitions';
+import { FilteredPractitioners,LocationSuggestionsResponse, ErrorProps, SpecialisationsResponse } from '../../types/typesdefinitions';
 export default async function getToken() { 
   const cookieStore = await cookies()
   const token = cookieStore.get('token')?.value;
@@ -28,7 +27,7 @@ export const  generateQueryString = async (params: Record<string, any>):Promise<
       }).join('&')     
   );
 }
-export const fetchSuggestions = async (queriesObject:  Record<string, any>, token: string | undefined):Promise<string |undefined> => {
+export const fetchSuggestions = async (queriesObject:  Record<string, any>, token: string | undefined):Promise<LocationSuggestionsResponse | ErrorProps> => {
   try {
     const filterQuery = await generateQueryString(queriesObject);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/practitionerlocations${filterQuery}`, {
@@ -40,17 +39,19 @@ export const fetchSuggestions = async (queriesObject:  Record<string, any>, toke
     });
     if (!response.ok) {
       const failedResponse = await response.json();
-      const { message } = failedResponse.careconnect
+      const { message } = failedResponse.careconnect;
       console.error(message)
-      throw new Error(`Fetching location suggestions failed, ${message}`);
+      return { success: false, error: `Fetching suggestions failed, ${message}` };
     }
     const data = await response.json();
-    return data.careconnect;
-  } catch (error) {
-    handleError(error);
+    return { success: true, data: data.careconnect };
+  } catch (error:any) {
+    const errorMessage = error.message || "An unexpected error occurred.";
+    console.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
-export const fetchPractitioners = async (queriesObject: Record<string, any>, token: string | undefined): Promise<FilteredPractitioners | undefined> => {
+export const fetchPractitioners = async (queriesObject: Record<string, any>, token: string | undefined): Promise<FilteredPractitioners | ErrorProps> => {
   try {
     // Replace with your actual API endpoint
     const queryString = await generateQueryString(queriesObject)
@@ -65,16 +66,18 @@ export const fetchPractitioners = async (queriesObject: Record<string, any>, tok
       const failedResponse = await response.json();
       const { message } = failedResponse.careconnect
       console.error(message)
-      throw new Error(`Fetching practitioner failed, ${message}`);
+      return { success: false, error: `Fetching practitioner failed, ${message}` };
     }
     const data = await response.json();
     return data.careconnect;
-  } catch (error) {
-     handleError(error);
+  } catch (error:any) {
+    const errorMessage = error.message || "An unexpected error occurred.";
+    console.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 
 }
-export const fetchSpecialisations = async (token:string |undefined):Promise<SpecialisationsProps[] | undefined> => {
+export const fetchSpecialisations = async (token:string |undefined):Promise<SpecialisationsResponse | ErrorProps> => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/specialisations`, {
       headers: {
@@ -86,12 +89,14 @@ export const fetchSpecialisations = async (token:string |undefined):Promise<Spec
       const failedResponse = await response.json();
       const { message } = failedResponse.careconnect
       console.error(message)
-      throw new Error(`Fetching specialisations failed, ${message}`);
+      return { success: false, error: `Fetching specialisations failed, ${message}` };
     }
     const data = await response.json();
-    return data.careconnect;
-  } catch (error) {
-    handleError(error)
+     return { success: true, data: data.careconnect };
+  }  catch (error:any) {
+    const errorMessage = error.message || "An unexpected error occurred.";
+    console.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 }
 

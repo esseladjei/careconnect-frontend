@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { FilterBoxProps, FiltersProps, SpecialisationsProps } from '../../types/typesdefinitions';
 import { fetchSpecialisations } from '@/actions/fetch';
+import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 
 const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
@@ -57,8 +58,12 @@ const FilterBox: React.FC<FilterBoxProps> = ({ onFilter }) => {
     (async () => {
       setLoading(true);
       try {
-        const specs = await fetchSpecialisations(token);
-        setSpecialisations(specs);
+        const specialisationsResponse = await fetchSpecialisations(token);
+        if (specialisationsResponse.success) {
+          setSpecialisations(specialisationsResponse.data);
+        } else {
+          toast.error(specialisationsResponse.error);
+        }
       } catch (error) {
         console.error('Failed to fetch specialisations:', error);
       } finally {

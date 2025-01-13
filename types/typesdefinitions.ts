@@ -107,3 +107,21 @@ export interface FiltersProps {
 export interface FilterBoxProps {
   onFilter: (filter: FiltersProps) => void;
 }
+
+export interface LocationSuggestions {
+  location: string;
+}
+
+export interface ErrorProps {
+  success: false;
+  error: string;
+}
+
+export interface LocationSuggestionsResponse {
+  success: true;
+  data: LocationSuggestions[];
+}
+export interface SpecialisationsResponse {
+  success: true;
+  data: SpecialisationsProps[];
+}

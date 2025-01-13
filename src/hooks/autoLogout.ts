@@ -12,10 +12,8 @@ const useAutoLogout = () => {
   }, [router]);
 
   const handleSessionWarning = useCallback((remainingTime: number) => {
-    const convertToTime = (time: number) => {
-      return new Date(time).toISOString().substring(11, 8);
-    }
-    toast.warning(`Your session is about to expire in ${convertToTime(remainingTime)} minute. Please save your work!`);
+    const minutes = Math.floor(remainingTime / 60000);
+    toast.warning(`Your session is about to expire in ${minutes} minute. Please save your work!`);
   }, []);
 
   

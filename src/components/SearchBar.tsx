@@ -1,14 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 import { fetchSuggestions } from '@/actions/fetch';
+import { LocationSuggestions } from '../../types/typesdefinitions';
 interface SearchBarProps {
   onFind: (query: Record<string, any>) => void; // Callback for search query
   onSearch: (query: string) => void; // Callback for search query
 }
-interface LocationSuggestions {
-  location: string
-}
+
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFind }) => {
   const [query, setQuery] = useState<string>("");
   const [suggestions, setSuggestions] = useState<LocationSuggestions[]>([]);
@@ -28,10 +28,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFind }) => {
     }
     (async () => {
       const queryObject = {
-        location:query
+        location: query
       }
-      const suggestionsReponse = await fetchSuggestions(queryObject, token);
-      setSuggestions(suggestionsReponse);
+      const suggestionsResponse = await fetchSuggestions(queryObject, token);
+      if (suggestionsResponse.success) {
+        setSuggestions(suggestionsResponse.data);
+      } else {
+        toast.error(suggestionsResponse.error);
+      }
     })();
 
   }, [token, query]);
