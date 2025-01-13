@@ -1,25 +1,59 @@
-import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+'use client';
+import React, { useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import DropDown from './Dropdown';
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from 'next/navigation';
+import { getItem, removeFromLocalStorage } from '@/actions/localStorage';
+import { AuthState } from '../../types/typesdefinitions';
+
 function Header() {
+  const { authState, setAuthState } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    const persistedUser = getItem<AuthState>('authstate');
+    if (!persistedUser) {
+      router.push("/"); // Redirect if no authState
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    setAuthState(null); // Clears state
+    removeFromLocalStorage('authstate');
+    document.cookie = "token=; path=/; domain=example.com; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+    router.push("/");
+  };
+
   return (
-    <header>
-      <nav className="relative container mx-auto p-6">
+    <header className="shadow-xl">
+      <nav className="relative container mx-auto p-4">
         {/* <!-- Flex container --> */}
         <div className="flex items-center justify-between">
-          {/*    <!--Logo --> */}
+          {/*  <!--Logo --> */}
           <div className="pt-2">
-            <Image src="/images/logo.png" className="w-full h-auto" width="0" height="0" sizes="5vw"  alt="logo" priority />
+            <Image src="/images/logo.png" className="w-full h-10" width="0" height="0" sizes="5vw" alt="logo" priority />
           </div>
           {/*  <!--Menu Items--> */}
-          <div className="hidden md:flex space-x-6">          
-            <Link href="/dashboard" className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">Dashboard</Link>
-            <Link href="/client" className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">Client</Link>
-            <Link href="/practitioner" className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">Practitioner</Link>
-            <Link href="/aboutus" className="p-3 rounded-md w-auto flex items-center hover:text-blue-600 hover:bg-blue-100">About Us</Link>
+          <div className="hidden md:flex space-x-6">
+            {authState && (
+              <>
+                <Link href={`/dashboard`} className="p-2 rounded-md w-auto gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600">
+                  <span className="ti-dashboard text-xl"></span>
+                  <span> Dashboard</span>
+                </Link>
+                <Link href={`/findpractitioner`} className="p-2 rounded-md w-auto  gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600" title="Find a doctor">
+                  <span className='ti-support'></span>
+                  <span>Find a practitioner</span>
+                </Link>
+              </>
+            )}
+            <Link href="/aboutus" className="p-2 rounded-md w-auto  gap-2 flex items-center hover:bg-gray-200 hover:text-gray-600">
+              <span className='ti-help-alt'></span>
+              <span>About Us</span>
+            </Link>
+            {authState && (<DropDown onLogout={handleLogout} user={authState} />)}
           </div>
-          {/*  <!-- Button --> */}
-          <Link href="" className="hidden md:block p-3 px-6-pt-2 text-white bg-brightRed rounded-full baseline hover:bg-brightRedLight">Sign Up</Link>
         </div>
       </nav>
     </header>

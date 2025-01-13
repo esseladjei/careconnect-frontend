@@ -1,54 +1,88 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { SignUpType } from '../../types/typesdefinitions';
+import { useAuth } from "@/context/AuthContext";
+import { SignUpType, FormData } from '../../types/typesdefinitions';
 import SignUpMessage from './SignUpMessage';
+import { signUp } from '@/actions/authentication';
+import { useRouter } from 'next/navigation';
+import { formSchema } from '../actions/validation';
+
 const SignUp: React.FC = () => {
-  const router = useRouter();
   const userData = {
     firstname: '',
     lastname: '',
     email: '',
     password: '',
-    termsconsent: 1,
-    appupdatesconsent: 0
+    appUpdatesConsent: 0,
+    accountOption: 'client'
   }
   const [signUpData, setSignUpData] = useState<SignUpType>(userData);
-  const [status, setStatus] = useState<string | null>(null);
   const [verifyPassword, setVerifyPassword] = useState<string>('');
-  const handleSignUp = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setStatus(null);
+  const [formErrors, setFormErrors] = useState<Partial<FormData>| any>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const { setAuthState } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Validate form data using Zod schema
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signUpData),
-      });
+      const validatedFields = formSchema.safeParse({
+        firstname: signUpData.firstname,
+        lastname: signUpData.lastname,
+        email: signUpData.email,
+        password: signUpData.password,
+        confirmPassword: verifyPassword
 
-      if (!res.ok) {
-        console.log(res)
-        throw new Error("Signup failed");
+      })
+      // If any form fields are invalid, return early
+      if (!validatedFields.success) {
+        const errors: Partial<FormData> = {
+          errors: validatedFields.error.flatten().fieldErrors
+        };
+        setFormErrors((prevError:  Partial<FormData>) => ({
+          ...prevError,
+          ...errors
+        })); // Show validation errors
+        setIsSubmitting(false); // Reset submission state
+        return; // Exit early if validation fails
       }
-      setStatus("Success! Account created successfully");
-      const createdAccount = await res.json();
-      router.push(`/dashboard/${createdAccount.id}`)
-    } catch (error: unknown) {
-      setStatus(`Error: ${error}`);
-    }
 
+      setFormErrors({}); // Clear errors if valid
+      // Handle successful submission
+      const signUpUser = await signUp(signUpData);
+      const { role, token, id } = signUpUser;;
+      setAuthState(signUpUser);
+      document.cookie = `token=${token};  path=/;  samesite=strict`
+      setIsSubmitting(false); // Reset submission state
+      // 5. Redirect user
+      router.push(`/profile/${role}/${id}`);
+
+    } catch (error: unknown) {
+      throw new Error(`${error}`);
+    }
   }
   const handleVerifyPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setVerifyPassword(value);
   }
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    setSignUpData({ ...signUpData, [id]: value });
+    const { name, value, type, checked } = event.target;
+    setFormErrors((prevState: Partial<FormData>) => ({
+      ...prevState,
+      errors: {
+        [name]: null
+      }
+    }))
+    setSignUpData((prevState) => ({
+      ...prevState,
+      [name]: type === 'checkbox' ? (checked ? 1 : 0) : value,
+    }));
+
   }
 
   return (
@@ -83,7 +117,7 @@ const SignUp: React.FC = () => {
                 />
               </div>
 
-              <form action="#" className="mt-8 grid grid-cols-6 gap-6" onSubmit={handleSignUp}>
+              <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <label htmlFor="firstname" className="block text-sm font-medium text-gray-700">
                     First Name
@@ -97,6 +131,7 @@ const SignUp: React.FC = () => {
                     value={signUpData?.firstname || ''}
                     onChange={handleChange}
                   />
+                  {formErrors?.errors?.firstname && <p className="text-red-500">{formErrors.errors.firstname}</p>}
                 </div>
 
                 <div className="col-span-6 sm:col-span-3">
@@ -112,6 +147,7 @@ const SignUp: React.FC = () => {
                     value={signUpData?.lastname || ''}
                     onChange={handleChange}
                   />
+                  {formErrors?.errors?.lastname && <p className="text-red-500">{formErrors.errors.lastname}</p>}
                 </div>
 
                 <div className="col-span-6">
@@ -125,6 +161,7 @@ const SignUp: React.FC = () => {
                     value={signUpData?.email || ''}
                     onChange={handleChange}
                   />
+                  {formErrors?.errors?.email && <p className="text-red-500">{formErrors.errors.email}</p>}
                 </div>
 
                 <div className="col-span-6 sm:col-span-3">
@@ -138,31 +175,89 @@ const SignUp: React.FC = () => {
                     value={signUpData?.password || ''}
                     onChange={handleChange}
                   />
+                  {formErrors?.errors?.password && (
+                    <div>
+                      <p>Password must:</p>
+                      <ul>
+                        {formErrors.errors.password.map((error:any) => (
+                          <li key={error} className="text-red-500">- {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 <div className="col-span-6 sm:col-span-3">
-                  <label htmlFor="passwordconfirmation" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                     Password Confirmation
                   </label>
 
                   <input
                     type="password"
-                    id="passwordconfirmation"
-                    name="passwordconfirmation"
+                    id="confirmPassword"
+                    name="confirmPassword"
                     className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                     value={verifyPassword || ''}
                     onChange={handleVerifyPasswordChange}
                   />
+                  {formErrors?.errors?.confirmPassword && (
+                    <div>
+                      <p>Password must:</p>
+                      <ul>
+                        {formErrors.errors.confirmPassword.map((error: any) => (
+                          <li key={error} className="text-red-500">- {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="col-span-3">
+                  <label htmlFor="client"
+                    className="flex cursor-pointer justify-between gap-4 rounded-lg border border-gray-100 bg-white p-4 text-sm font-medium shadow-sm hover:border-gray-200 has-[:checked]:border-blue-500 has-[:checked]:ring-1 has-[:checked]:ring-blue-500">
+                    <div>
+                      <p className="text-gray-700">Client</p>
+                      <p className="mt-1 text-gray-900">eg:(Patient)</p>
+                    </div>
+                    <input
+                      id="client"
+                      name="accountOption"
+                      type="radio"
+                      value="client"
+                      className="size-5 border-gray-300 text-blue-500"
+                      checked={signUpData?.accountOption === 'client'}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+                <div className="col-span-3">
+                  <label
+                    htmlFor="practitioner"
+                    className="flex cursor-pointer justify-between gap-4 rounded-lg border border-gray-100 bg-white p-4 text-sm font-medium shadow-sm hover:border-gray-200 has-[:checked]:border-blue-500 has-[:checked]:ring-1 has-[:checked]:ring-blue-500">
+                    <div>
+                      <p className="text-gray-700">Practitioner</p>
+                      <p className="mt-1 text-gray-900">eg: (Doctor, Nurse etc)</p>
+                    </div>
+                    <input
+                      id="practitioner"
+                      name="accountOption"
+                      type="radio"
+                      className="size-5 border-gray-300 text-blue-500"
+                      value="practitioner"
+                      checked={signUpData?.accountOption === 'practitioner'}
+                      onChange={handleChange}
+                    />
+                  </label>
                 </div>
 
                 <div className="col-span-6">
-                  <label htmlFor="MarketingAccept" className="flex gap-4">
+                  <label htmlFor="appUpdatesConsent" className="flex gap-4">
                     <input
                       type="checkbox"
-                      id="appupdatesconsent"
-                      name="appupdatesconsent"
+                      id="appUpdatesConsent"
+                      name="appUpdatesConsent"
                       className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
-                      value={signUpData?.appupdatesconsent || ''}
+                      checked={!!signUpData?.appUpdatesConsent}
                       onChange={handleChange}
                     />
 
@@ -184,7 +279,10 @@ const SignUp: React.FC = () => {
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                   <button className="inline-block shrink-0 rounded-md border border-blue-600
                    bg-blue-600  px-12 py-3 text-sm font-medium text-white transition w-full md:w-auto
-                    hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500" >
+                    hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                     disabled={isSubmitting}
+                    type="submit"
+                  >
                     Create an account
                   </button>
 
@@ -193,7 +291,6 @@ const SignUp: React.FC = () => {
                     <Link href="/" className="text-gray-700 underline">Log in</Link>.
                   </p>
                 </div>
-                {status && <p className='col-span-6'>{status}</p>}
               </form>
             </div>
           </main>
