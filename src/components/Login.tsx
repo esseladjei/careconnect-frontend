@@ -1,16 +1,16 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { setItem } from '@/utils/localStorage';
+import { setItem } from '@/actions/localStorage';
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
   const { setAuthState } = useAuth();
   const router = useRouter();
-  const [status, setStatus] = useState<string | null>(null);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>('kofi@gmail.com');
+  const [password, setPassword] = useState<string>('Kofi1234$');
 
   const handleEmailTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -22,7 +22,6 @@ const Login: React.FC = () => {
   }
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus(null);
     const formData = {
       email,
       password
@@ -38,9 +37,9 @@ const Login: React.FC = () => {
 
       if (!response.ok) {
         const failedResponse = await response.json();
-        throw new Error(`Login failed, ${failedResponse.careconnect.message}`);
+        return toast.error(`Login failed, ${failedResponse.careconnect.message}`);
       }
-      setStatus("Success! Login successfull");
+      toast.success("Success! Login successfull");
       const { careconnect } = await response.json();
       const { token } = careconnect;
       setItem('authstate', careconnect);
@@ -48,7 +47,11 @@ const Login: React.FC = () => {
       document.cookie = `token=${token};  path=/; samesite=strict`
       router.push(`/dashboard`)
     } catch (error: unknown) {
-      setStatus(`${error}`);
+      if (error instanceof Error) {
+        toast.error(`${error.message}`);
+      } else {
+        toast.error('An unknown error occurred.');
+      }
     }
   };
   return (
@@ -167,7 +170,6 @@ const Login: React.FC = () => {
                 Sign in
               </button>
             </div>
-            {status && <p className="text-red-500">{status}</p>}
           </form>
         </div>
       </div>

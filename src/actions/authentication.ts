@@ -1,4 +1,5 @@
 import { SignUpType } from '../../types/typesdefinitions';
+import { redirect } from 'next/navigation';
 export async function signUp(formData: SignUpType) {
 
   // Call the provider to create a user...
@@ -19,5 +20,5 @@ export async function signUp(formData: SignUpType) {
 }
 export async function logout() {
   localStorage.removeItem('user')
- // redirect('/login')
+   redirect('/login')
 }

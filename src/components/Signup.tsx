@@ -7,7 +7,7 @@ import { SignUpType, FormData } from '../../types/typesdefinitions';
 import SignUpMessage from './SignUpMessage';
 import { signUp } from '@/actions/authentication';
 import { useRouter } from 'next/navigation';
-import { formSchema } from '@/actions/validation';
+import { formSchema } from '../actions/validation';
 
 const SignUp: React.FC = () => {
   const userData = {
