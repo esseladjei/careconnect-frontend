@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import { fetchSuggestions } from '@/actions/fetch';
 import { LocationSuggestions } from '../../types/typesdefinitions';
+import SearchButton from './SearchButton';
 interface SearchBarProps {
   onFind: (query: Record<string, any>) => void; // Callback for search query
   onSearch: (query: string) => void; // Callback for search query
@@ -111,12 +112,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFind }) => {
         </div>
       </div>
       <div className='w-full'>
-        <button
-          onClick={handleFind}
-          className="flex gap-2 items-center w-full bg-blue-500 text-white text-sm font-medium py-2.5 px-2.5 rounded-lg hover:bg-blue-600 transition">
-          <span className='ti ti-search'></span>
-          <span title='eg.(doctor, nurse e.t.c)'>Find practitioner</span>
-        </button>
+        <SearchButton onClick={handleFind} lable='Find practitioner'/>
       </div>
     </>
   )
