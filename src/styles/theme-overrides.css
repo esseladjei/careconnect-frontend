@@ -1,0 +1,21 @@
+/* Keep this small — only non-utility component rules you rely on */
+
+.card {
+  border-radius: 7px;
+  background-color: #fff;
+  box-shadow: 0 12px 24px rgba(145,158,171,0.12);
+}
+.btn {
+  border-radius: 7px;
+  background-color: #5D87FF;
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
+.radial-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background: radial-gradient(rgb(210,241,223), rgb(211,215,250), rgb(186,216,244));
+  pointer-events: none;
+}
