@@ -1,29 +1,39 @@
 import React from 'react';
+import type { FilterParams } from '../types/search.ts';
 
-interface SidebarFilterProps {
-  mockResults: any[];
+interface Props {
+    filters: FilterParams;
+    resultsCount: number;
+    location: string;
+    onChange: (filters: FilterParams) => void;
 }
 
-const SideBarFilter: React.FC<SidebarFilterProps> = ({ mockResults }) => {
-  // Mock data for filters
-  const specialisations = ['Cardiology', 'Dermatology', 'Neurology', 'Orthopedics'];
-  const appointmentTypes = ['In-person', 'Video Call'];
+const SideBarFilter: React.FC<Props> = ({  filters, resultsCount, location, onChange,}) => {
+    const toggleSpec = (spec: string) => {
+        onChange({
+            ...filters,
+            specializations: filters.specializations.includes(spec)
+                ? filters.specializations.filter((s) => s !== spec)
+                : [...filters.specializations, spec],
+        });
+    };
+
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg h-full sticky top-4">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Refine Results</h3>
-           <h3 className="text-2xl font-bold text-gray-800 mb-6">
-              Showing {mockResults.length} Results in London
+      <h3 className="text-2xl font-bold text-gray-800 mb-6">Showing {resultsCount} Results in {location || 'all locations'}
             </h3>
       {/* --- Checkbox Filter: Health Specialisation --- */}
       <div className="mb-8 pb-4 border-b border-gray-200">
         <h4 className="text-lg font-semibold text-gray-800 mb-3">Specialisation</h4>
         <div className="space-y-2">
-          {specialisations.map((spec) => (
+          {['Cardiology', 'Dermatology', 'Neurology'].map((spec) => (
             <div key={spec} className="flex items-center">
               <input
                 id={`check-${spec}`}
                 type="checkbox"
+                checked={filters.specializations.includes(spec)}
+                onChange={() => toggleSpec(spec)}
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <label htmlFor={`check-${spec}`} className="ml-3 text-sm text-gray-700">
@@ -38,12 +48,16 @@ const SideBarFilter: React.FC<SidebarFilterProps> = ({ mockResults }) => {
       <div className="mb-8 pb-4 border-b border-gray-200">
         <h4 className="text-lg font-semibold text-gray-800 mb-3">Type of Appointment</h4>
         <div className="space-y-2">
-          {appointmentTypes.map((type) => (
+          {['In-person', 'Video Call'].map((type) => (
             <div key={type} className="flex items-center">
               <input
                 id={`radio-${type}`}
                 name="appointment-type"
                 type="radio"
+                checked={filters.appointmentType === type}
+                onChange={() =>
+                    onChange({ ...filters, appointmentType: type as any })
+                }
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
               />
               <label htmlFor={`radio-${type}`} className="ml-3 text-sm text-gray-700">
@@ -57,7 +71,7 @@ const SideBarFilter: React.FC<SidebarFilterProps> = ({ mockResults }) => {
       {/* --- Price Range Filter (Consultation Fee) --- */}
       <div className="mb-6">
         <h4 className="text-lg font-semibold text-gray-800 mb-3">Consultation Fee (USD)</h4>
-        
+
         {/* Price Range Inputs */}
         <div className="flex justify-between items-center space-x-4">
           <div>
@@ -68,6 +82,8 @@ const SideBarFilter: React.FC<SidebarFilterProps> = ({ mockResults }) => {
               type="number"
               id="min-price"
               placeholder="$50"
+              value={filters.minPrice}
+              onChange={(e) => onChange({...filters, minPrice: e.target.value as any})}
               className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500"
             />
           </div>
@@ -80,20 +96,15 @@ const SideBarFilter: React.FC<SidebarFilterProps> = ({ mockResults }) => {
               type="number"
               id="max-price"
               placeholder="$200"
+              value={filters.maxPrice}
+              onChange={(e) => onChange({...filters, maxPrice: e.target.value as any})}
               className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500"
             />
           </div>
         </div>
 
       </div>
-      
-      {/* Apply Filters Button */}
-      <button
-        type="button"
-        className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-md focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      >
-        Apply Filters
-      </button>
+
 
     </div>
   );
