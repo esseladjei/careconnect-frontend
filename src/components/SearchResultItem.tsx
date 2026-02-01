@@ -10,7 +10,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
   const navigate = useNavigate();
 
   const handleSlotClick = (slot: SearchResult['slots'][0]) => {
-    navigate(`/offerdetails/${result.provider._id}`, { state: { selectedSlot: slot } });
+    navigate(`/offerdetails/${result.provider._id}`, {
+      state: { selectedSlot: slot },
+    });
   };
 
   return (
@@ -25,6 +27,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
         </div>
         <div className="text-right">
           <h3 className="text-lg font-semibold text-gray-900 leading-tight">
+            {result.provider.userId.title} {result.provider.userId.firstname}{' '}
             {result.provider.userId.lastname}
           </h3>
 

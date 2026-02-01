@@ -13,17 +13,24 @@ const SearchPage: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
 
+  // Helper function to format date as DD-MM-YYYY
+  const getFormattedDate = (daysOffset: number = 0): string => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysOffset);
+    return date.toISOString().split('T')[0];
+  };
+
   const [query, setQuery] = useState<SearchQuery>({
     search: {
-      startDate: '',
-      endDate: '',
+      startDate: getFormattedDate(0), // Today
+      endDate: getFormattedDate(7), // 7 days from today
       location: '',
     },
     filters: {
       specializations: [],
       appointmentType: 'In-person',
       minPrice: 50,
-      maxPrice: 100,
+      maxPrice: 500,
     },
   });
 

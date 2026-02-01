@@ -24,6 +24,7 @@ export interface SearchResult {
       _id: string;
       email: string;
       role: string;
+      title: string;
       firstname: string;
       lastname: string;
     };
