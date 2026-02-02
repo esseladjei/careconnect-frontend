@@ -1,11 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { UserPassword } from '../types/user.ts';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
 interface SecuritySettingsProps {
   onChange: (field: keyof UserPassword, value: string) => void;
   onPasswordSave: () => void;
   savePasswordStatus: boolean;
 }
+
+interface PasswordInputProps {
+  id: string;
+  label: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+}
+
+// Reusable Password Input Component with visibility toggle
+const PasswordInput: React.FC<PasswordInputProps> = ({
+  id,
+  label,
+  onChange,
+  required = true,
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+      <div className="relative mt-1">
+        <input
+          type={showPassword ? 'text' : 'password'}
+          id={id}
+          onChange={(e) => onChange(e.target.value)}
+          required={required}
+          className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          {showPassword ? (
+            <EyeSlashIcon className="h-5 w-5" />
+          ) : (
+            <EyeIcon className="h-5 w-5" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // --- Sub-Component: Security Settings Form ---
 const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   onChange,
@@ -28,54 +75,24 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
           onSubmit={handlePasswordChangeSubmit}
           className="space-y-4 max-w-lg"
         >
-          <div>
-            <label
-              htmlFor="current-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Current Password
-            </label>
-            <input
-              type="password"
-              id="current-password"
-              name="password"
-              onChange={(e) => onChange('oldPassword', e.target.value)}
-              required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="new-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              New Password
-            </label>
-            <input
-              type="password"
-              id="newpassword"
-              name="newPassword"
-              onChange={(e) => onChange('newPassword', e.target.value)}
-              required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="confirm-new-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              id="confirm-new-password"
-              name="confirmNewPassword"
-              onChange={(e) => onChange('confirmNewPassword', e.target.value)}
-              required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
-            />
-          </div>
+          <PasswordInput
+            id="current-password"
+            label="Current Password"
+            onChange={(value) => onChange('oldPassword', value)}
+            required
+          />
+          <PasswordInput
+            id="new-password"
+            label="New Password"
+            onChange={(value) => onChange('newPassword', value)}
+            required
+          />
+          <PasswordInput
+            id="confirm-new-password"
+            label="Confirm New Password"
+            onChange={(value) => onChange('confirmNewPassword', value)}
+            required
+          />
           <button
             type="submit"
             disabled={savePasswordStatus}
