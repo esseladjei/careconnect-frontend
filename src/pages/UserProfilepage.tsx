@@ -22,6 +22,12 @@ const UserProfilePage: React.FC = () => {
     email: '',
     phone: '',
     location: '',
+    bio: '',
+    gender: '',
+    role: '',
+    dateOfBirth: new Date(),
+    languages: [],
+    address: '',
     createdAt: undefined,
   });
   const { userId } = useAuth();
@@ -33,7 +39,7 @@ const UserProfilePage: React.FC = () => {
     oldPassword: '',
   });
 
-  const handleChange = (field: keyof User, value: string) => {
+  const handleChange = (field: keyof User, value: string | string[]) => {
     setUser((prev) => ({
       ...prev,
       [field]: value,
@@ -73,6 +79,7 @@ const UserProfilePage: React.FC = () => {
   const saveUser = async () => {
     if (!userId) return;
 
+    console.log('Saving user data:', user); // Debug log
     const savingToast = toast.loading('Saving profile…');
     try {
       await axiosClient.patch(`/users/update/${userId}`, user);

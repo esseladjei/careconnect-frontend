@@ -5,6 +5,12 @@ export interface User {
   email?: string;
   phone?: string;
   location?: string;
+  bio?: string;
+  gender?: string;
+  role?: string;
+  dateOfBirth: Date;
+  languages?: string[];
+  address?: string;
   createdAt?: Date;
 }
 
