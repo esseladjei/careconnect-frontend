@@ -7,3 +7,9 @@ export interface User {
   location?: string;
   createdAt?: Date;
 }
+
+export interface UserPassword {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}

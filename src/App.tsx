@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/RegisterUser';
+import Logout from './pages/Logout';
 import Doctors from './pages/Doctors';
 //import BookAppointment from './pages/BookAppointment';
 import Dashboard from './pages/Dashboard';
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="/findprovider" element={<SearchPage />} />
         <Route
           path="/dashboard/:id"

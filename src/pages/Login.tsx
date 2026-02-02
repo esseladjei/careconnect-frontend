@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('micheal.oppong@gmail.com');
@@ -14,7 +15,7 @@ const Login = () => {
       localStorage.setItem('userId', res.data.user._id);
       navigate(`/dashboard/${res.data.user._id}`);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Login failed');
+      toast.error(err.response?.data?.message || 'Login failed');
     }
   };
 
