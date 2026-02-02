@@ -4,10 +4,12 @@ import ProfileDetailsForm from '../components/ProfileDetailsForms';
 import SecuritySettings from '../components/SecuritySettings';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import type { User } from '../types/user.ts';
+import type { User, UserPassword } from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
+
 type SaveStatus = boolean;
+type savePasswordStatus = boolean;
 
 // --- Main Component ---
 const UserProfilePage: React.FC = () => {
@@ -20,21 +22,64 @@ const UserProfilePage: React.FC = () => {
     email: '',
     phone: '',
     location: '',
+    bio: '',
+    gender: '',
+    role: '',
+    dateOfBirth: new Date(),
+    languages: [],
+    address: '',
     createdAt: undefined,
   });
   const { userId } = useAuth();
+  const [savePasswordStatus, setSavePasswordStatus] =
+    useState<savePasswordStatus>(false);
+  const [userPassword, setUserPassword] = useState<UserPassword>({
+    newPassword: '',
+    confirmNewPassword: '',
+    oldPassword: '',
+  });
 
-  const handleChange = (field: keyof User, value: string) => {
+  const handleChange = (field: keyof User, value: string | string[]) => {
     setUser((prev) => ({
       ...prev,
       [field]: value,
     }));
     setSaveStatus(false);
   };
+  const handlePasswordChange = (field: keyof UserPassword, value: string) => {
+    setUserPassword((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    setSavePasswordStatus(false);
+  };
+  const savePassword = async () => {
+    if (!userId) return;
+    if (userPassword.newPassword !== userPassword.confirmNewPassword)
+      return toast.error("Passwords don't match");
+    try {
+      await axiosClient.patch(`/users/update/password/${userId}`, userPassword);
+      toast.success('Password updated successfully!');
 
+      // Reset form
+      setUserPassword({
+        newPassword: '',
+        confirmNewPassword: '',
+        oldPassword: '',
+      });
+      setSavePasswordStatus(true);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(
+        err.response?.data?.message || 'Failed to update password',
+        {}
+      );
+    }
+  };
   const saveUser = async () => {
     if (!userId) return;
 
+    console.log('Saving user data:', user); // Debug log
     const savingToast = toast.loading('Saving profile…');
     try {
       await axiosClient.patch(`/users/update/${userId}`, user);
@@ -135,7 +180,13 @@ const UserProfilePage: React.FC = () => {
                 saveStatus={saveStatus}
               />
             )}
-            {activeTab === 'security' && <SecuritySettings />}
+            {activeTab === 'security' && (
+              <SecuritySettings
+                onChange={handlePasswordChange}
+                onPasswordSave={savePassword}
+                savePasswordStatus={savePasswordStatus}
+              />
+            )}
           </div>
         </div>
       </main>
