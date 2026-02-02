@@ -34,7 +34,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
             type="text"
             id="firstName"
             name="firstName"
-            value={user.firstName}
+            value={user.firstName || ''}
             onChange={(e) => onChange('firstName', e.target.value)}
             className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
@@ -52,7 +52,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
             type="text"
             id="lastName"
             name="lastName"
-            value={user.lastName}
+            value={user.lastName || ''}
             onChange={(e) => onChange('lastName', e.target.value)}
             className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
@@ -71,7 +71,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
           type="email"
           id="email"
           name="email"
-          value={user.email}
+          value={user.email || ''}
           disabled
           className="mt-1 w-full p-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed"
         />
@@ -92,7 +92,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
           type="tel"
           id="phone"
           name="phone"
-          value={user.phone}
+          value={user.phone || ''}
           onChange={(e) => onChange('phone', e.target.value)}
           className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
         />
@@ -110,7 +110,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
           type="text"
           id="location"
           name="location"
-          value={user.location}
+          value={user.location || ''}
           onChange={(e) => onChange('location', e.target.value)}
           className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
         />
