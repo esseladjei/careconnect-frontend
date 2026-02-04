@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/RegisterUser';
@@ -15,6 +15,7 @@ import ReferralPage from './pages/ReferalPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './hooks/useAuth';
 import './App.css';
+import ProviderOnboarding from './pages/ProviderOnboarding.tsx';
 
 function App() {
   const { isLoggedIn, userId } = useAuth();
@@ -26,6 +27,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
+        <Route
+          path="/provider/onboarding/:id"
+          element={
+            isLoggedIn ? <ProviderOnboarding /> : <Navigate to="/login" />
+          }
+        />
         <Route path="/findprovider" element={<SearchPage />} />
         <Route
           path="/dashboard/:id"

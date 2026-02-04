@@ -8,7 +8,6 @@ const Navbar: React.FC = () => {
   const { userId } = useAuth();
   // Navigation Links
   const navLinks = [
-    { name: 'Become a Provider', href: '/register' },
     {
       name: 'Account',
       href: '#',
@@ -19,8 +18,9 @@ const Navbar: React.FC = () => {
         { name: 'My Dashboard', href: `/dashboard/${userId}` },
         { name: 'Find provider', href: `/findprovider` },
         { name: 'My Appointments', href: `/appointments/${userId}` },
-        { name: 'Refer a patient', href: `/referral/patient/${userId}` },
-        { name: 'Refer a provider', href: `/referral/provider/${userId}` },
+        { name: 'Verification Status', href: `/provider/onboarding/${userId}` },
+        { name: 'Refer a Patient', href: `/referral/patient/${userId}` },
+        { name: 'Refer a Provider', href: `/referral/provider/${userId}` },
         { name: 'Logout', href: '/logout' },
       ],
     },
