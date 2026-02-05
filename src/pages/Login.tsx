@@ -2,28 +2,36 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import toast from 'react-hot-toast';
+import { useMutation } from '@tanstack/react-query';
 
 const Login = () => {
   const [email, setEmail] = useState('micheal.oppong@gmail.com');
   const [password, setPassword] = useState('123456');
   const navigate = useNavigate();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      return await axiosClient.post('/auth/login', { email, password });
+    },
+    onSuccess: (data) => {
+      const { accessToken, user } = data.data;
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('userId', user.userId);
+      navigate(`/dashboard/${user.userId}`);
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || 'Login failed');
+    },
+  });
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await axiosClient.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('userId', res.data.user._id);
-      navigate(`/dashboard/${res.data.user._id}`);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-    }
+    mutation.mutate();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 p-4">
       <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-xl">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Login
+          CareConnect Login
         </h2>
 
         <form onSubmit={handleSubmit}>

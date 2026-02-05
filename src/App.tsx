@@ -16,9 +16,10 @@ import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './hooks/useAuth';
 import './App.css';
 import ProviderOnboarding from './pages/ProviderOnboarding.tsx';
+import Home from './pages/Home';
 
 function App() {
-  const { isLoggedIn, userId } = useAuth();
+  const { isLoggedIn } = useAuth();
 
   return (
     <>
@@ -33,7 +34,7 @@ function App() {
             isLoggedIn ? <ProviderOnboarding /> : <Navigate to="/login" />
           }
         />
-        <Route path="/findprovider" element={<SearchPage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route
           path="/dashboard/:id"
           element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
@@ -66,12 +67,7 @@ function App() {
           path="/referral/patient/:id"
           element={isLoggedIn ? <ReferralPage /> : <Navigate to="/login" />}
         />
-        <Route
-          path="/"
-          element={
-            <Navigate to={isLoggedIn ? `/dashboard/${userId}` : '/login'} />
-          }
-        />
+        <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>

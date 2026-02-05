@@ -1,0 +1,20 @@
+/* ...existing code... */
+
+/* App specific overrides */
+body {
+  /* keep Tailwind variables working; background can be controlled via classes */
+}
+
+.hero-cta {
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.hero-cta:active {
+  transform: translateY(1px);
+}
+
+/* Ensure anchor links used as buttons are visible on focus */
+a[role="button"]:focus {
+  outline: 3px solid rgba(255, 255, 255, 0.12);
+  outline-offset: 3px;
+}
