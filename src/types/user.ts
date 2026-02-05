@@ -4,8 +4,15 @@ export interface UserProfile {
   lastName: string;
   role: string;
   email: string;
-  password: string;
-  confirmPassword: string;
+  password?: string;
+  confirmPassword?: string;
+  phone?: string;
+  location?: string;
+  gender?: string;
+  dateOfBirth?: Date;
+  languages?: string[];
+  address?: string;
+  createdAt?: Date;
 }
 
 export interface UserPassword {
@@ -50,4 +57,9 @@ export interface RegisterResponse {
   role: Role;
   providerStatus?: 'pending' | 'verified' | 'rejected';
   message: string;
+}
+
+export interface UserResponse {
+  user: UserProfile;
+  profile: ProviderProfile | PatientProfile;
 }
