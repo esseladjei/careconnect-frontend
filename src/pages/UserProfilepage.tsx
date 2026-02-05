@@ -72,7 +72,7 @@ const UserProfilePage: React.FC = () => {
       if (userPassword.newPassword !== userPassword.confirmNewPassword)
         return toast.error("Passwords don't match");
       return axiosClient.patch(
-        `/users/updatePassword/${userId}`,
+        `/auth/update/password/${userId}`,
         userPassword,
         {
           headers: {
