@@ -8,3 +8,22 @@ export const useGetMaxDate = () => {
   );
   return maxDate.toISOString().split('T')[0];
 };
+
+export const useGetToday = () => {
+  return new Date().toISOString().split('T')[0];
+};
+
+export const useGetMonth = () => {
+  const today = new Date();
+  return new Date(today.setMonth(today.getMonth() + 3))
+    .toISOString()
+    .split('T')[0];
+};
+
+export const useGetDayMonthOnly = (dateString: string) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+  }).format(date);
+};

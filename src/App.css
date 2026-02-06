@@ -18,3 +18,148 @@ a[role="button"]:focus {
   outline: 3px solid rgba(255, 255, 255, 0.12);
   outline-offset: 3px;
 }
+
+/* ============================================ */
+/* Search Result Card Enhancements */
+/* ============================================ */
+
+/* Smooth animations for search result cards */
+article[aria-label*="Healthcare Provider"] {
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced hover state for cards */
+article[aria-label*="Healthcare Provider"]:hover {
+  box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
+}
+
+/* Badge hover effects */
+.inline-block.px-3.py-1 {
+  transition: all 0.2s ease-in-out;
+  cursor: default;
+}
+
+/* Language and Specialty tags enhanced */
+span.bg-blue-100,
+span.bg-indigo-100 {
+  position: relative;
+  overflow: hidden;
+}
+
+span.bg-blue-100::before,
+span.bg-indigo-100::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: left 0.3s ease;
+}
+
+span.bg-blue-100:hover::before,
+span.bg-indigo-100:hover::before {
+  left: 100%;
+}
+
+/* Smooth link transitions */
+a[aria-label*="Book appointment"] {
+  position: relative;
+  overflow: hidden;
+}
+
+a[aria-label*="Book appointment"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: left 0.3s ease;
+}
+
+a[aria-label*="Book appointment"]:hover::before {
+  left: 100%;
+}
+
+/* Status badge animation */
+.inline-flex.items-center.gap-1.px-3.py-1.bg-green-100 {
+  animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Green dot pulse animation */
+.w-2.h-2.bg-green-500 {
+  animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  article[aria-label*="Healthcare Provider"] {
+    margin-bottom: 8px;
+  }
+}
+
+/* Print styles for SEO */
+@media print {
+  article[aria-label*="Healthcare Provider"] {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  article[aria-label*="Healthcare Provider"] {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+
+  article[aria-label*="Healthcare Provider"] h2,
+  article[aria-label*="Healthcare Provider"] h3,
+  article[aria-label*="Healthcare Provider"] p {
+    color: #f3f4f6;
+  }
+
+  article[aria-label*="Healthcare Provider"] .bg-gray-100 {
+    background-color: #374151;
+  }
+
+  article[aria-label*="Healthcare Provider"] .text-gray-500 {
+    color: #d1d5db;
+  }
+}

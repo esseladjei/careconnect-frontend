@@ -61,7 +61,6 @@ const Register: React.FC = () => {
       specialties: [],
       clinicAddress: '',
       phone: '',
-      hourlyRate: undefined,
     },
   });
 
@@ -132,23 +131,13 @@ const Register: React.FC = () => {
     // Handle provider profile fields
     if (name.startsWith('provider_')) {
       const fieldName = name.replace('provider_', '');
-      if (fieldName === 'hourlyRate') {
-        setFormData((prev) => ({
-          ...prev,
-          providerProfile: {
-            ...prev.providerProfile,
-            [fieldName]: value ? parseFloat(value) : undefined,
-          },
-        }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          providerProfile: {
-            ...prev.providerProfile,
-            [fieldName]: value,
-          },
-        }));
-      }
+      setFormData((prev) => ({
+        ...prev,
+        providerProfile: {
+          ...prev.providerProfile,
+          [fieldName]: value,
+        },
+      }));
       if (errors.providerProfile?.[fieldName]) {
         setErrors((prev) => ({
           ...prev,
@@ -257,7 +246,6 @@ const Register: React.FC = () => {
             specialties: [],
             clinicAddress: '',
             phone: '',
-            hourlyRate: undefined,
           },
         });
 
@@ -606,24 +594,6 @@ const Register: React.FC = () => {
                       {errors.providerProfile.phone}
                     </p>
                   )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="provider_hourlyRate"
-                    className="block text-sm font-medium text-gray-600 mb-1"
-                  >
-                    Hourly Rate (Optional)
-                  </label>
-                  <input
-                    type="number"
-                    id="provider_hourlyRate"
-                    name="provider_hourlyRate"
-                    placeholder="e.g., 100"
-                    value={formData.providerProfile.hourlyRate || ''}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  />
                 </div>
               </div>
 

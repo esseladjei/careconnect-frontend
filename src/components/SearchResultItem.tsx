@@ -1,91 +1,222 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { SearchResult } from '../types/search.ts';
+import { useGetDayMonthOnly } from '../hooks/useMaxDate.ts';
+import useCapitalizeFirst from '../hooks/useCapitalizeFirst.ts';
+import { CheckBadgeIcon } from '@heroicons/react/16/solid';
 
 interface SearchResultItemProps {
   result: SearchResult;
 }
 
 const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
-  const navigate = useNavigate();
-
-  const handleSlotClick = (slot: SearchResult['slots'][0]) => {
-    navigate(`/offerdetails/${result.provider._id}`, {
-      state: { selectedSlot: slot },
-    });
-  };
-
+  const providerName = `${result.user.title} ${useCapitalizeFirst(result.user.firstName)} ${useCapitalizeFirst(result.user.lastName)}`;
+  const pricePerHour = result.availability.price;
+  const startDate = useGetDayMonthOnly(result.availability.start);
+  const endDate = useGetDayMonthOnly(result.availability.end);
+  const verificationStatus = useCapitalizeFirst(
+    result.provider.providerStatus || ''
+  );
+  const availabilityStatus = useCapitalizeFirst(
+    result.provider.available || ''
+  );
   return (
-    <div
-      className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 
-    border border-gray-100 flex flex-col text-center aspect-video basis-30"
+    <article
+      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 
+        border border-gray-200 hover:border-blue-300 overflow-hidden flex flex-col h-full
+        hover:transform hover:scale-105 group"
+      aria-label={`${providerName} - Healthcare Provider`}
     >
-      {/* Top: Avatar */}
-      <div className="flex justify-between">
-        <div className="w-15 h-15 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden mb-3">
-          <span className="text-3xl text-blue-500">👨‍⚕️</span>
-        </div>
-        <div className="text-right">
-          <h3 className="text-lg font-semibold text-gray-900 leading-tight">
-            {result.provider.userId.title} {result.provider.userId.firstname}{' '}
-            {result.provider.userId.lastname}
-          </h3>
+      {/* Header Section with Avatar */}
+      <div className="bg-linear-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-100">
+        <div className="flex items-start gap-4">
+          {/* Avatar */}
+          <div
+            className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center 
+              shrink-0 text-3xl shadow-sm group-hover:scale-110 transition-transform duration-300"
+            role="img"
+            aria-label={`${providerName} avatar`}
+          >
+            👨‍⚕️
+          </div>
 
-          <h3 className="text-lg text-gray-900 leading-tight mt-2">
-            Gh¢ {result.provider.hourlyRate}
-          </h3>
+          {/* Provider Name and Price */}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-gray-900 leading-tight truncate">
+              {providerName}
+            </h2>
+            <div className="mt-2 flex items-baseline gap-1">
+              <span className="text-2xl font-bold text-blue-600">
+                Gh¢ {pricePerHour}
+              </span>
+              <span className="text-sm text-gray-500 font-medium">
+                / Booking session
+              </span>
+            </div>
+          </div>
         </div>
-        {/* Middle: Name + Specialty */}
       </div>
 
-      {/* Middle: Location + Rating */}
-      <div className="flex justify-evenly text-gray-500 text-xs space-y-1 mb-4">
-        <p className="text-sm text-gray-500 font-medium mb-1 border-r pr-2">
-          {result.provider.specialization}
-        </p>
-        <p className="text-sm text-gray-500 font-medium mb-1 border-r pr-2">
-          <span className="mr-1">📍</span>
-          {result.provider.location}
-        </p>
-        <p className="text-sm text-gray-500 font-medium mb-1">
-          <span className="mr-1 text-yellow-500">⭐</span>
-          GH¢ {result.provider.hourlyRate.toFixed(1)}
-        </p>
-      </div>
+      {/* Main Content */}
+      <div className="flex-1 px-6 py-5 space-y-5">
+        {/* Quick Info Row */}
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {/* Gender Badge */}
+          {result.user.gender && (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600 font-medium">Gender:</span>
+              <span className="inline-block px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium text-xs">
+                {result.user.gender}
+              </span>
+            </div>
+          )}
 
-      {/* Bottom: Availability + Button */}
-      <div className="w-full">
-        <p className="text-xs text-left text-gray-500 mb-3">
-          {result.slots.length} Slots Today
-        </p>
-        <div className="flex flex-wrap gap-2 mb-3">
-          {result.slots.map((slot, index) => (
-            <button
-              key={index}
-              onClick={() => handleSlotClick(slot)}
-              className="text-xs px-3 py-1 rounded-md bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer border border-blue-300"
-            >
-              {new Date(slot.start).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}{' '}
-              -{' '}
-              {new Date(slot.end).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </button>
-          ))}
+          {/* Availability Badge */}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-600 font-medium">Status:</span>
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 rounded-full text-green-700 font-medium text-xs">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              {availabilityStatus}
+            </span>
+          </div>
+
+          {/* Location */}
+          <div className="col-span-2 flex items-start gap-2">
+            <span className="text-lg mt-0.5">📍</span>
+            <div className="flex-1">
+              <span className="text-gray-600 font-medium block text-xs mb-1">
+                Location
+              </span>
+              <p className="text-gray-800 text-sm font-medium truncate">
+                {result.availability.location}
+              </p>
+            </div>
+          </div>
         </div>
 
+        {/* Professional Details */}
+        {(result.provider.experience !== undefined ||
+          result.provider.practiceName ||
+          result.provider.providerStatus) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+              Professional Details
+            </h3>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              {result.provider.experience !== undefined && (
+                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                  <dt className="text-xs font-semibold text-gray-500">
+                    Experience
+                  </dt>
+                  <dd className="text-gray-800 font-medium">
+                    {result.provider.experience} Year(s)
+                  </dd>
+                </div>
+              )}
+              {result.provider.practiceName && (
+                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                  <dt className="text-xs font-semibold text-gray-500">
+                    Affiliate Practice Name
+                  </dt>
+                  <dd className="text-gray-800 font-medium truncate">
+                    {result.provider.practiceName}
+                  </dd>
+                </div>
+              )}
+              {result.provider.providerStatus && (
+                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                  <dt className="text-xs font-semibold text-gray-500">
+                    Verification Status
+                  </dt>
+                  <dd className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 rounded-full text-green-700 font-medium text-xs">
+                    <CheckBadgeIcon className="w-5 h-5 text-green-500" />
+                    {verificationStatus}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
+
+        {/* Languages Section */}
+        {result.provider.languages && result.provider.languages.length > 0 && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+              Languages
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {result.provider.languages.map((language, index) => (
+                <span
+                  key={`language-${index}`}
+                  className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors"
+                >
+                  {language}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Specialties Section */}
+        {result.provider.specialties &&
+          result.provider.specialties.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                Specialties
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {result.provider.specialties.map((specialty, index) => (
+                  <span
+                    key={`specialty-${index}`}
+                    className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-medium hover:bg-indigo-200 transition-colors"
+                  >
+                    {specialty}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+        {/* Availability Info */}
+        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+          <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+            Available Dates
+          </h3>
+          <p className="text-sm text-gray-800 font-medium">
+            <span className="text-blue-600 font-bold">{startDate}</span>
+            <span className="text-gray-500 mx-2">—</span>
+            <span className="text-blue-600 font-bold">{endDate}</span>
+          </p>
+
+          <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-3 mb-2">
+            Appointment Type
+          </h3>
+          <div className="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-blue-200">
+            <span className="text-lg">
+              {result.availability.appointmentType === 'Phone call'
+                ? '📞'
+                : '🏥'}
+            </span>
+            <span className="text-sm font-medium text-gray-800">
+              {result.availability.appointmentType}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Button */}
+      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
         <a
-          className="block w-full px-10 py-2 mb-3 text-base font-medium text-white bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-300 dark:hover:bg-blue-700 md:mr-5 md:mb-0"
           href={`/offerdetails/${result.provider._id}`}
+          className="block w-full px-4 py-3 text-center text-base font-semibold text-white 
+            bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg
+            focus:outline-none focus:ring-4 focus:ring-blue-300
+            transition-all duration-200 transform hover:-translate-y-0.5"
+          aria-label={`Book appointment with ${providerName}`}
         >
           Book Appointment
         </a>
       </div>
-    </div>
+    </article>
   );
 };
 
