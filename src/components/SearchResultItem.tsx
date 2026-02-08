@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { SearchResult } from '../types/search.ts';
 import { useGetDayMonthOnly } from '../hooks/useMaxDate.ts';
 import useCapitalizeFirst from '../hooks/useCapitalizeFirst.ts';
@@ -205,16 +206,16 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
 
       {/* CTA Button */}
       <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-        <a
-          href={`/offerdetails/${result.provider._id}`}
+        <Link
+          to={`/offerdetails/${result.id}`}
           className="block w-full px-4 py-3 text-center text-base font-semibold text-white 
-            bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg
+            bg-blue-700 hover:bg-blue-800 active:bg-blue-900 rounded-lg
             focus:outline-none focus:ring-4 focus:ring-blue-300
             transition-all duration-200 transform hover:-translate-y-0.5"
           aria-label={`Book appointment with ${providerName}`}
         >
           Book Appointment
-        </a>
+        </Link>
       </div>
     </article>
   );

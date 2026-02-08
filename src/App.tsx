@@ -7,7 +7,7 @@ import Doctors from './pages/Doctors';
 //import BookAppointment from './pages/BookAppointment';
 import Dashboard from './pages/Dashboard';
 import SearchPage from './pages/SearchPage';
-import OfferDetails from './pages/OfferDetailsPages';
+import OfferDetailsPage from './pages/OfferDetailsPage.tsx';
 import UserProfilePage from './pages/UserProfilepage';
 import Payments from './pages/PaymentsPages';
 import Appointments from './pages/AppointmentPage';
@@ -49,7 +49,7 @@ function App() {
         />
         <Route
           path="/offerdetails/:id"
-          element={isLoggedIn ? <OfferDetails /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <OfferDetailsPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/profile/:id"

@@ -18,6 +18,7 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
+  id: string;
   provider: {
     _id: string;
     specialties: string[];

@@ -143,6 +143,7 @@ a[aria-label*="Book appointment"]:hover::before {
 }
 
 /* Dark mode support */
+/*
 @media (prefers-color-scheme: dark) {
   article[aria-label*="Healthcare Provider"] {
     background-color: #1f2937;
@@ -162,4 +163,4 @@ a[aria-label*="Book appointment"]:hover::before {
   article[aria-label*="Healthcare Provider"] .text-gray-500 {
     color: #d1d5db;
   }
-}
+}*/
