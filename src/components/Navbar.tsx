@@ -14,6 +14,7 @@ const Navbar: React.FC = () => {
       submenu: [
         { name: 'Help', href: '/help' },
         { name: 'My Profile', href: `/profile/${userId}` },
+        { name: 'Create Listing', href: `/createlisting/${userId}` },
         { name: 'My Payments', href: `/payments/${userId}` },
         { name: 'My Dashboard', href: `/dashboard/${userId}` },
         { name: 'Find provider', href: `/search` },

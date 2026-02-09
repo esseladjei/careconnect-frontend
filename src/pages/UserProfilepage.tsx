@@ -5,13 +5,7 @@ import SecuritySettings from '../components/SecuritySettings';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import type {
-  PatientProfile,
-  ProviderProfile,
-  UserPassword,
-  UserProfile,
-  UserResponse,
-} from '../types/user.ts';
+import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -105,6 +99,7 @@ const UserProfilePage: React.FC = () => {
     data: userData,
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ['user', userId],
     queryFn: async () => {
@@ -176,7 +171,7 @@ const UserProfilePage: React.FC = () => {
     if (userData) {
       setUserResponse(userData);
     }
-    if (isError) toast.error('Failed to fetch user data');
+    if (isError) toast.error(error.message || 'Failed to fetch user data');
   }, [userData, isError]);
 
   const user = userResponse.user;

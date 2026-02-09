@@ -25,7 +25,7 @@ const SearchPage: React.FC = () => {
     },
     filters: {
       specialties: [],
-      appointmentType: 'In-person',
+      appointmentType: 'In-Person',
       minPrice: 50,
       maxPrice: 500,
     },
@@ -138,7 +138,7 @@ const SearchPage: React.FC = () => {
                         },
                         filters: {
                           specialties: [],
-                          appointmentType: 'In-person',
+                          appointmentType: 'In-Person',
                           minPrice: 50,
                           maxPrice: 500,
                         },

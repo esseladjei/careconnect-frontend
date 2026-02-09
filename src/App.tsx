@@ -4,10 +4,10 @@ import Login from './pages/Login';
 import Register from './pages/RegisterUser';
 import Logout from './pages/Logout';
 import Doctors from './pages/Doctors';
-//import BookAppointment from './pages/BookAppointment';
 import Dashboard from './pages/Dashboard';
 import SearchPage from './pages/SearchPage';
-import OfferDetailsPage from './pages/OfferDetailsPage.tsx';
+import BookingPage from './pages/BookingPage.tsx';
+import CreateListing from './pages/CreateListing';
 import UserProfilePage from './pages/UserProfilepage';
 import Payments from './pages/PaymentsPages';
 import Appointments from './pages/AppointmentPage';
@@ -29,30 +29,35 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
         <Route
-          path="/provider/onboarding/:id"
+          path="/provider/onboarding/:userId"
           element={
             isLoggedIn ? <ProviderOnboarding /> : <Navigate to="/login" />
           }
         />
         <Route path="/search" element={<SearchPage />} />
         <Route
-          path="/dashboard/:id"
+          path="/createlisting/:userId"
+          element={isLoggedIn ? <CreateListing /> : <Navigate to="/login" />}
+        />
+
+        <Route
+          path="/dashboard/:userId"
           element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
         />
         <Route
-          path="/payments/:id"
+          path="/payments/:userId"
           element={isLoggedIn ? <Payments /> : <Navigate to="/login" />}
         />
         <Route
-          path="/appointments/:id"
+          path="/appointments/:userId"
           element={isLoggedIn ? <Appointments /> : <Navigate to="/login" />}
         />
         <Route
-          path="/offerdetails/:id"
-          element={isLoggedIn ? <OfferDetailsPage /> : <Navigate to="/login" />}
+          path="/offerdetails/:userId"
+          element={isLoggedIn ? <BookingPage /> : <Navigate to="/login" />}
         />
         <Route
-          path="/profile/:id"
+          path="/profile/:userId"
           element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/login" />}
         />
         <Route
@@ -60,11 +65,11 @@ function App() {
           element={isLoggedIn ? <Doctors /> : <Navigate to="/login" />}
         />
         <Route
-          path="/referral/provider/:id"
+          path="/referral/provider/:userId"
           element={isLoggedIn ? <ReferralPage /> : <Navigate to="/login" />}
         />
         <Route
-          path="/referral/patient/:id"
+          path="/referral/patient/:userId"
           element={isLoggedIn ? <ReferralPage /> : <Navigate to="/login" />}
         />
         <Route path="/" element={<Home />} />

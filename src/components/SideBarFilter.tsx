@@ -78,7 +78,10 @@ const SideBarFilter: React.FC<Props> = ({
           Type of Appointment
         </h4>
         <div className="space-y-2">
-          {['In-person', 'Phone call'].map((type) => (
+          {/* ['In-Person', 'Phone Consultation', 'Home Visit']
+          change this to read from the database
+         */}
+          {['In-Person', 'Home Visit', 'Phone Consultation'].map((type) => (
             <div key={type} className="flex items-center">
               <input
                 id={`radio-${type}`}

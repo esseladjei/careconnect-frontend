@@ -7,7 +7,7 @@ export interface SearchParams {
 
 export interface FilterParams {
   specialties: string[];
-  appointmentType?: 'In-person' | 'Phone call';
+  appointmentType?: 'In-Person' | 'Phone Consultation' | 'Home Visit';
   minPrice?: number;
   maxPrice?: number;
 }

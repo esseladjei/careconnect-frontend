@@ -2,9 +2,7 @@ import React from 'react';
 
 interface Props {
   activeTab: 'overview' | 'availability' | 'reviews';
-  setActiveTab: React.Dispatch<
-    React.SetStateAction<'overview' | 'availability' | 'reviews'>
-  >;
+  setActiveTab: React.Dispatch<React.SetStateAction<'overview' | 'reviews'>>;
   reviewCount: number;
 }
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import axiosClient from '../api/axiosClient';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import appointmentsApi from '../api/appointmentsApi';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Spinner from '../components/Spinner';
@@ -14,7 +15,8 @@ import {
   ReviewsTab,
 } from '../components/booking';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import type { IProviderListing } from '../types/providerListing';
+import type { IProviderListing, IProviderSlot } from '../types/providerListing';
+import { useAuth } from '../hooks/useAuth.ts';
 
 // Types
 interface Review {
@@ -24,6 +26,12 @@ interface Review {
   date: string;
   comment: string;
   verified: boolean;
+}
+
+interface TimeSlot {
+  time: string;
+  available: boolean;
+  slotId?: string;
 }
 
 // Mock reviews data
@@ -54,13 +62,18 @@ const mockReviews: Review[] = [
   },
 ];
 
-const OfferDetailsPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+const BookingPage: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+  const { providerId } = useAuth();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState<
-    'overview' | 'availability' | 'reviews'
-  >('overview');
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>(
+    'overview'
+  );
+  const [patientCondition, setPatientCondition] = useState<string>('');
+  const [knownAllergy, setKnownAllergy] = useState<string>('');
 
   // Fetch provider details
   const {
@@ -68,12 +81,49 @@ const OfferDetailsPage: React.FC = () => {
     isLoading,
     isError,
   } = useQuery<IProviderListing>({
-    queryKey: ['provider', id],
+    queryKey: ['provider', userId],
     queryFn: async () => {
-      const response = await axiosClient.get(`/appointments/offers/${id}`);
-      return response.data;
+      if (!userId) throw new Error('Provider ID is required');
+      return await appointmentsApi.getProviderOffer(userId);
     },
     staleTime: 1000 * 60 * 5,
+  });
+
+  // Fetch available slots for selected date
+  const {
+    data: slotsData,
+    isLoading: slotsLoading,
+    refetch: refetchSlots,
+  } = useQuery<IProviderSlot[]>({
+    queryKey: ['slots', userId, selectedDate.toDateString()],
+    queryFn: async () => {
+      if (!providerId) throw new Error('Provider ID is required');
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      return await appointmentsApi.getAvailableSlots(providerId, dateStr);
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30, // Refetch every 30 seconds
+  });
+
+  // Book appointment mutation
+  const bookAppointmentMutation = useMutation({
+    mutationFn: async (slotId: string) => {
+      if (!userId) throw new Error('Provider ID is required');
+      return await appointmentsApi.bookAppointment({
+        slotId,
+        providerId: userId,
+      });
+    },
+    onSuccess: async () => {
+      toast.success('Appointment booked successfully!');
+      await refetchSlots();
+      navigate('/dashboard');
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || 'Failed to book appointment'
+      );
+    },
   });
 
   const averageRating = 4.7;
@@ -98,16 +148,51 @@ const OfferDetailsPage: React.FC = () => {
     }
   }, [providerOfferData]);
 
-  const handleBooking = () => {
-    alert('To be implemented' + id);
-    navigate(`/appointments/${id}`, {
-      state: {
-        providerId: id,
-        date: selectedDate,
-        price: providerOfferData?.price,
-      },
-    });
+  // Check if selected date is a working day
+  const isWorkingDay = (date: Date): boolean => {
+    if (!providerOfferData?.workingDays) return true;
+    const dayOfWeek = date.getDay(); // 0=Sun, 1=Mon...
+    const normalizedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+    return providerOfferData.workingDays.includes(normalizedDay);
   };
+
+  // Generate time slots from fetched slots data
+  const generateTimeSlots = (): TimeSlot[] => {
+    if (!slotsData || slotsData.length === 0) {
+      return [];
+    }
+
+    return slotsData.map((slot) => ({
+      time: slot.startTime,
+      available: slot.status === 'available',
+      slotId: slot._id,
+    }));
+  };
+
+  const handleSlotSelect = (time: string) => {
+    setSelectedSlot(time);
+    const slot = slotsData?.find((s) => s.startTime === time);
+    if (slot) {
+      setSelectedSlotId(slot._id);
+    }
+  };
+
+  const handleBooking = () => {
+    if (!selectedSlotId) {
+      toast.error('Please select a time slot');
+      return;
+    }
+
+    bookAppointmentMutation.mutate(selectedSlotId);
+  };
+
+  const handlePatientConditionChange = (value: string) => {
+    setPatientCondition(value);
+  };
+  const handleKnownAllergyChange = (value: string) => {
+    setKnownAllergy(value);
+  };
+  const timeSlots = generateTimeSlots();
 
   // Loading state
   if (isLoading) {
@@ -210,6 +295,7 @@ const OfferDetailsPage: React.FC = () => {
               {activeTab === 'overview' && (
                 <OverviewTab offer={providerOfferData} />
               )}
+
               {activeTab === 'reviews' && <ReviewsTab reviews={mockReviews} />}
             </div>
           </div>
@@ -218,7 +304,17 @@ const OfferDetailsPage: React.FC = () => {
           <BookingSidebar
             offer={providerOfferData}
             selectedDate={selectedDate}
+            selectedSlot={selectedSlot}
             onBook={handleBooking}
+            isBooking={bookAppointmentMutation.isPending}
+            timeSlots={timeSlots}
+            onSlotSelect={handleSlotSelect}
+            slotsLoading={slotsLoading}
+            isWorkingDay={isWorkingDay(selectedDate)}
+            patientCondition={patientCondition}
+            onPatientConditionChange={handlePatientConditionChange}
+            knownAllergy={knownAllergy}
+            onKnownAllergyChange={handleKnownAllergyChange}
           />
         </div>
       </main>
@@ -250,4 +346,4 @@ const OfferDetailsPage: React.FC = () => {
   );
 };
 
-export default OfferDetailsPage;
+export default BookingPage;

@@ -13,9 +13,16 @@ const Login = () => {
       return await axiosClient.post('/auth/login', { email, password });
     },
     onSuccess: (data) => {
-      const { accessToken, user } = data.data;
+      const { accessToken, user, provider, patient } = data.data;
       localStorage.setItem('token', accessToken);
       localStorage.setItem('userId', user.userId);
+      if (provider) {
+        localStorage.setItem('providerId', provider);
+      }
+      if (patient) {
+        localStorage.setItem('patientId', patient);
+      }
+      toast.success('Login successful!');
       navigate(`/dashboard/${user.userId}`);
     },
     onError: (err: any) => {
