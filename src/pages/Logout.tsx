@@ -12,6 +12,8 @@ const Logout: React.FC = () => {
     // Clear all authentication data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('providerId');
+    localStorage.removeItem('patientId');
 
     // Redirect to a login page immediately
     navigate('/login');

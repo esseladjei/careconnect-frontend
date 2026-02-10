@@ -1,13 +1,22 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query';
 
 const Login = () => {
-  const [email, setEmail] = useState('micheal.oppong@gmail.com');
-  const [password, setPassword] = useState('123456');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load saved email ONLY on component mount (NOT password for security)
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberMeEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const mutation = useMutation({
     mutationFn: async () => {
       return await axiosClient.post('/auth/login', { email, password });
@@ -22,8 +31,18 @@ const Login = () => {
       if (patient) {
         localStorage.setItem('patientId', patient);
       }
+
+      // Handle "Remember me" functionality (SECURE: Email only, never store password)
+      if (rememberMe) {
+        localStorage.setItem('rememberMeEmail', email);
+      } else {
+        // Clear saved email if "Remember me" is unchecked
+        localStorage.removeItem('rememberMeEmail');
+      }
+
       toast.success('Login successful!');
-      navigate(`/dashboard/${user.userId}`);
+      // Force a hard reload to ensure useAuth hook re-evaluates
+      window.location.href = `/dashboard/${user.userId}`;
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || 'Login failed');
@@ -83,6 +102,8 @@ const Login = () => {
               <input
                 id="remember"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <label
