@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { SearchResult } from '../types/search.ts';
-import { useGetDayMonthOnly } from '../hooks/useMaxDate.ts';
+import { useGetDayMonthOnly } from '../hooks/useDate.ts';
 import useCapitalizeFirst from '../hooks/useCapitalizeFirst.ts';
 import { CheckBadgeIcon } from '@heroicons/react/16/solid';
 
@@ -193,7 +193,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
           </h3>
           <div className="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-blue-200">
             <span className="text-lg">
-              {result.availability.appointmentType === 'Phone call'
+              {result.availability.appointmentType === 'Phone Call'
                 ? '📞'
                 : '🏥'}
             </span>

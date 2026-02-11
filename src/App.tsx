@@ -53,7 +53,7 @@ function App() {
           element={isLoggedIn ? <Appointments /> : <Navigate to="/login" />}
         />
         <Route
-          path="/offerdetails/:userId"
+          path="/offerdetails/:availabilityId"
           element={isLoggedIn ? <BookingPage /> : <Navigate to="/login" />}
         />
         <Route

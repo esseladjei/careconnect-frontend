@@ -8,19 +8,14 @@ import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import type { SearchQuery, SearchResult } from '../types/search.ts';
+import { getFormattedDate } from '../hooks/useDate.ts';
 
 const SearchPage: React.FC = () => {
   // Helper function to format date as DD-MM-YYYY
-  const getFormattedDate = (daysOffset: number = 0): string => {
-    const date = new Date();
-    date.setDate(date.getDate() + daysOffset);
-    return date.toISOString().split('T')[0];
-  };
-
   const [query, setQuery] = useState<SearchQuery>({
     search: {
       startDate: getFormattedDate(0), // Today
-      endDate: getFormattedDate(30), // 7 days from today
+      endDate: getFormattedDate(30), // 30 days from today
       location: '',
     },
     filters: {

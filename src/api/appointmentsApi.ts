@@ -28,11 +28,11 @@ export const appointmentsApi = {
 
   // Get available slots for a specific date and provider
   getAvailableSlots: async (
-    providerId: string,
+    availabilityId: string,
     date: string
   ): Promise<IProviderSlot[]> => {
     const response = await axiosClient.get(
-      `/appointments/slots/${providerId}?date=${date}`
+      `/appointments/slots/${availabilityId}?date=${date}`
     );
     return response.data;
   },
@@ -42,6 +42,14 @@ export const appointmentsApi = {
     slotId: string;
     providerId: string;
     patientId?: string;
+    availabilityId: string;
+    knownAllergies: string;
+    duration: number;
+    patientCondition: string;
+    scheduledAt: Date;
+    status: 'pending';
+    price: number;
+    appointmentType: string;
   }): Promise<any> => {
     const response = await axiosClient.post('/appointments/booklisting', data);
     return response.data;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -14,6 +14,8 @@ import {
   MapPinIcon,
 } from '@heroicons/react/24/outline';
 import type { ICreateListingParams } from '../types/providerListing';
+import { filterLocations, useLocations } from '../hooks/useLocations.ts';
+import { getFormattedDate } from '../hooks/useDate.ts';
 
 const DAYS_OF_WEEK = [
   { value: 1, label: 'Monday' },
@@ -22,17 +24,16 @@ const DAYS_OF_WEEK = [
   { value: 4, label: 'Thursday' },
   { value: 5, label: 'Friday' },
   { value: 6, label: 'Saturday' },
-  { value: 7, label: 'Sunday' },
+  { value: 0, label: 'Sunday' },
 ];
 
 const APPOINTMENT_TYPES = ['In-Person', 'Phone Consultation', 'Home Visit'];
 
 const SESSION_DURATIONS = [
-  { value: 15, label: '15 minutes' },
   { value: 30, label: '30 minutes' },
   { value: 45, label: '45 minutes' },
   { value: 60, label: '1 hour' },
-  { value: 90, label: '1.5 hours' },
+  { value: 90, label: '1 hour 30 minutes' },
   { value: 120, label: '2 hours' },
 ];
 
@@ -41,16 +42,54 @@ const CreateListing: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [formData, setFormData] = useState<ICreateListingParams>({
     userId: userId || '', // Get from URL params
-    start: '',
-    end: '',
+    start: getFormattedDate(0),
+    end: getFormattedDate(3),
     price: 0,
     appointmentType: 'In-Person',
     location: '',
-    workingDays: [1, 2, 3, 4, 5], // Default: Mon-Fri
+    workingDays: [], // Default: Mon-Fri
     dailyStartTime: '09:00',
     dailyEndTime: '17:00',
     sessionDuration: 30,
   });
+
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const locationInputRef = useRef<HTMLDivElement>(null);
+
+  // Fetch all available locations from DB using custom hook
+  const { data: allLocations = [], isLoading: locationsLoading } =
+    useLocations();
+
+  // Filter locations based on input
+  const filteredLocations = filterLocations(allLocations, formData.location);
+
+  // Handle location selection
+  const handleLocationSelect = (location: string) => {
+    setFormData({ ...formData, location: location });
+    setShowLocationDropdown(false);
+  };
+
+  // Handle location input change
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setFormData({ ...formData, location: e.target.value });
+    setShowLocationDropdown(input.length > 0);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        locationInputRef.current &&
+        !locationInputRef.current.contains(event.target as Node)
+      ) {
+        setShowLocationDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const createListingMutation = useMutation({
     mutationFn: async (data: ICreateListingParams) => {
@@ -62,7 +101,8 @@ const CreateListing: React.FC = () => {
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || 'Failed to publish availability'
+        error.response?.data?.message || 'Failed to publish availability',
+        { duration: 4000 }
       );
     },
   });
@@ -115,7 +155,38 @@ const CreateListing: React.FC = () => {
       }
     });
   };
+  const handleSetDaysFromDate = () => {
+    const startDate = new Date(formData.start);
+    const endDate = new Date(formData.end);
 
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return; // Exit if dates are invalid
+    }
+
+    const selectedDays: number[] = [];
+    const currentDate = new Date(startDate);
+
+    // Iterate through all dates in the range
+    while (currentDate <= endDate) {
+      const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+      // Add day if not already in the array
+      if (!selectedDays.includes(dayOfWeek)) {
+        selectedDays.push(dayOfWeek);
+      }
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    setFormData((prevState) => ({
+      ...prevState,
+      workingDays: selectedDays.sort((a, b) => a - b),
+    }));
+  };
+  useEffect(() => {
+    handleSetDaysFromDate();
+  }, [formData.start, formData.end]);
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO
@@ -292,10 +363,15 @@ const CreateListing: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="appointmentType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Appointment Type
                   </label>
                   <select
+                    id="appointmentType"
+                    name="appointmentType"
                     required
                     value={formData.appointmentType}
                     onChange={(e) =>
@@ -314,20 +390,87 @@ const CreateListing: React.FC = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location / Address
+                {/* Location with Autocomplete */}
+                <div ref={locationInputRef} className="relative">
+                  <label
+                    htmlFor="location-filter"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Location
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    placeholder="e.g., Accra, Ghana"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div className="relative">
+                    {/* Location Input with City Icon */}
+                    <input
+                      id="location-filter"
+                      type="text"
+                      placeholder="Search location or enter location..."
+                      value={formData.location}
+                      onChange={handleLocationChange}
+                      onFocus={() =>
+                        formData.location.length > 0 &&
+                        setShowLocationDropdown(true)
+                      }
+                      disabled={locationsLoading}
+                      className="w-full px-4 py-3 pl-7 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    {/* City/Building Icon */}
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2h2v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+
+                    {/* Autocomplete Dropdown */}
+                    {showLocationDropdown && filteredLocations.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
+                        {filteredLocations.map((location, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleLocationSelect(location)}
+                            className="w-full text-left px-4 py-3 hover:bg-blue-50 transition flex items-center gap-2 first:rounded-t-lg last:rounded-b-lg border-b border-gray-100 last:border-b-0"
+                          >
+                            <svg
+                              className="text-blue-600 w-4 h-4 shrink-0"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">
+                              {location}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* No results message */}
+                    {showLocationDropdown &&
+                      formData.location.length > 0 &&
+                      filteredLocations.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4 text-center">
+                          <p className="text-sm text-gray-500">
+                            No locations found for "{formData.location}"
+                          </p>
+                        </div>
+                      )}
+
+                    {/* Loading indicator */}
+                    {locationsLoading && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4 text-center">
+                        <p className="text-sm text-gray-500">
+                          Loading locations...
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

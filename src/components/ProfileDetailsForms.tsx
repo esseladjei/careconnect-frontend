@@ -1,6 +1,6 @@
 import React from 'react';
 import type { UserProfile } from '../types/user.ts';
-import { useGetMaxDate } from '../hooks/useMaxDate.ts';
+import { useGetMaxDate } from '../hooks/useDate.ts';
 
 interface ProfileDetailsProp {
   user: UserProfile;

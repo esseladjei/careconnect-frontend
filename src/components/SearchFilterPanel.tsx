@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { filterLocations, useLocations } from '../hooks/useLocations';
 import type { FilterParams, SearchParams } from '../types/search.ts';
-import { useGetMonth, useGetToday } from '../hooks/useMaxDate.ts';
+import { useGetMonth, useGetToday } from '../hooks/useDate.ts';
 
 interface Props {
   value: SearchParams;

@@ -17,16 +17,7 @@ import {
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { IProviderListing, IProviderSlot } from '../types/providerListing';
 import { useAuth } from '../hooks/useAuth.ts';
-
-// Types
-interface Review {
-  id: string;
-  patientName: string;
-  rating: number;
-  date: string;
-  comment: string;
-  verified: boolean;
-}
+import { mockReviews } from '../types/reviews.ts';
 
 interface TimeSlot {
   time: string;
@@ -34,37 +25,14 @@ interface TimeSlot {
   slotId?: string;
 }
 
-// Mock reviews data
-const mockReviews: Review[] = [
-  {
-    id: '1',
-    patientName: 'Sarah Johnson',
-    rating: 5,
-    date: '2026-01-15',
-    comment: 'Excellent care and very professional. Highly recommend!',
-    verified: true,
-  },
-  {
-    id: '2',
-    patientName: 'Michael Chen',
-    rating: 4,
-    date: '2026-01-10',
-    comment: 'Very knowledgeable and took time to explain everything.',
-    verified: true,
-  },
-  {
-    id: '3',
-    patientName: 'Emma Davis',
-    rating: 5,
-    date: '2026-01-05',
-    comment: "Best healthcare experience I've had. Very caring and attentive.",
-    verified: true,
-  },
-];
+export interface BookingFormErrors {
+  patientCondition?: string;
+  KnownAllergy?: string;
+}
 
 const BookingPage: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
-  const { providerId } = useAuth();
+  const { availabilityId } = useParams<{ availabilityId: string }>();
+  const { providerId, patientId } = useAuth();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -74,17 +42,17 @@ const BookingPage: React.FC = () => {
   );
   const [patientCondition, setPatientCondition] = useState<string>('');
   const [knownAllergy, setKnownAllergy] = useState<string>('');
-
   // Fetch provider details
   const {
     data: providerOfferData,
     isLoading,
     isError,
   } = useQuery<IProviderListing>({
-    queryKey: ['provider', userId],
+    queryKey: ['provider', availabilityId],
     queryFn: async () => {
-      if (!userId) throw new Error('Provider ID is required');
-      return await appointmentsApi.getProviderOffer(userId);
+      if (!availabilityId)
+        throw new Error('Provider availability ID is required');
+      return await appointmentsApi.getProviderOffer(availabilityId!);
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -95,29 +63,38 @@ const BookingPage: React.FC = () => {
     isLoading: slotsLoading,
     refetch: refetchSlots,
   } = useQuery<IProviderSlot[]>({
-    queryKey: ['slots', userId, selectedDate.toDateString()],
+    queryKey: ['slots', providerId, selectedDate.toDateString()],
     queryFn: async () => {
-      if (!providerId) throw new Error('Provider ID is required');
+      if (!availabilityId) throw new Error('AvailabilityId ID is required');
       const dateStr = selectedDate.toISOString().split('T')[0];
-      return await appointmentsApi.getAvailableSlots(providerId, dateStr);
+      return await appointmentsApi.getAvailableSlots(availabilityId, dateStr);
     },
-    enabled: !!userId,
+    enabled: !!availabilityId,
     staleTime: 1000 * 30, // Refetch every 30 seconds
   });
 
   // Book appointment mutation
   const bookAppointmentMutation = useMutation({
     mutationFn: async (slotId: string) => {
-      if (!userId) throw new Error('Provider ID is required');
+      if (!providerOfferData) throw new Error('Provider ID is required');
       return await appointmentsApi.bookAppointment({
         slotId,
-        providerId: userId,
+        availabilityId: availabilityId!,
+        providerId: providerOfferData.providerId!,
+        patientId: patientId!,
+        appointmentType: providerOfferData?.appointmentType,
+        duration: providerOfferData?.sessionDuration!,
+        scheduledAt: selectedDate,
+        status: 'pending',
+        knownAllergies: knownAllergy,
+        patientCondition,
+        price: providerOfferData?.price,
       });
     },
     onSuccess: async () => {
       toast.success('Appointment booked successfully!');
       await refetchSlots();
-      navigate('/dashboard');
+      navigate(`/dashboard/${patientId}`);
     },
     onError: (error: any) => {
       toast.error(
@@ -163,7 +140,7 @@ const BookingPage: React.FC = () => {
     }
 
     return slotsData.map((slot) => ({
-      time: slot.startTime,
+      time: `${slot.startTime} - ${slot.endTime}`,
       available: slot.status === 'available',
       slotId: slot._id,
     }));
@@ -171,13 +148,35 @@ const BookingPage: React.FC = () => {
 
   const handleSlotSelect = (time: string) => {
     setSelectedSlot(time);
-    const slot = slotsData?.find((s) => s.startTime === time);
+    const firstTimePart = time.split('-')[0].trim();
+    const slot = slotsData?.find((s) => s.startTime === firstTimePart);
     if (slot) {
       setSelectedSlotId(slot._id);
     }
+    setErrors((prev) => ({
+      ...prev,
+      timeslot: undefined,
+    }));
   };
 
+  const [errors, setErrors] = useState<BookingFormErrors>({});
+
+  const validateBookingForm = (): boolean => {
+    const newErrors: BookingFormErrors = {};
+    if (!knownAllergy.trim()) {
+      newErrors.KnownAllergy = 'Please enter "Unknown" if you are not sure';
+    }
+    if (patientCondition.length <= 10) {
+      newErrors.patientCondition = 'Please describe your health condition" ';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const handleBooking = () => {
+    if (!validateBookingForm()) {
+      toast.error('Please fix the errors on the booking form.');
+      return;
+    }
     if (!selectedSlotId) {
       toast.error('Please select a time slot');
       return;
@@ -188,9 +187,21 @@ const BookingPage: React.FC = () => {
 
   const handlePatientConditionChange = (value: string) => {
     setPatientCondition(value);
+    setErrors((prev) => ({
+      ...prev,
+      patientCondition: undefined,
+    }));
   };
   const handleKnownAllergyChange = (value: string) => {
     setKnownAllergy(value);
+    setErrors((prev) => ({
+      ...prev,
+      knownAllergy: undefined,
+    }));
+  };
+
+  const handleDateChange = (value: string) => {
+    setSelectedDate(new Date(value));
   };
   const timeSlots = generateTimeSlots();
 
@@ -315,6 +326,12 @@ const BookingPage: React.FC = () => {
             onPatientConditionChange={handlePatientConditionChange}
             knownAllergy={knownAllergy}
             onKnownAllergyChange={handleKnownAllergyChange}
+            dateRange={{
+              start: providerOfferData.start,
+              end: providerOfferData.end,
+            }}
+            onDateRangeChange={handleDateChange}
+            errors={errors}
           />
         </div>
       </main>

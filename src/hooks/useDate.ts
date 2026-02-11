@@ -27,3 +27,9 @@ export const useGetDayMonthOnly = (dateString: string) => {
     month: 'short',
   }).format(date);
 };
+
+export const getFormattedDate = (daysOffset: number = 0): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+  return date.toISOString().split('T')[0];
+};
