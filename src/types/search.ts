@@ -6,8 +6,8 @@ export interface SearchParams {
 }
 
 export interface FilterParams {
-  specializations: string[];
-  appointmentType?: 'In-person' | 'Video Call';
+  specialties: string[];
+  appointmentType?: 'In-Person' | 'Phone Consultation' | 'Home Visit';
   minPrice?: number;
   maxPrice?: number;
 }
@@ -18,28 +18,32 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
+  id: string;
   provider: {
     _id: string;
-    userId: {
-      _id: string;
-      email: string;
-      role: string;
-      title: string;
-      firstname: string;
-      lastname: string;
-    };
-    gender: string;
-    specialization: string;
-    bio: string;
-    experience: number;
-    hourlyRate: number;
-    available: boolean;
-    location: string;
+    specialties: string[];
     languages: string[];
+    location: string;
+    available: string;
+    experience?: string | number;
+    practiceName?: string;
+    providerStatus?: string;
   };
-  slots: Array<{
+  user: {
+    _id: string;
+    email: string;
+    role: string;
+    title: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+  };
+  availability: {
+    id: string;
     start: string;
     end: string;
     price: number;
-  }>;
+    appointmentType: string;
+    location: string;
+  };
 }

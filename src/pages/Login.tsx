@@ -1,29 +1,65 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import toast from 'react-hot-toast';
+import { useMutation } from '@tanstack/react-query';
 
 const Login = () => {
-  const [email, setEmail] = useState('micheal.oppong@gmail.com');
-  const [password, setPassword] = useState('123456');
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load saved email ONLY on component mount (NOT password for security)
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberMeEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      return await axiosClient.post('/auth/login', { email, password });
+    },
+    onSuccess: (data) => {
+      const { accessToken, user, provider, patient } = data.data;
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('userId', user.userId);
+      localStorage.setItem('role', user.role);
+      if (user.role === 'provider') {
+        localStorage.setItem('providerId', provider);
+      } else {
+        localStorage.setItem('patientId', patient);
+      }
+
+      // Handle "Remember me" functionality (SECURE: Email only, never store password)
+      if (rememberMe) {
+        localStorage.setItem('rememberMeEmail', email);
+      } else {
+        // Clear saved email if "Remember me" is unchecked
+        localStorage.removeItem('rememberMeEmail');
+      }
+
+      toast.success('Login successful!');
+      // Force a hard reload to ensure useAuth hook re-evaluates
+      window.location.href = `/dashboard/${user.userId}`;
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || 'Login failed');
+    },
+  });
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await axiosClient.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('userId', res.data.user._id);
-      navigate(`/dashboard/${res.data.user._id}`);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-    }
+    mutation.mutate();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 p-4">
       <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-xl">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Login
+          CareConnect Login
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -68,6 +104,8 @@ const Login = () => {
               <input
                 id="remember"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <label
@@ -77,12 +115,13 @@ const Login = () => {
                 Remember me
               </label>
             </div>
-            <a
-              href="/resetpassword"
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
               className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
             >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button

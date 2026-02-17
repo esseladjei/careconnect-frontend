@@ -1,9 +1,10 @@
 import React from 'react';
-import type { User } from '../types/user.ts';
+import type { UserProfile } from '../types/user.ts';
+import { useGetMaxDate } from '../hooks/useDate.ts';
 
 interface ProfileDetailsProp {
-  user: User;
-  onChange: (field: keyof User, value: string | string[]) => void;
+  user: UserProfile;
+  onChange: (field: keyof UserProfile, value: string | string[]) => void;
   onSave: () => void;
   saveStatus: boolean;
 }
@@ -37,17 +38,6 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
   onSave,
   saveStatus,
 }) => {
-  // Calculate the max date (18 years ago from today)
-  const getMaxDate = () => {
-    const today = new Date();
-    const maxDate = new Date(
-      today.getFullYear() - 18,
-      today.getMonth(),
-      today.getDate()
-    );
-    return maxDate.toISOString().split('T')[0];
-  };
-
   const handleLanguageChange = (language: string) => {
     const currentLanguages = user.languages || [];
     if (currentLanguages.includes(language)) {
@@ -188,7 +178,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
             type="date"
             id="dateOfBirth"
             name="dateOfBirth"
-            max={getMaxDate()}
+            max={useGetMaxDate()}
             value={
               user?.dateOfBirth
                 ? new Date(user.dateOfBirth).toISOString().split('T')[0]
