@@ -2,14 +2,14 @@ import React from 'react';
 import type { FilterParams } from '../types/search.ts';
 import { useSpecialties } from '../hooks/useSpecialties';
 
-interface Props {
+interface SideBarFilterProps {
   filters: FilterParams;
   resultsCount: number;
   location: string;
   onChange: (filters: FilterParams) => void;
 }
 
-const SideBarFilter: React.FC<Props> = ({
+const SideBarFilter: React.FC<SideBarFilterProps> = ({
   filters,
   resultsCount,
   location,

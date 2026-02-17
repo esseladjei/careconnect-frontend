@@ -4,21 +4,25 @@ import type {
   IProviderListing,
   IProviderSlot,
 } from '../types/providerListing';
+import type {
+  Appointment,
+  CancelAppointmentParams,
+  ConfirmAppointmentParams,
+  FetchAppointmentsParams,
+} from '../types/appointment.ts';
 
 export const appointmentsApi = {
-  // Get all provider offers
+  // ...existing code...
   getProviderOffers: async (): Promise<IProviderListing[]> => {
     const response = await axiosClient.get('/appointments/offers');
     return response.data;
   },
 
-  // Get single provider offer
   getProviderOffer: async (id: string): Promise<IProviderListing> => {
     const response = await axiosClient.get(`/appointments/offers/${id}`);
     return response.data;
   },
 
-  // Create/Publish availability
   publishAvailability: async (
     data: ICreateListingParams
   ): Promise<IProviderListing> => {
@@ -26,7 +30,6 @@ export const appointmentsApi = {
     return response.data;
   },
 
-  // Get available slots for a specific date and provider
   getAvailableSlots: async (
     availabilityId: string,
     date: string
@@ -37,7 +40,6 @@ export const appointmentsApi = {
     return response.data;
   },
 
-  // Book an appointment slot
   bookAppointment: async (data: {
     slotId: string;
     providerId: string;
@@ -55,13 +57,6 @@ export const appointmentsApi = {
     return response.data;
   },
 
-  // Cancel an appointment
-  cancelAppointment: async (appointmentId: string): Promise<any> => {
-    const response = await axiosClient.delete(`/appointments/${appointmentId}`);
-    return response.data;
-  },
-
-  // Get provider's availability listings
   getProviderAvailability: async (
     providerId: string
   ): Promise<IProviderListing[]> => {
@@ -71,7 +66,6 @@ export const appointmentsApi = {
     return response.data;
   },
 
-  // Update availability
   updateAvailability: async (
     availabilityId: string,
     data: Partial<ICreateListingParams>
@@ -83,9 +77,46 @@ export const appointmentsApi = {
     return response.data;
   },
 
-  // Delete availability
   deleteAvailability: async (availabilityId: string): Promise<void> => {
     await axiosClient.delete(`/appointments/availability/${availabilityId}`);
+  },
+
+  // Fetch user appointments with filters
+  fetchUserAppointments: async (
+    params: FetchAppointmentsParams
+  ): Promise<Appointment[]> => {
+    const { actorId, ...queryParams } = params;
+    const response = await axiosClient.get(
+      `/appointments/${actorId}/fetchappointments`,
+      {
+        params: queryParams,
+      }
+    );
+    return response.data;
+  },
+
+  // Confirm an appointment
+  confirmAppointment: async (
+    params: ConfirmAppointmentParams
+  ): Promise<Appointment> => {
+    const { appointmentId, ...data } = params;
+    const response = await axiosClient.patch(
+      `/appointments/${appointmentId}/confirm`,
+      data
+    );
+    return response.data;
+  },
+
+  // Cancel an appointment
+  cancelAppointment: async (
+    params: CancelAppointmentParams
+  ): Promise<Appointment> => {
+    const { appointmentId, ...data } = params;
+    const response = await axiosClient.patch(
+      `/appointments/${appointmentId}/cancel`,
+      data
+    );
+    return response.data;
   },
 };
 

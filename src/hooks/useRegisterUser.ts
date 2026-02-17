@@ -29,6 +29,7 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   role: Role;
+  referralCode?: string;
   patientProfile?: PatientProfile;
   providerProfile?: ProviderProfile;
 }

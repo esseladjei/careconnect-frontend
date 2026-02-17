@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -25,10 +27,10 @@ const Login = () => {
       const { accessToken, user, provider, patient } = data.data;
       localStorage.setItem('token', accessToken);
       localStorage.setItem('userId', user.userId);
-      if (provider) {
+      localStorage.setItem('role', user.role);
+      if (user.role === 'provider') {
         localStorage.setItem('providerId', provider);
-      }
-      if (patient) {
+      } else {
         localStorage.setItem('patientId', patient);
       }
 
@@ -113,12 +115,13 @@ const Login = () => {
                 Remember me
               </label>
             </div>
-            <a
-              href="/resetpassword"
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
               className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
             >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button

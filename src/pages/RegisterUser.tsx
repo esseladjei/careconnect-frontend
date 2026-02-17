@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   type PatientProfile,
@@ -12,6 +12,7 @@ import {
 interface FormData extends RegisterFormData {
   patientProfile: PatientProfile;
   providerProfile: ProviderProfile;
+  referralCode?: string;
 }
 
 interface FormErrors {
@@ -38,6 +39,7 @@ const SPECIALTIES = [
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { mutate: registerUser, isPending } = useRegisterUser();
 
   const [formData, setFormData] = useState<FormData>({
@@ -47,6 +49,7 @@ const Register: React.FC = () => {
     password: '',
     confirmPassword: '',
     role: 'patient',
+    referralCode: searchParams.get('ref') || '',
     patientProfile: {
       dateOfBirth: '',
       gender: '',
@@ -91,6 +94,7 @@ const Register: React.FC = () => {
         'email',
         'password',
         'confirmPassword',
+        'referralCode',
       ].includes(name)
     ) {
       setFormData((prev) => ({
@@ -393,6 +397,28 @@ const Register: React.FC = () => {
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="referralCode"
+              className="block text-sm font-medium text-gray-600 mb-1"
+            >
+              Referral Code (Optional)
+            </label>
+            <input
+              type="text"
+              id="referralCode"
+              name="referralCode"
+              placeholder="Enter referral code if you have one"
+              value={formData.referralCode || ''}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              🎁 Use a friend's referral code to get a discount on your first
+              service!
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

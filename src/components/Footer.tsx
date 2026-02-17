@@ -1,6 +1,6 @@
 import React from 'react';
 const Footer: React.FC = () => {
-  // Define your footer navigation links
+  // Define footer navigation links
   const footerLinks = [
     {
       title: 'Support',

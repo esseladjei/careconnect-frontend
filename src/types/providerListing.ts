@@ -1,3 +1,5 @@
+import type { IUser } from './user.ts';
+
 export interface IProviderListing {
   _id: string;
   providerId: string;
@@ -58,17 +60,4 @@ export interface IProvider {
   createdAt: string; // ISO 8601 date string
   updatedAt: string; // ISO 8601 date string
   location: string;
-}
-
-export interface IUser {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  emailVerified: boolean;
-  phone: string;
-  languages: string[];
-  gender: string;
-  title: string;
 }

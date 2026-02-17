@@ -29,8 +29,8 @@ const SearchFilterPanel: React.FC<Props> = ({ value, filters, onChange }) => {
   };
 
   // Handle location input change
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.target.value;
     setLocationInput(input);
     onChange({ ...value, location: input });
     setShowLocationDropdown(input.length > 0);

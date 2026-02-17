@@ -1,132 +1,190 @@
-import React, {useEffect, useState} from 'react';
-import Navbar from '../components/Navbar'; 
+import React, { useState } from 'react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import axiosClient from "../api/axiosClient.ts";
+import {
+  useCancelAppointment,
+  useConfirmAppointment,
+  useFetchAppointments,
+} from '../hooks/useAppointments';
+import Spinner from '../components/Spinner';
+import { useAuth } from '../hooks/useAuth.ts';
+import AppointmentCard from '../components/AppointmentCard.tsx';
 
-// --- Mock Data ---
-interface Appointment {
-  id: string;
-  date: string;
-  time: string;
-  doctor: string;
-  specialisation: string;
-  type: 'In-person' | 'Video Call';
-  location: string;
-  status: 'Confirmed' | 'Completed' | 'Cancelled' | 'Pending';
-}
-
-
-// --- Status Styling Helper ---
-const getStatusClasses = (status: Appointment['status']) => {
-  switch (status) {
-    case 'Confirmed':
-    case 'Completed':
-      return 'bg-green-100 text-green-800 border-green-300';
-    case 'Pending':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    case 'Cancelled':
-      return 'bg-red-100 text-red-800 border-red-300';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-300';
-  }
+// Set default date range: 3 months ago to 3 months from now
+const getDefaultStartDate = () => {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 3);
+  return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 };
 
-
-// --- Appointment Card Component ---
-const AppointmentCard: React.FC<{ appointment: Appointment }> = ({ appointment }) => (
-  <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-600 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 hover:shadow-xl transition-shadow duration-300">
-    
-    {/* Details (Left Side) */}
-    <div className="flex-grow space-y-1">
-      <h3 className="text-xl font-bold text-gray-900">{appointment.doctor}</h3>
-      <p className="text-blue-600 font-medium">{appointment.specialisation} Appointment</p>
-      
-      <div className="flex items-center text-gray-600 text-sm pt-1">
-        <span className="mr-3">🗓️ {appointment.date} at {appointment.time}</span>
-        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
-            {appointment.type}
-        </span>
-      </div>
-      <p className="text-gray-500 text-sm">
-          📍 {appointment.location}
-      </p>
-    </div>
-
-    {/* Actions & Status (Right Side) */}
-    <div className="flex flex-col items-start md:items-end space-y-3 pt-4 md:pt-0">
-      
-      {/* Status Badge */}
-      <span className={`px-3 py-1 text-xs leading-5 font-semibold rounded-full border ${getStatusClasses(appointment.status)}`}>
-        {appointment.status}
-      </span>
-
-      {/* Action Buttons */}
-      {appointment.status === 'Confirmed' && (
-        <div className="flex space-x-2">
-          <button className="px-3 py-1 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50">
-            Cancel
-          </button>
-          <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Reschedule
-          </button>
-        </div>
-      )}
-      
-      {appointment.status === 'Completed' && (
-        <button className="px-3 py-1 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-          View Summary
-        </button>
-      )}
-
-    </div>
-  </div>
-);
-
+const getDefaultEndDate = () => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 3);
+  return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+};
 
 // --- Main Component ---
 const AppointmentHistoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  useEffect(() => {
-    const fetchAppointments = async ()=>{
-      try {
-        const response = await axiosClient.get('/appointments/offers/',
-            {params: {
-                start: '2025-03-18T09:00:00.000Z',
-                end: '2026-03-18T09:00:00.000Z',
-                durationMinutes: 30,
-                slotMinutes: 15,
-            }});
-        setAppointments(response.data);
-      } catch (error) {
-        console.error('Failed to fetch appointments:', error);
-      }
-    };
-    fetchAppointments().catch(error => {
-      console.error('Error fetching appointments:', error);
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
+  const { userId, role, actorId } = useAuth();
+  // Fetch appointments with TanStack Query
+  const {
+    data: appointments = [],
+    isLoading,
+    error,
+  } = useFetchAppointments({
+    userId: userId,
+    role,
+    actorId,
+    start: new Date(startDate).toISOString(),
+    end: new Date(endDate).toISOString(),
+  });
+
+  // Mutations for cancel and confirm
+  const { mutate: cancelAppointment, isPending: isCanceling } =
+    useCancelAppointment();
+  const { mutate: confirmAppointment, isPending: isConfirming } =
+    useConfirmAppointment();
+
+  const handleCancel = (appointmentId: string, cancelledBy: string) => {
+    cancelAppointment({
+      appointmentId,
+      cancelledBy,
+      reason: 'User requested cancellation',
     });
-  },[])
+  };
 
-  const upcomingAppointments = appointments.filter(a => a.status === 'Confirmed' || a.status === 'Pending');
-  const pastAppointments = appointments.filter(a => a.status === 'Completed' || a.status === 'Cancelled');
-  
-  const appointmentsToShow = activeTab === 'upcoming' ? upcomingAppointments : pastAppointments;
+  const handleConfirm = (appointmentId: string) => {
+    confirmAppointment({ appointmentId, status: 'confirmed' });
+  };
+
+  const upcomingAppointments = appointments.filter(
+    (a) => a.status === 'confirmed' || a.status === 'pending'
+  );
+  const pastAppointments = appointments.filter(
+    (a) => a.status === 'completed' || a.status === 'cancelled'
+  );
+
+  const appointmentsToShow =
+    activeTab === 'upcoming' ? upcomingAppointments : pastAppointments;
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar /> 
-      
+      <Navbar />
+
       <main className="container mx-auto p-4 md:p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Appointments</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          Your Appointments
+        </h1>
+
+        {/* Date Filter Section */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="text-xl">📅</span>
+            Filter by Date Range
+          </h2>
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            {/* Start Date */}
+            <div className="flex-1">
+              <label
+                htmlFor="startDate"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Start Date
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="flex-1">
+              <label
+                htmlFor="endDate"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                End Date
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            {/* Quick Filter Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const today = new Date();
+                  const nextMonth = new Date();
+                  nextMonth.setMonth(nextMonth.getMonth() + 1);
+                  setStartDate(today.toISOString().split('T')[0]);
+                  setEndDate(nextMonth.toISOString().split('T')[0]);
+                }}
+                className="px-4 py-2.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors whitespace-nowrap"
+              >
+                Next Month
+              </button>
+              <button
+                onClick={() => {
+                  const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+                  const endOfYear = new Date(new Date().getFullYear(), 11, 31);
+                  setStartDate(startOfYear.toISOString().split('T')[0]);
+                  setEndDate(endOfYear.toISOString().split('T')[0]);
+                }}
+                className="px-4 py-2.5 text-sm font-medium text-green-700 bg-green-50 border border-green-300 rounded-lg hover:bg-green-100 transition-colors whitespace-nowrap"
+              >
+                This Year
+              </button>
+              <button
+                onClick={() => {
+                  setStartDate(getDefaultStartDate());
+                  setEndDate(getDefaultEndDate());
+                }}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          {/* Date Range Info */}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <span className="font-semibold">Showing appointments from:</span>{' '}
+              {new Date(startDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}{' '}
+              <span className="font-semibold">to</span>{' '}
+              {new Date(endDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+          </div>
+        </div>
 
         {/* Tab Navigation */}
         <div className="bg-white p-2 rounded-xl shadow-lg mb-8 inline-flex">
           <button
             onClick={() => setActiveTab('upcoming')}
             className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'upcoming' 
-                ? 'bg-blue-600 text-white shadow-md' 
+              activeTab === 'upcoming'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -135,8 +193,8 @@ const AppointmentHistoryPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('past')}
             className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'past' 
-                ? 'bg-blue-600 text-white shadow-md' 
+              activeTab === 'past'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -146,15 +204,29 @@ const AppointmentHistoryPage: React.FC = () => {
 
         {/* Appointment List */}
         <div className="space-y-6">
-          {appointmentsToShow.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <div className="p-8 bg-white rounded-xl shadow-lg text-center text-red-500">
+              Failed to load appointments. Please try again.
+            </div>
+          ) : appointmentsToShow.length > 0 ? (
             appointmentsToShow.map((app) => (
-              <AppointmentCard key={app.id} appointment={app} />
+              <AppointmentCard
+                key={app._id}
+                appointment={app}
+                onCancel={handleCancel}
+                onConfirm={handleConfirm}
+                isLoading={isCanceling || isConfirming}
+              />
             ))
           ) : (
             <div className="p-8 bg-white rounded-xl shadow-lg text-center text-gray-500">
-              {activeTab === 'upcoming' 
-                ? "You have no upcoming appointments. Time to book one!"
-                : "No past records found."}
+              {activeTab === 'upcoming'
+                ? 'You have no upcoming appointments. Time to book one!'
+                : 'No past records found.'}
             </div>
           )}
         </div>

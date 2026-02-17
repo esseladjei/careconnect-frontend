@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/RegisterUser';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 import Logout from './pages/Logout';
 import Doctors from './pages/Doctors';
 import Dashboard from './pages/Dashboard';
@@ -13,10 +15,10 @@ import Payments from './pages/PaymentsPages';
 import Appointments from './pages/AppointmentPage';
 import ReferralPage from './pages/ReferalPage';
 import NotFoundPage from './pages/NotFoundPage';
-import { useAuth } from './hooks/useAuth';
-import './App.css';
 import ProviderOnboarding from './pages/ProviderOnboarding.tsx';
 import Home from './pages/Home';
+import { useAuth } from './hooks/useAuth';
+import './App.css';
 
 function App() {
   const { isLoggedIn } = useAuth();
@@ -27,6 +29,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/password-reset/:role/:userId/:timestamp"
+          element={<ResetPassword />}
+        />
         <Route path="/logout" element={<Logout />} />
         <Route
           path="/provider/onboarding/:userId"

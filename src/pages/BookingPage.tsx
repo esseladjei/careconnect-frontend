@@ -32,7 +32,7 @@ export interface BookingFormErrors {
 
 const BookingPage: React.FC = () => {
   const { availabilityId } = useParams<{ availabilityId: string }>();
-  const { providerId, patientId } = useAuth();
+  const { actorId } = useAuth();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -63,7 +63,11 @@ const BookingPage: React.FC = () => {
     isLoading: slotsLoading,
     refetch: refetchSlots,
   } = useQuery<IProviderSlot[]>({
-    queryKey: ['slots', providerId, selectedDate.toDateString()],
+    queryKey: [
+      'slots',
+      providerOfferData?.providerId,
+      selectedDate.toDateString(),
+    ],
     queryFn: async () => {
       if (!availabilityId) throw new Error('AvailabilityId ID is required');
       const dateStr = selectedDate.toISOString().split('T')[0];
@@ -77,13 +81,14 @@ const BookingPage: React.FC = () => {
   const bookAppointmentMutation = useMutation({
     mutationFn: async (slotId: string) => {
       if (!providerOfferData) throw new Error('Provider ID is required');
+      const { start, end } = providerOfferData;
       return await appointmentsApi.bookAppointment({
         slotId,
         availabilityId: availabilityId!,
         providerId: providerOfferData.providerId!,
-        patientId: patientId!,
+        patientId: actorId!,
         appointmentType: providerOfferData?.appointmentType,
-        duration: providerOfferData?.sessionDuration!,
+        duration: getDuration(start, end),
         scheduledAt: selectedDate,
         status: 'pending',
         knownAllergies: knownAllergy,
@@ -94,7 +99,7 @@ const BookingPage: React.FC = () => {
     onSuccess: async () => {
       toast.success('Appointment booked successfully!');
       await refetchSlots();
-      navigate(`/dashboard/${patientId}`);
+      navigate(`/dashboard/${actorId}`);
     },
     onError: (error: any) => {
       toast.error(
@@ -133,6 +138,40 @@ const BookingPage: React.FC = () => {
     return providerOfferData.workingDays.includes(normalizedDay);
   };
 
+  function isSlotPast(startTime: string, endTime: string): boolean {
+    const now = new Date();
+
+    // Build Date objects for today with the given times
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const start = new Date(now);
+    start.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date(now);
+    end.setHours(endHour, endMinute, 0, 0);
+    return end < now; // slot is past if the END is before now
+  }
+
+  function getDuration(startTime: string, endTime: string): number {
+    const now = new Date();
+
+    // Build Date objects for today with the given times
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const start = new Date(now);
+    start.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date(now);
+    end.setHours(endHour, endMinute, 0, 0);
+    const diffMs = end.getTime() - start.getTime();
+    const diffMinutes = diffMs / (1000 * 60);
+    return diffMinutes / 60;
+  }
+
+  console.log(isSlotPast('09:00', '11:00')); // true if current time is 14:00
+
   // Generate time slots from fetched slots data
   const generateTimeSlots = (): TimeSlot[] => {
     if (!slotsData || slotsData.length === 0) {
@@ -140,8 +179,11 @@ const BookingPage: React.FC = () => {
     }
 
     return slotsData.map((slot) => ({
+      //check if time slot is not already past
       time: `${slot.startTime} - ${slot.endTime}`,
-      available: slot.status === 'available',
+      available:
+        slot.status === 'available' &&
+        !isSlotPast(slot.startTime, slot.endTime),
       slotId: slot._id,
     }));
   };

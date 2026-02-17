@@ -23,7 +23,7 @@ const RatingSummary: React.FC<Props> = ({ reviews }) => {
       : 0;
 
   return (
-    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border-2 border-yellow-200">
+    <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border-2 border-yellow-200">
       <div className="flex items-center gap-6">
         <div className="text-center">
           <div className="text-5xl font-bold text-gray-900">

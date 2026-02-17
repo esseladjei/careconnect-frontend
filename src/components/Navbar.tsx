@@ -5,27 +5,90 @@ import { useAuth } from '../hooks/useAuth';
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const { userId, isLoggedIn } = useAuth();
+  const { userId, isLoggedIn, role } = useAuth();
   // Navigation Links
   const navLinks = [
+    {
+      name: 'Create Listing',
+      href: `/createlisting/${userId}`,
+      title: 'As medical professional - create a listing ',
+      roles: ['provider'], // Only visible to providers
+    },
+    {
+      name: 'Find a Provider',
+      href: `/search`,
+      title: 'Find a Provider - Search for a medical professional',
+      roles: ['patient'], // Only visible to patients
+    },
     {
       name: 'Account',
       href: '#',
       submenu: [
-        { name: 'Create Listing', href: `/createlisting/${userId}` },
-        { name: 'Find provider', href: `/search` },
-        { name: 'My Appointments', href: `/appointments/${userId}` },
-        { name: 'My Dashboard', href: `/dashboard/${userId}` },
-        { name: 'My Payments', href: `/payments/${userId}` },
-        { name: 'My Profile', href: `/profile/${userId}` },
-        { name: 'Verification Status', href: `/provider/onboarding/${userId}` },
-        { name: 'Refer a Patient', href: `/referral/patient/${userId}` },
-        { name: 'Refer a Provider', href: `/referral/provider/${userId}` },
-        { name: 'Help', href: '/help' },
+        {
+          name: 'Help',
+          href: '/help',
+          title: 'Get support on how to use careconnect app',
+        },
+        {
+          name: 'My Profile',
+          href: `/profile/${userId}`,
+          title: 'Review and updated your profile',
+        },
+        {
+          name: 'My Payments',
+          href: `/payments/${userId}`,
+          title: 'Get an overview of all your payments',
+        },
+        {
+          name: 'My Dashboard',
+          href: `/dashboard/${userId}`,
+          title: 'Get a visualisation dashboard of your transaction and usage',
+        },
+        {
+          name: 'My Appointments',
+          href: `/appointments/${userId}`,
+          title: 'Get an overview of your Appointments',
+        },
+        {
+          name: 'Verification Status',
+          href: `/provider/onboarding/${userId}`,
+          title: 'Check the verification status progress',
+          roles: ['provider'], // Only visible to providers
+        },
+        {
+          name: 'Refer a Patient',
+          href: `/referral/patient/${userId}`,
+          title: 'Refer a friend to careconnect',
+          roles: ['patient'], // Only visible to patients
+        },
+        {
+          name: 'Refer a Provider',
+          href: `/referral/provider/${userId}`,
+          title: 'Refer a friend to careconnect',
+          roles: ['provider'], // Only visible to providers
+        },
         { name: 'Logout', href: '/logout' },
       ],
     },
   ];
+
+  // Filter navigation links based on user role
+  const filteredNavLinks = navLinks.filter(
+    (link) => !link.roles || link.roles.includes(role)
+  );
+
+  // Filter submenu items based on user role
+  const filteredNavLinksWithSubmenu = filteredNavLinks.map((link) => {
+    if (link.submenu) {
+      return {
+        ...link,
+        submenu: link.submenu.filter(
+          (item) => !item.roles || item.roles.includes(role)
+        ),
+      };
+    }
+    return link;
+  });
 
   return (
     <nav className="bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 text-white p-4">
@@ -45,10 +108,11 @@ const Navbar: React.FC = () => {
         {/* Desktop Menu and Toggle */}
         <div className="hidden md:flex items-center space-x-6">
           {isLoggedIn &&
-            navLinks.map((link) => (
+            filteredNavLinksWithSubmenu.map((link) => (
               <div key={link.name} className="relative group">
                 <a
                   href={link.href}
+                  title={link.title}
                   className="text-sm font-medium hover:text-blue-300 transition-colors flex items-center"
                 >
                   {link.name}
@@ -65,6 +129,7 @@ const Navbar: React.FC = () => {
                     {link.submenu.map((item) => (
                       <a
                         key={item.name}
+                        title={item.title}
                         href={item.href}
                         className="block px-4 py-2 text-sm hover:bg-blue-700 first:rounded-t-md last:rounded-b-md transition-colors"
                       >
@@ -106,7 +171,7 @@ const Navbar: React.FC = () => {
       {isOpen && (
         <div className="md:hidden mt-4 space-y-2 bg-blue-800 p-3 rounded-md">
           {isLoggedIn &&
-            navLinks.map((link) => (
+            filteredNavLinksWithSubmenu.map((link) => (
               <div key={link.name}>
                 <button
                   onClick={() =>
@@ -131,6 +196,7 @@ const Navbar: React.FC = () => {
                       <a
                         key={item.name}
                         href={item.href}
+                        title={item.title}
                         className="block px-3 py-2 text-sm hover:bg-blue-700 rounded-md transition-colors"
                         onClick={() => setIsOpen(false)}
                       >
@@ -146,6 +212,7 @@ const Navbar: React.FC = () => {
           {!isLoggedIn && (
             <a
               href="/login"
+              title="Log In"
               aria-label="Login or Register for CareConnect"
               data-analytics="navbar-login-register-mobile"
               className="block bg-white text-blue-700 px-4 py-2 rounded-md font-semibold shadow text-center"

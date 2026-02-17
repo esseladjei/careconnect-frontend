@@ -63,3 +63,16 @@ export interface UserResponse {
   user: UserProfile;
   profile: ProviderProfile | PatientProfile;
 }
+
+export interface IUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  emailVerified: boolean;
+  phone: string;
+  languages: string[];
+  gender: string;
+  title: string;
+}

@@ -5,13 +5,7 @@ import SecuritySettings from '../components/SecuritySettings';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import type {
-  PatientProfile,
-  ProviderProfile,
-  UserPassword,
-  UserProfile,
-  UserResponse,
-} from '../types/user.ts';
+import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -52,7 +46,7 @@ const UserProfilePage: React.FC = () => {
   const saveUserMutation = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      return axiosClient.patch(`/users/update/${userId}`, userResponse, {
+      return axiosClient.patch(`/user/update/${userId}`, userResponse, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -78,7 +72,7 @@ const UserProfilePage: React.FC = () => {
       if (userPassword.newPassword !== userPassword.confirmNewPassword)
         return toast.error("Passwords don't match");
       return axiosClient.patch(
-        `/auth/update/password/${userId}`,
+        `/user/update/password/${userId}`,
         userPassword,
         {
           headers: {
@@ -109,7 +103,7 @@ const UserProfilePage: React.FC = () => {
   } = useQuery({
     queryKey: ['user', userId],
     queryFn: async () => {
-      const response = await axiosClient.get(`/users/${userId}`, {
+      const response = await axiosClient.get(`/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
