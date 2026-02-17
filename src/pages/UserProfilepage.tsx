@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import ProfileDetailsForm from '../components/ProfileDetailsForms';
 import SecuritySettings from '../components/SecuritySettings';
+import MFASettings from '../components/MFASettings';
+import MFAVerificationModal from '../components/MFAVerificationModal';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
+import type {
+  PatientProfile,
+  ProviderProfile,
+  UserPassword,
+  UserProfile,
+  UserResponse,
+} from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -15,8 +23,14 @@ type savePasswordStatus = boolean;
 
 // --- Main Component ---
 const UserProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'mfa'>(
+    'profile'
+  );
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(false);
+  const [mfaVerificationOpen, setMFAVerificationOpen] = useState(false);
+  const [mfaAction, setMFAAction] = useState<
+    'login' | 'password-change' | 'profile-update'
+  >('login');
   const [userResponse, setUserResponse] = useState<UserResponse>({
     user: {
       title: '',
@@ -60,6 +74,13 @@ const UserProfilePage: React.FC = () => {
       setSaveStatus(true);
     },
     onError: (err: any, __, toastId) => {
+      // Check if MFA verification is required
+      if (err.response?.status === 403 && err.response?.data?.requiresMFA) {
+        toast.dismiss(toastId);
+        setMFAAction('profile-update');
+        setMFAVerificationOpen(true);
+        return;
+      }
       toast.error(err.response?.data?.message || 'Failed to update profile', {
         id: toastId,
       });
@@ -91,6 +112,12 @@ const UserProfilePage: React.FC = () => {
       setSavePasswordStatus(true);
     },
     onError: (err: any) => {
+      // Check if MFA verification is required
+      if (err.response?.status === 403 && err.response?.data?.requiresMFA) {
+        setMFAAction('password-change');
+        setMFAVerificationOpen(true);
+        return;
+      }
       toast.error(err.response?.data?.message || 'Failed to update password');
     },
   });
@@ -299,6 +326,16 @@ const UserProfilePage: React.FC = () => {
               >
                 Security & Access
               </button>
+              <button
+                onClick={() => setActiveTab('mfa')}
+                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                  activeTab === 'mfa'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Two-Factor Auth
+              </button>
             </div>
 
             {/* Tab Content with Loading Indicator */}
@@ -329,12 +366,40 @@ const UserProfilePage: React.FC = () => {
                       savePasswordStatus={savePasswordStatus}
                     />
                   )}
+                  {activeTab === 'mfa' && userId && (
+                    <MFASettings userId={userId} userEmail={user.email} />
+                  )}
                 </>
               )}
             </div>
           </div>
         )}
       </main>
+
+      {/* MFA Verification Modal */}
+      <MFAVerificationModal
+        isOpen={mfaVerificationOpen}
+        onClose={() => setMFAVerificationOpen(false)}
+        onSuccess={(token?: string) => {
+          setMFAVerificationOpen(false);
+          // If a new token is returned, update it in localStorage
+          if (token) {
+            localStorage.setItem('mfa-token', token);
+          }
+          // Retry the original operation
+          if (mfaAction === 'password-change') {
+            savePasswordMutation.mutate();
+          } else if (mfaAction === 'profile-update') {
+            saveUserMutation.mutate();
+          }
+        }}
+        onError={() => {
+          setMFAVerificationOpen(false);
+          toast.error('MFA verification failed. Please try again.');
+        }}
+        actionType={mfaAction}
+        userId={userId}
+      />
 
       <Footer />
     </div>
