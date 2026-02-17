@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
             />
           </div>
 
-          {/* 4. Secondary Visualization Cards (Revenue, Top Products) */}
+          {/* Secondary Visualization Cards (Revenue, Top Products) */}
           <div className="sm:col-span-2 lg:col-span-2 xl:col-span-2">
             <DataCard title="Top Selling Products" size="large" type="line" />
           </div>
