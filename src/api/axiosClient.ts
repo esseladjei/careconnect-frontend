@@ -1,35 +1,60 @@
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 const axiosClient = axios.create({
   baseURL: 'http://localhost:5500/api',
+  withCredentials: true,
 });
 
-// Request interceptor to add token to every request
-axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+const refreshClient = axios.create({
+  baseURL: 'http://localhost:5500/api',
+  withCredentials: true,
+});
 
-// Response interceptor to handle token expiration
+const clearStoredAuth = () => {
+  localStorage.removeItem('userId');
+  localStorage.removeItem('providerId');
+  localStorage.removeItem('patientId');
+  localStorage.removeItem('role');
+};
+
+const refreshSession = async () => {
+  await refreshClient.post('/auth/refresh');
+};
+
+// Response interceptor to handle auth expiration
 axiosClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - clear auth data and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('providerId');
-      localStorage.removeItem('patientId');
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+    const data = error.response?.data as { code?: string };
+    if (
+      error.response?.status === 401 &&
+      data?.code === 'TOKEN_EXPIRED' &&
+      originalRequest
+    ) {
+      const isRefreshRequest =
+        typeof originalRequest.url === 'string' &&
+        originalRequest.url.includes('/auth/refresh');
+
+      if (!originalRequest._retry && !isRefreshRequest) {
+        originalRequest._retry = true;
+        try {
+          await refreshSession();
+          return axiosClient(originalRequest);
+        } catch (refreshError) {
+          clearStoredAuth();
+          window.location.href = '/login';
+          return Promise.reject(refreshError);
+        }
+      }
+
+      clearStoredAuth();
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

@@ -1,20 +1,20 @@
 /**
- * Custom hook to get authentication data (token and userId) from localStorage
+ * Custom hook to get authentication data from localStorage
  * Use this hook in any component that needs the user ID
  *
- * THIS WILL BE REFACTORED TO USE HTTPS COOKIES INSTEAD OF SENDING TOKEN VIA EVERY REQUEST
+ * NOTE: Auth now uses HTTP-only cookies; no JWT is stored in localStorage.
  */
 export const useAuth = () => {
-  const token = localStorage.getItem('token')!;
-  const userId = localStorage.getItem('userId')!;
-  const providerId = localStorage.getItem('providerId')!;
-  const patientId = localStorage.getItem('patientId')!;
-  const role = localStorage.getItem('role')!;
+  const userId = localStorage.getItem('userId') ?? '';
+  const providerId = localStorage.getItem('providerId') ?? '';
+  const patientId = localStorage.getItem('patientId') ?? '';
+  const role = localStorage.getItem('role') ?? '';
+  const actorId = role === 'provider' ? providerId : patientId;
+
   return {
-    token,
     userId,
     role,
-    actorId: role === 'provider' ? providerId : patientId,
-    isLoggedIn: !!token && !!userId,
+    actorId,
+    isLoggedIn: Boolean(userId && role),
   };
 };
