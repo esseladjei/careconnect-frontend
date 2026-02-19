@@ -137,4 +137,4 @@ export const useAuth = () => {
     isSessionLoading: sessionLoading && hasStoredUserId && !isFreshLogin,
     isSessionValid: isTrusted && hasStoredUserId,
   };
-};;;;
+};
