@@ -53,6 +53,18 @@ axiosClient.interceptors.response.use(
       _retry?: boolean;
     };
     const data = error.response?.data as { code?: string };
+    const isAuthMeRequest =
+      typeof originalRequest.url === 'string' &&
+      originalRequest.url.includes('/auth/me');
+
+    // ✅ FIX: Don't redirect to login for /auth/me 401 errors
+    // These are expected when session is invalid
+    if (isAuthMeRequest && error.response?.status === 401) {
+      console.log('📍 Session verification failed - user not authenticated');
+      // Just return the error, don't redirect
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 401 &&
       data?.code === 'TOKEN_EXPIRED' &&
