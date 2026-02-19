@@ -43,7 +43,7 @@ const refreshSession = async () => {
     });
 
   return refreshPromise;
-};;
+};
 
 // Response interceptor to handle auth expiration
 axiosClient.interceptors.response.use(
