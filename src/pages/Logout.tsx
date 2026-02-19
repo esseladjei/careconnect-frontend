@@ -12,7 +12,7 @@ const Logout: React.FC = () => {
         await logout();
         toast.success('You have been logged out successfully!');
       } catch (err: any) {
-        toast.error(err.response?.data?.message || 'Logout failed');
+        toast.error(err.response?.data?.message || 'Server logout failed. You have been logged out locally.');
       } finally {
         // Clear all authentication data from localStorage
         localStorage.removeItem('userId');
@@ -24,9 +24,7 @@ const Logout: React.FC = () => {
         navigate('/login');
       }
     };
-    (async () => {
-      await runLogout();
-    })();
+    runLogout();
   }, [navigate]);
 
   return null;

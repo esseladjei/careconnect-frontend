@@ -397,7 +397,14 @@ const UserProfilePage: React.FC = () => {
                       onChange={handlePasswordChange}
                       onPasswordSave={savePasswordMutation.mutate}
                       savePasswordStatus={savePasswordStatus}
-                      onLogoutAll={() => logoutAll()}
+                      onLogoutAll={async () => {
+                        try {
+                          await logoutAll();
+                          toast.success('You have been logged out from all devices.');
+                        } catch (error) {
+                          toast.error('Failed to log out from all devices. Please try again.');
+                        }
+                      }}
                     />
                   )}
                   {activeTab === 'mfa' && userId && (
