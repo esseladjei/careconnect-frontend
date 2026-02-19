@@ -1,29 +1,16 @@
 import axiosClient from './axiosClient';
-import type { CreateReferralResponse, ReferralStats } from '../types/referral';
+import type { ReferralStats } from '../types/referral';
 
 const BASE_URL = '/referrals';
 
 /**
- * Get referral statistics and list for the current user
+ * Get referral statistics/code and list for the current user
  */
 export const getReferralStats = async (
   userId: string
 ): Promise<ReferralStats> => {
   const response = await axiosClient.get<ReferralStats>(
     `${BASE_URL}/${userId}`
-  );
-  return response.data;
-};
-
-/**
- * Generate or get existing referral code for user
- */
-export const generateReferralCode = async (
-  userId: string
-): Promise<CreateReferralResponse> => {
-  const response = await axiosClient.post<CreateReferralResponse>(
-    `${BASE_URL}/generate`,
-    { userId }
   );
   return response.data;
 };

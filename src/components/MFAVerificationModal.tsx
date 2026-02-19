@@ -8,8 +8,13 @@ interface MFAVerificationModalProps {
   onClose: () => void;
   onSuccess: (token?: string) => void;
   onError: () => void;
-  actionType?: 'login' | 'password-change' | 'profile-update';
+  actionType?:
+    | 'login'
+    | 'password-change'
+    | 'profile-update'
+    | 'password-reset';
   userId: string;
+  method: 'email' | 'totp';
 }
 
 const MFAVerificationModal: React.FC<MFAVerificationModalProps> = ({
@@ -19,14 +24,17 @@ const MFAVerificationModal: React.FC<MFAVerificationModalProps> = ({
   onError,
   actionType = 'login',
   userId,
+  method,
 }) => {
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<'email' | 'totp'>(
-    'email'
+    method
   );
   const [attemptCount, setAttemptCount] = useState(0);
   const MAX_ATTEMPTS = 3;
+  //required for resetting forgotten password
+  const email = localStorage.getItem('email') || undefined;
 
   const handleVerifyCode = async () => {
     if (!code.trim()) {
@@ -51,6 +59,7 @@ const MFAVerificationModal: React.FC<MFAVerificationModalProps> = ({
         code,
         method: selectedMethod,
         userId,
+        email,
       });
 
       if (response.success) {
@@ -101,9 +110,9 @@ const MFAVerificationModal: React.FC<MFAVerificationModalProps> = ({
     if (isOpen) {
       setCode('');
       setAttemptCount(0);
-      setSelectedMethod('email');
+      setSelectedMethod(method);
     }
-  }, [isOpen]);
+  }, [isOpen, method]);
 
   if (!isOpen) return null;
 
@@ -122,6 +131,8 @@ const MFAVerificationModal: React.FC<MFAVerificationModalProps> = ({
               'Please verify your identity with a 2FA code before changing your password.'}
             {actionType === 'profile-update' &&
               'Please verify your identity with a 2FA code before updating your profile.'}
+            {actionType === 'password-reset' &&
+              'Please verify your identity with a 2FA code before sending the password reset link.'}
           </p>
         </div>
 

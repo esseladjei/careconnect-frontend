@@ -5,7 +5,6 @@ import Register from './pages/RegisterUser';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 import Logout from './pages/Logout';
-import Doctors from './pages/Doctors';
 import Dashboard from './pages/Dashboard';
 import SearchPage from './pages/SearchPage';
 import BookingPage from './pages/BookingPage.tsx';
@@ -66,10 +65,6 @@ function App() {
         <Route
           path="/profile/:userId"
           element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/doctors"
-          element={isLoggedIn ? <Doctors /> : <Navigate to="/login" />}
         />
         <Route
           path="/referral/provider/:userId"

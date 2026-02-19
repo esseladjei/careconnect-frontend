@@ -24,6 +24,7 @@ export interface MFAVerificationRequest {
   code: string;
   method: 'email' | 'totp';
   userId?: string;
+  email?: string;
 }
 
 export interface MFAVerificationResponse {

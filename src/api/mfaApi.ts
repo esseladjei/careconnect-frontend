@@ -9,11 +9,7 @@ import type {
  * Fetch current MFA settings for the user
  */
 export const fetchMFASettings = async (userId: string): Promise<any> => {
-  const response = await axiosClient.get(`/mfa/settings/${userId}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
+  const response = await axiosClient.get(`/mfa/settings/${userId}`);
   // Handle both direct data and wrapped response format
   return response.data.data || response.data;
 };
@@ -22,15 +18,7 @@ export const fetchMFASettings = async (userId: string): Promise<any> => {
  * Enable MFA for the user
  */
 export const enableMFA = async (userId: string): Promise<void> => {
-  await axiosClient.post(
-    `/mfa/enable/${userId}`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }
-  );
+  await axiosClient.post(`/mfa/enable/${userId}`);
 };
 
 /**
@@ -40,11 +28,7 @@ export const disableMFA = async (
   userId: string,
   data: MFADisableRequest
 ): Promise<void> => {
-  await axiosClient.post(`/mfa/disable/${userId}`, data, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
+  await axiosClient.post(`/mfa/disable/${userId}`, data);
 };
 
 /**
@@ -55,15 +39,10 @@ export const enrollMFAMethod = async (
   userEmail: string,
   method: MFAEnrollmentType
 ): Promise<any> => {
-  const response = await axiosClient.post(
-    `/mfa/enroll/${userId}`,
-    { method, email: userEmail },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }
-  );
+  const response = await axiosClient.post(`/mfa/enroll/${userId}`, {
+    method,
+    email: userEmail,
+  });
   // Handle both direct data and wrapped response format
   return response.data.data || response.data;
 };
@@ -77,12 +56,7 @@ export const verifyMFAEnrollment = async (
 ): Promise<any> => {
   const response = await axiosClient.post(
     `/mfa/verify-enrollment/${userId}`,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }
+    data
   );
   // Handle both direct data and wrapped response format
   return response.data.data || response.data;
@@ -106,15 +80,7 @@ export const setPrimaryMFAMethod = async (
   userId: string,
   method: MFAEnrollmentType
 ): Promise<void> => {
-  await axiosClient.post(
-    `/mfa/set-primary/${userId}`,
-    { method },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }
-  );
+  await axiosClient.post(`/mfa/set-primary/${userId}`, { method });
 };
 
 /**
@@ -124,17 +90,13 @@ export const removeMFAMethod = async (
   userId: string,
   method: MFAEnrollmentType
 ): Promise<void> => {
-  await axiosClient.delete(`/mfa/method/${userId}/${method}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
+  await axiosClient.delete(`/mfa/method/${userId}/${method}`);
 };
 
 /**
- * Send MFA code during login (triggers email or prepares TOTP)
+ * Send MFA code during login or sensitive operation (triggers email or prepares TOTP)
  */
-export const sendMFACodeForLogin = async (
+export const sendMFACode = async (
   userId: string,
   method: MFAEnrollmentType
 ): Promise<any> => {
@@ -145,22 +107,3 @@ export const sendMFACodeForLogin = async (
   // Handle both direct data and wrapped response format
   return response.data.data || response.data;
 };
-
-/**
- * Verify MFA code during login to get authentication token
- */
-/*
-export const verifyMFACodeForLogin = async (
-  userId: string,
-  code: string,
-  method: MFAEnrollmentType
-): Promise<any> => {
-  const response = await axiosClient.post(`/mfa/verify`, {
-    userId,
-    code,
-    method,
-  });
-  // Handle both direct data and wrapped response format
-  return response.data.data || response.data;
-};
-*/
