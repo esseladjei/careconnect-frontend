@@ -7,7 +7,13 @@ import MFAVerificationModal from '../components/MFAVerificationModal';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
+import type {
+  PatientProfile,
+  ProviderProfile,
+  UserPassword,
+  UserProfile,
+  UserResponse,
+} from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
