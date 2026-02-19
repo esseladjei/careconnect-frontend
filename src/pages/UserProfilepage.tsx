@@ -18,6 +18,7 @@ import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSendMFACode } from '../hooks/useSendMFACode.ts';
+import { logoutAll } from '../api/authApi';
 
 type SaveStatus = boolean;
 type savePasswordStatus = boolean;
@@ -35,6 +36,7 @@ const UserProfilePage: React.FC = () => {
   const [method, setMethod] = useState<'email' | 'totp'>('email');
   const [userResponse, setUserResponse] = useState<UserResponse>({
     user: {
+      userId: '',
       title: '',
       firstName: '',
       lastName: '',
@@ -69,7 +71,6 @@ const UserProfilePage: React.FC = () => {
       if (mfaToken) {
         headers['x-mfa-token'] = mfaToken;
       }
-
       return axiosClient.patch(`/user/update/${userId}`, userResponse, {
         headers,
       });
@@ -396,6 +397,14 @@ const UserProfilePage: React.FC = () => {
                       onChange={handlePasswordChange}
                       onPasswordSave={savePasswordMutation.mutate}
                       savePasswordStatus={savePasswordStatus}
+                      onLogoutAll={async () => {
+                        try {
+                          await logoutAll();
+                          toast.success('You have been logged out from all devices.');
+                        } catch (error) {
+                          toast.error('Failed to log out from all devices. Please try again.');
+                        }
+                      }}
                     />
                   )}
                   {activeTab === 'mfa' && userId && (

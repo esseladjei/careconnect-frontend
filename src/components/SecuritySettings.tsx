@@ -6,6 +6,7 @@ interface SecuritySettingsProps {
   onChange: (field: keyof UserPassword, value: string) => void;
   onPasswordSave: () => void;
   savePasswordStatus: boolean;
+  onLogoutAll: () => void;
 }
 
 interface PasswordInputProps {
@@ -58,6 +59,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   onChange,
   onPasswordSave,
   savePasswordStatus,
+  onLogoutAll,
 }) => {
   const handlePasswordChangeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +116,23 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
         </p>
         <button className="px-4 py-2 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
           Deactivate Account
+        </button>
+      </div>
+
+      {/* Logout all devices */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-3">
+          Logout All Devices
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Sign out of your account on all devices.
+        </p>
+        <button
+          type="button"
+          onClick={onLogoutAll}
+          className="px-4 py-2 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+        >
+          Log out all devices
         </button>
       </div>
     </div>
