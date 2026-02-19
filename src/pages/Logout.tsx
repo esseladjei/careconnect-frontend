@@ -24,9 +24,7 @@ const Logout: React.FC = () => {
         navigate('/login');
       }
     };
-    (async () => {
-      await runLogout();
-    })();
+    runLogout();
   }, [navigate]);
 
   return null;
