@@ -8,7 +8,6 @@ import Spinner from '../components/Spinner';
 import { useSendMFACode } from '../hooks/useSendMFACode.ts';
 
 interface LoginResponse {
-  accessToken: string;
   user: { userId: string; role: string };
   provider?: string;
   patient?: string;
