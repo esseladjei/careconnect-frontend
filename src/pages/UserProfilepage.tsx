@@ -17,6 +17,7 @@ import type {
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useSendMFACode } from '../hooks/useSendMFACode.ts';
 
 type SaveStatus = boolean;
 type savePasswordStatus = boolean;
@@ -31,6 +32,7 @@ const UserProfilePage: React.FC = () => {
   const [mfaAction, setMFAAction] = useState<
     'login' | 'password-change' | 'profile-update'
   >('login');
+  const [method, setMethod] = useState<'email' | 'totp'>('email');
   const [userResponse, setUserResponse] = useState<UserResponse>({
     user: {
       title: '',
@@ -56,14 +58,20 @@ const UserProfilePage: React.FC = () => {
     confirmNewPassword: '',
     oldPassword: '',
   });
+  const { sendCode } = useSendMFACode();
 
   const saveUserMutation = useMutation({
     mutationFn: async () => {
       if (!userId) return;
+      const headers: Record<string, string> = {};
+      // Add MFA token if available (from previous verification)
+      const mfaToken = localStorage.getItem('mfa-token');
+      if (mfaToken) {
+        headers['x-mfa-token'] = mfaToken;
+      }
+
       return axiosClient.patch(`/user/update/${userId}`, userResponse, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers,
       });
     },
     onMutate: () => {
@@ -71,14 +79,26 @@ const UserProfilePage: React.FC = () => {
     },
     onSuccess: (_, __, toastId) => {
       toast.success('Profile updated successfully!', { id: toastId });
+      localStorage.removeItem('mfa-token'); // Clean up after success
       setSaveStatus(true);
     },
-    onError: (err: any, __, toastId) => {
+    onError: async (err: any, __, toastId) => {
       // Check if MFA verification is required
-      if (err.response?.status === 403 && err.response?.data?.requiresMFA) {
+      if (
+        err.response?.status === 403 &&
+        err.response?.data?.data.requiresMFA
+      ) {
         toast.dismiss(toastId);
-        setMFAAction('profile-update');
         setMFAVerificationOpen(true);
+        setMFAAction('profile-update');
+        const defaultMethod = err.response?.data?.data?.primaryMethod;
+        const method = err.response?.data.data?.mfaMethods.find(
+          (m: any) => m.type === defaultMethod
+        );
+        setMethod(method);
+        if (method.type === 'email') {
+          await sendCode(userId, method.type);
+        }
         return;
       }
       toast.error(err.response?.data?.message || 'Failed to update profile', {
@@ -92,14 +112,18 @@ const UserProfilePage: React.FC = () => {
       if (!userId) return;
       if (userPassword.newPassword !== userPassword.confirmNewPassword)
         return toast.error("Passwords don't match");
+
+      const headers: Record<string, string> = {};
+
+      // Add MFA token if available (from previous verification)
+      const mfaToken = localStorage.getItem('mfa-token');
+      if (mfaToken) {
+        headers['x-mfa-token'] = mfaToken;
+      }
       return axiosClient.patch(
         `/user/update/password/${userId}`,
         userPassword,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
+        { headers }
       );
     },
     onSuccess: () => {
@@ -111,11 +135,24 @@ const UserProfilePage: React.FC = () => {
       });
       setSavePasswordStatus(true);
     },
-    onError: (err: any) => {
+    onError: async (err: any) => {
       // Check if MFA verification is required
-      if (err.response?.status === 403 && err.response?.data?.requiresMFA) {
+      if (
+        err.response?.status === 403 &&
+        err.response?.data?.data?.requiresMFA
+      ) {
         setMFAAction('password-change');
         setMFAVerificationOpen(true);
+        const defaultMethod = err.response?.data?.data?.primaryMethod;
+        const method = err.response?.data.data?.mfaMethods.find(
+          (m: any) => m.type === defaultMethod
+        );
+        if (method) {
+          setMethod(method.type);
+          if (method.type === 'email') {
+            await sendCode(userId, method.type);
+          }
+        }
         return;
       }
       toast.error(err.response?.data?.message || 'Failed to update password');
@@ -130,11 +167,7 @@ const UserProfilePage: React.FC = () => {
   } = useQuery({
     queryKey: ['user', userId],
     queryFn: async () => {
-      const response = await axiosClient.get(`/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const response = await axiosClient.get(`/user/${userId}`);
       return response.data as UserResponse;
     },
     enabled: !!userId,
@@ -158,7 +191,6 @@ const UserProfilePage: React.FC = () => {
     'confirmPassword',
   ]);
 
-  // Fixed handleChange: updates both user and profile fields correctly
   const handleChange = (
     field: keyof UserProfile | keyof (PatientProfile | ProviderProfile),
     value: string | string[] | Date | number | boolean
@@ -395,10 +427,12 @@ const UserProfilePage: React.FC = () => {
         }}
         onError={() => {
           setMFAVerificationOpen(false);
+          localStorage.removeItem('mfa-token'); // Clean up on error
           toast.error('MFA verification failed. Please try again.');
         }}
         actionType={mfaAction}
         userId={userId}
+        method={method}
       />
 
       <Footer />

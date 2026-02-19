@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query';
 import MFAVerificationModal from '../components/MFAVerificationModal';
-import { sendMFACodeForLogin } from '../api/mfaApi';
 import Spinner from '../components/Spinner';
+import { useSendMFACode } from '../hooks/useSendMFACode.ts';
 
 interface LoginResponse {
   accessToken: string;
@@ -14,6 +14,7 @@ interface LoginResponse {
   patient?: string;
   requiresMFA?: boolean;
   userId?: string;
+  defaultMethod: string;
   mfaMethods?: Array<{ type: 'email' | 'totp'; isVerified: boolean }>;
 }
 
@@ -28,10 +29,11 @@ const Login = () => {
   const [mfaMethods, setMfaMethods] = useState<
     Array<{ type: 'email' | 'totp'; isVerified: boolean }>
   >([]);
-  const [selectedMFAMethod, setSelectedMFAMethod] = useState<'email' | 'totp'>(
-    'email'
-  );
-  const [sendingCode, setSendingCode] = useState(false);
+  const [method, setMethod] = useState<'email' | 'totp'>('email');
+  const [selectedMFAMethod, setSelectedMFAMethod] = useState<
+    'email' | 'totp'
+  >();
+  const { sendCode, sendingCode } = useSendMFACode();
 
   // Load saved email ONLY on component mount (NOT password for security)
   useEffect(() => {
@@ -41,6 +43,25 @@ const Login = () => {
       setRememberMe(true);
     }
   }, []);
+
+  const setLocalStorage = (response: LoginResponse): void => {
+    const { user, provider, patient } = response;
+    localStorage.setItem('userId', user.userId);
+    localStorage.setItem('role', user.role);
+    if (user.role === 'provider' && provider) {
+      localStorage.setItem('providerId', provider);
+    } else if (user.role === 'patient' && patient) {
+      localStorage.setItem('patientId', patient);
+    }
+
+    // Handle "Remember me" functionality (SECURE: Email only, never store password)
+    if (rememberMe) {
+      localStorage.setItem('rememberMeEmail', email);
+    } else {
+      // Clear saved email if "Remember me" is unchecked
+      localStorage.removeItem('rememberMeEmail');
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -55,45 +76,30 @@ const Login = () => {
         setMfaUserId(response.userId);
         setLoginData(response);
         setMfaMethods(response.mfaMethods);
-
+        const defaultMethod = response.defaultMethod;
         // Auto-select email if available, otherwise TOTP
-        const emailMethod = response.mfaMethods.find((m) => m.type === 'email');
-        const totpMethod = response.mfaMethods.find((m) => m.type === 'totp');
-        if (emailMethod) {
-          setSelectedMFAMethod('email');
-        } else if (totpMethod) {
-          setSelectedMFAMethod('totp');
-        }
-
-        // Automatically send code to the selected method
-        await handleSendMFACode(
-          response.userId,
-          emailMethod ? 'email' : 'totp'
+        const method = response?.mfaMethods.find(
+          (m) => m.type === defaultMethod
         );
-
-        toast.custom('MFA verification required. Check your email or app.');
+        if (method) {
+          const { type } = method;
+          setMethod(type);
+          if (method?.type === 'email') {
+            setSelectedMFAMethod('email');
+          } else {
+            setSelectedMFAMethod('totp');
+          }
+          // Automatically send code to the selected method
+          await sendCode(response.userId, type);
+        }
+        toast.loading('MFA verification required. Check your email or app.');
         return;
       }
 
       // No MFA - proceed with normal login
-      const { accessToken, user, provider, patient } = response;
+      const { user, accessToken } = response;
       localStorage.setItem('token', accessToken);
-      localStorage.setItem('userId', user.userId);
-      localStorage.setItem('role', user.role);
-      if (user.role === 'provider' && provider) {
-        localStorage.setItem('providerId', provider);
-      } else if (user.role === 'patient' && patient) {
-        localStorage.setItem('patientId', patient);
-      }
-
-      // Handle "Remember me" functionality (SECURE: Email only, never store password)
-      if (rememberMe) {
-        localStorage.setItem('rememberMeEmail', email);
-      } else {
-        // Clear saved email if "Remember me" is unchecked
-        localStorage.removeItem('rememberMeEmail');
-      }
-
+      setLocalStorage(response);
       toast.success('Login successful!');
       // Force a hard reload to ensure useAuth hook re-evaluates
       window.location.href = `/dashboard/${user.userId}`;
@@ -102,18 +108,19 @@ const Login = () => {
       toast.error(err.response?.data?.message || 'Login failed');
     },
   });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate();
   };
 
-  const handleSendMFACode = async (
+  /*const handleSendMFACode = async (
     userId: string,
     method: 'email' | 'totp'
   ) => {
     try {
       setSendingCode(true);
-      await sendMFACodeForLogin(userId, method);
+      await sendMFACode(userId, method);
       toast.success(
         method === 'email'
           ? 'Verification code sent to your email'
@@ -128,7 +135,7 @@ const Login = () => {
       setSendingCode(false);
     }
   };
-
+*/
   const handleMFASuccess = async (token?: string) => {
     if (!mfaUserId || !loginData) {
       toast.error('MFA session lost. Please login again.');
@@ -137,28 +144,12 @@ const Login = () => {
     }
 
     try {
-      const { user, provider, patient } = loginData;
-
+      const { user } = loginData;
       // Use the new token from MFA verification if provided
       if (token) {
         localStorage.setItem('token', token);
       }
-
-      localStorage.setItem('userId', user.userId);
-      localStorage.setItem('role', user.role);
-      if (user.role === 'provider' && provider) {
-        localStorage.setItem('providerId', provider);
-      } else if (user.role === 'patient' && patient) {
-        localStorage.setItem('patientId', patient);
-      }
-
-      // Handle "Remember me" functionality
-      if (rememberMe) {
-        localStorage.setItem('rememberMeEmail', email);
-      } else {
-        localStorage.removeItem('rememberMeEmail');
-      }
-
+      setLocalStorage(loginData);
       toast.success('Login successful!');
       setMfaRequired(false);
       window.location.href = `/dashboard/${user.userId}`;
@@ -198,9 +189,9 @@ const Login = () => {
                     name="mfaMethod"
                     value={method.type}
                     checked={selectedMFAMethod === method.type}
-                    onChange={() => {
+                    onChange={async () => {
                       setSelectedMFAMethod(method.type);
-                      handleSendMFACode(mfaUserId!, method.type);
+                      await sendCode(mfaUserId!, method.type);
                     }}
                     disabled={sendingCode}
                     className="w-4 h-4 text-blue-600"
@@ -318,6 +309,7 @@ const Login = () => {
           onError={handleMFAError}
           actionType="login"
           userId={mfaUserId}
+          method={method}
         />
       )}
     </div>

@@ -304,7 +304,6 @@ frontend/
 │   │   ├── ResetPassword.tsx        # Password reset page
 │   │   ├── Logout.tsx               # Logout handler
 │   │   ├── Dashboard.tsx            # User dashboard
-│   │   ├── Doctors.tsx              # Doctor listing
 │   │   ├── SearchPage.tsx           # Search and filter page
 │   │   ├── BookingPage.tsx          # Appointment booking
 │   │   ├── CreateListing.tsx        # Provider listing creation

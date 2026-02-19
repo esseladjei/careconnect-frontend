@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForgotPassword } from '../hooks/useForgotPassword';
+import { useSendMFACode } from '../hooks/useSendMFACode';
+import MFAVerificationModal from '../components/MFAVerificationModal';
+import type { MFARequirements } from '../api/forgotPasswordApi';
+import toast from 'react-hot-toast';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const { mutate: requestReset, isPending } = useForgotPassword();
+  const { sendCode } = useSendMFACode();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  // MFA related state
+  const [mfaVerificationOpen, setMFAVerificationOpen] = useState(false);
+  const [mfaRequirements, setMfaRequirements] =
+    useState<MFARequirements | null>(null);
+  const [userId, setUserId] = useState<string>('');
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -19,31 +30,67 @@ const ForgotPassword: React.FC = () => {
     if (error) setError('');
   };
 
+  const onSuccessCallback = () => {
+    setSubmitted(true);
+    setEmail('');
+    localStorage.removeItem('email');
+    toast.success('Password reset link sent to your email!');
+    // Auto-redirect after 5 seconds
+    setTimeout(() => navigate('/login'), 5000);
+  };
+
+  const onErrorCallback = async (err: any) => {
+    // Check if MFA verification is required
+    if (err.response?.status === 403 && err.response?.data?.data?.requiresMFA) {
+      const mfaData = err.response.data.data;
+      setMfaRequirements(mfaData);
+      const extractedUserId = mfaData.userId || '';
+      setUserId(extractedUserId);
+
+      // Set default method to primary method
+      const primaryMethod = mfaData.primaryMethod || 'email';
+
+      // Send code if email method is selected
+      if (primaryMethod === 'email' && extractedUserId) {
+        await sendCode(extractedUserId, 'email');
+      }
+
+      // Open MFA verification modal
+      setMFAVerificationOpen(true);
+      return;
+    }
+
+    // Handle other errors
+    const message =
+      err.response?.data?.message ||
+      err.message ||
+      'Failed to send reset email';
+    toast.error(message);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email.trim()) {
       setError('Email is required');
       return;
     }
-
     if (!validateEmail(email)) {
       setError('Please enter a valid email address');
       return;
     }
-
-    requestReset(email, {
-      onSuccess: () => {
-        setSubmitted(true);
-        setEmail('');
-        // Auto-redirect after 5 seconds
-        setTimeout(() => navigate('/login'), 5000);
-      },
-    });
+    //store email in localstorage, and send it along during verification
+    localStorage.setItem('email', email);
+    requestReset(
+      { email },
+      {
+        onSuccess: onSuccessCallback,
+        onError: onErrorCallback,
+      }
+    );
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -182,6 +229,46 @@ const ForgotPassword: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* MFA Verification Modal */}
+      {mfaRequirements && (
+        <MFAVerificationModal
+          isOpen={mfaVerificationOpen}
+          onClose={() => setMFAVerificationOpen(false)}
+          onSuccess={(token?: string) => {
+            setMFAVerificationOpen(false);
+            // Retry password reset with MFA token
+            if (token) {
+              requestReset(
+                { email, mfaToken: token },
+                {
+                  onSuccess: () => {
+                    setSubmitted(true);
+                    setEmail('');
+                    toast.success('Password reset link sent to your email!');
+                    // Auto-redirect after 5 seconds
+                    setTimeout(() => navigate('/login'), 5000);
+                  },
+                  onError: (err: any) => {
+                    const message =
+                      err.response?.data?.message ||
+                      err.message ||
+                      'Failed to send reset email';
+                    toast.error(message);
+                  },
+                }
+              );
+            }
+          }}
+          onError={() => {
+            setMFAVerificationOpen(false);
+            toast.error('MFA verification failed. Please try again.');
+          }}
+          actionType="password-reset"
+          userId={userId}
+          method={mfaRequirements.primaryMethod || 'email'}
+        />
+      )}
     </div>
   );
 };

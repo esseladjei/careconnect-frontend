@@ -5,6 +5,7 @@ import type {
 } from '../api/passwordApi';
 import { resetPassword } from '../api/passwordApi';
 import toast from 'react-hot-toast';
+import type { AxiosError } from 'axios';
 
 /**
  * Hook to reset user password
@@ -12,7 +13,7 @@ import toast from 'react-hot-toast';
 export const useResetPassword = () => {
   return useMutation<
     ResetPasswordResponse,
-    Error,
+    AxiosError,
     {
       role: string;
       userId: string;
