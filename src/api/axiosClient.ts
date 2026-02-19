@@ -11,6 +11,9 @@ const refreshClient = axios.create({
   withCredentials: true,
 });
 
+// Token refresh queue management
+let refreshPromise: Promise<void> | null = null;
+
 const clearStoredAuth = () => {
   localStorage.removeItem('userId');
   localStorage.removeItem('providerId');
@@ -18,9 +21,29 @@ const clearStoredAuth = () => {
   localStorage.removeItem('role');
 };
 
+/**
+ * Refresh session with queuing to prevent concurrent refresh requests
+ * Multiple failed requests will wait for the first refresh to complete
+ */
 const refreshSession = async () => {
-  await refreshClient.post('/auth/refresh');
-};
+  // If a refresh is already in progress, wait for it instead of making a new request
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  // Create a new refresh promise and store it
+  refreshPromise = refreshClient
+    .post('/auth/refresh')
+    .then(() => {
+      refreshPromise = null;
+    })
+    .catch((error) => {
+      refreshPromise = null;
+      throw error;
+    });
+
+  return refreshPromise;
+};;
 
 // Response interceptor to handle auth expiration
 axiosClient.interceptors.response.use(
