@@ -17,10 +17,20 @@ import NotFoundPage from './pages/NotFoundPage';
 import ProviderOnboarding from './pages/ProviderOnboarding.tsx';
 import Home from './pages/Home';
 import { useAuth } from './hooks/useAuth';
+import Spinner from './components/Spinner';
 import './App.css';
 
 function App() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isSessionLoading } = useAuth();
+
+  // Show loading while verifying session
+  if (isSessionLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <>

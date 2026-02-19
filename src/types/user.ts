@@ -1,4 +1,5 @@
 export interface UserProfile {
+  userId: string;
   title: string;
   firstName: string;
   lastName: string;

@@ -8,13 +8,12 @@ import Spinner from '../components/Spinner';
 import { useSendMFACode } from '../hooks/useSendMFACode.ts';
 
 interface LoginResponse {
-  accessToken: string;
   user: { userId: string; role: string };
   provider?: string;
   patient?: string;
   requiresMFA?: boolean;
   userId?: string;
-  defaultMethod: string;
+  primaryMethod: 'email' | 'totp';
   mfaMethods?: Array<{ type: 'email' | 'totp'; isVerified: boolean }>;
 }
 
@@ -76,29 +75,23 @@ const Login = () => {
         setMfaUserId(response.userId);
         setLoginData(response);
         setMfaMethods(response.mfaMethods);
-        const defaultMethod = response.defaultMethod;
-        // Auto-select email if available, otherwise TOTP
-        const method = response?.mfaMethods.find(
-          (m) => m.type === defaultMethod
-        );
-        if (method) {
-          const { type } = method;
-          setMethod(type);
-          if (method?.type === 'email') {
+        const defaultMethod = response.primaryMethod;
+        if (defaultMethod) {
+          setMethod(defaultMethod);
+          if (defaultMethod === 'email') {
+            // Automatically send code to the email method
             setSelectedMFAMethod('email');
+            await sendCode(response.userId, defaultMethod);
           } else {
             setSelectedMFAMethod('totp');
           }
-          // Automatically send code to the selected method
-          await sendCode(response.userId, type);
         }
         toast.loading('MFA verification required. Check your email or app.');
         return;
       }
 
       // No MFA - proceed with normal login
-      const { user, accessToken } = response;
-      localStorage.setItem('token', accessToken);
+      const { user } = response;
       setLocalStorage(response);
       toast.success('Login successful!');
       // Force a hard reload to ensure useAuth hook re-evaluates
@@ -114,29 +107,7 @@ const Login = () => {
     mutation.mutate();
   };
 
-  /*const handleSendMFACode = async (
-    userId: string,
-    method: 'email' | 'totp'
-  ) => {
-    try {
-      setSendingCode(true);
-      await sendMFACode(userId, method);
-      toast.success(
-        method === 'email'
-          ? 'Verification code sent to your email'
-          : 'Ready to enter code from your authenticator app'
-      );
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message ||
-          `Failed to send ${method} code. Please try again.`
-      );
-    } finally {
-      setSendingCode(false);
-    }
-  };
-*/
-  const handleMFASuccess = async (token?: string) => {
+  const handleMFASuccess = async () => {
     if (!mfaUserId || !loginData) {
       toast.error('MFA session lost. Please login again.');
       setMfaRequired(false);
@@ -145,10 +116,6 @@ const Login = () => {
 
     try {
       const { user } = loginData;
-      // Use the new token from MFA verification if provided
-      if (token) {
-        localStorage.setItem('token', token);
-      }
       setLocalStorage(loginData);
       toast.success('Login successful!');
       setMfaRequired(false);
