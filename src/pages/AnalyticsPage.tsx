@@ -8,14 +8,13 @@ import {
   usePatientBookingsChart,
   useProviderBookingsChart,
 } from '../hooks/useAnalytics';
-import { BarChart, LineChart } from '../components/charts/ChartComponents';
-import { Spinner } from '../components/Spinner';
+import { BarChart, LineChart } from '../components/charts';
+import Spinner from '../components/Spinner';
 
 const AnalyticsPage: React.FC = () => {
   const [view, setView] = useState<'personal' | 'overview'>('personal');
 
   // Get user info from localStorage
-  const userId = localStorage.getItem('userId');
   const providerId = localStorage.getItem('providerId');
   const patientId = localStorage.getItem('patientId');
   const role = localStorage.getItem('role');
