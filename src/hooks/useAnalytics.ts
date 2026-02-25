@@ -8,6 +8,7 @@ export const useProviderBookings = (providerId?: string) => {
   return useQuery({
     queryKey: ['providerBookings', providerId],
     queryFn: () => analyticsApi.getProviderBookings(providerId),
+    enabled: !!providerId,
   });
 };
 
@@ -28,6 +29,7 @@ export const useConfirmationRate = (providerId?: string) => {
   return useQuery({
     queryKey: ['confirmationRate', providerId],
     queryFn: () => analyticsApi.getProviderConfirmationRate(providerId),
+    enabled: !!providerId,
   });
 };
 
@@ -38,6 +40,7 @@ export const useCancellationRate = (providerId?: string) => {
   return useQuery({
     queryKey: ['cancellationRate', providerId],
     queryFn: () => analyticsApi.getProviderCancellationRate(providerId),
+    enabled: !!providerId,
   });
 };
 
@@ -48,6 +51,7 @@ export const useMonthlyBookingTrendChart = (providerId?: string) => {
   return useQuery({
     queryKey: ['monthlyBookingTrendChart', providerId],
     queryFn: () => analyticsApi.getMonthlyBookingTrendChart(providerId),
+    enabled: !!providerId,
   });
 };
 
@@ -58,6 +62,7 @@ export const useMonthlyAvailabilityChart = (providerId?: string) => {
   return useQuery({
     queryKey: ['monthlyAvailabilityChart', providerId],
     queryFn: () => analyticsApi.getMonthlyAvailabilityChart(providerId),
+    enabled: !!providerId,
   });
 };
 
@@ -88,6 +93,7 @@ export const usePatientBookings = (patientId?: string) => {
   return useQuery({
     queryKey: ['patientBookings', patientId],
     queryFn: () => analyticsApi.getPatientBookings(patientId),
+    enabled: !!patientId,
   });
 };
 
