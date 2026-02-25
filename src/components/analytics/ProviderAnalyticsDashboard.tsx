@@ -58,6 +58,13 @@ export const ProviderAnalyticsDashboard: React.FC<
   const availabilityData = availabilityQuery.data;
 
   // Calculate metrics
+  const completionRate =
+    bookingData && bookingData.totalBookings > 0
+      ? (
+          (bookingData.completedBookings / bookingData.totalBookings) *
+          100
+        ).toFixed(1)
+      : 0;
   const totalBookings = bookingData?.totalBookings || 0;
   const completedBookings = bookingData?.completedBookings || 0;
   const cancelledBookings = bookingData?.cancelledBookings || 0;
@@ -261,8 +268,10 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {completedBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {totalBookings > 0 ? ((completedBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
-                  total
+                  {(totalBookings > 0
+                    ? (completedBookings / totalBookings) * 100
+                    : 0
+                  ).toFixed(1)}% of total
                 </p>
               </div>
 
@@ -272,8 +281,10 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {cancelledBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {totalBookings > 0 ? ((cancelledBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
-                  total
+                  {(totalBookings > 0
+                    ? (cancelledBookings / totalBookings) * 100
+                    : 0
+                  ).toFixed(1)}% of total
                 </p>
               </div>
 
@@ -283,8 +294,10 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {pendingBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {totalBookings > 0 ? ((pendingBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
-                  total
+                  {(totalBookings > 0
+                    ? (pendingBookings / totalBookings) * 100
+                    : 0
+                  ).toFixed(1)}% of total
                 </p>
               </div>
 
