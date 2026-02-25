@@ -24,15 +24,19 @@ export const useAuth = () => {
     patientId: localStorage.getItem('patientId') ?? '',
   });
 
+  // Check if we have a stored userId to decide if query should run
+  const hasStoredUserId = Boolean(authState.userId);
+
   // Query server to verify session validity
-  // Runs on mount and when dependencies change
+  // Only runs when we have a stored userId to avoid 401 loops
   const {
     data: sessionData,
     isLoading: sessionLoading,
     isError: sessionError,
   } = useQuery({
-    queryKey: ['auth-session'],
+    queryKey: ['auth-session', authState.userId],
     queryFn: verifySession,
+    enabled: hasStoredUserId, // CRITICAL: Only verify if we think user is logged in
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: false, // Don't retry on 401 to avoid loops
@@ -77,12 +81,16 @@ export const useAuth = () => {
   const actorId =
     authState.role === 'provider' ? authState.providerId : authState.patientId;
 
+  // If no stored userId, user is definitely not logged in (no loading needed)
+  const isLoading = hasStoredUserId ? sessionLoading : false;
+  const isValid = hasStoredUserId && !sessionError && !sessionLoading;
+
   return {
     userId: authState.userId,
     role: authState.role,
     actorId,
-    isLoggedIn: Boolean(authState.userId && authState.role && !sessionError),
-    isSessionLoading: sessionLoading,
-    isSessionValid: !sessionError && !sessionLoading,
+    isLoggedIn: Boolean(authState.userId && authState.role && isValid),
+    isSessionLoading: isLoading,
+    isSessionValid: isValid,
   };
 };
