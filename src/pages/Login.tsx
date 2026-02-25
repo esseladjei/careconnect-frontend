@@ -47,6 +47,9 @@ const Login = () => {
     const { user, provider, patient } = response;
     localStorage.setItem('userId', user.userId);
     localStorage.setItem('role', user.role);
+    // ✅ FIX: Set login timestamp to prevent immediate session verification
+    localStorage.setItem('lastLoginTime', Date.now().toString());
+
     if (user.role === 'provider' && provider) {
       localStorage.setItem('providerId', provider);
     } else if (user.role === 'patient' && patient) {

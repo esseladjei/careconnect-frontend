@@ -8,7 +8,14 @@ interface SessionData {
   role: string;
   providerId?: string;
   patientId?: string;
-  providerStatus?: string;
+  user?: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+    providerStatus?: string;
+  };
 }
 
 /**
@@ -33,6 +40,7 @@ export const useAuth = () => {
     data: sessionData,
     isLoading: sessionLoading,
     isError: sessionError,
+    error: sessionErrorDetails,
   } = useQuery({
     queryKey: ['auth-session', authState.userId],
     queryFn: verifySession,
@@ -78,7 +86,7 @@ export const useAuth = () => {
     }
   }, [sessionError]);
 
-  const actorId =
+ const actorId =
     authState.role === 'provider' ? authState.providerId : authState.patientId;
 
   // If no stored userId, user is definitely not logged in (no loading needed)
