@@ -261,7 +261,7 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {completedBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {((completedBookings / totalBookings) * 100).toFixed(1)}% of
+                  {totalBookings > 0 ? ((completedBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
                   total
                 </p>
               </div>
@@ -272,7 +272,7 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {cancelledBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {((cancelledBookings / totalBookings) * 100).toFixed(1)}% of
+                  {totalBookings > 0 ? ((cancelledBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
                   total
                 </p>
               </div>
@@ -283,7 +283,7 @@ export const ProviderAnalyticsDashboard: React.FC<
                   {pendingBookings}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {((pendingBookings / totalBookings) * 100).toFixed(1)}% of
+                  {totalBookings > 0 ? ((pendingBookings / totalBookings) * 100).toFixed(1) : "0.0"}% of
                   total
                 </p>
               </div>
