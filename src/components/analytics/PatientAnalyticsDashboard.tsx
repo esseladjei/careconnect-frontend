@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { BarChart, DoughnutChart, LineChart } from '../charts';
 import { KPICard, ProgressBar, StatGrid } from './StatCards';
 import Spinner from '../Spinner';
-import { usePatientBookings, usePatientBookingsChart, } from '../../hooks/useAnalytics';
+import {
+  usePatientBookings,
+  usePatientBookingsChart,
+} from '../../hooks/useAnalytics';
 import type { PatientBooking } from '../../types/analytics';
 
 interface PatientAnalyticsDashboardProps {
