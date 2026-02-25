@@ -242,7 +242,14 @@ export const getProviderDashboard = async (
     ]);
 
     return {
-      bookingStats: bookings[0],
+      bookingStats: bookings[0] ?? {
+        providerId: '',
+        providerName: '',
+        totalBookings: 0,
+        completedBookings: 0,
+        cancelledBookings: 0,
+        pendingBookings: 0,
+      },
       confirmationRate: confirmationRate[0]?.confirmationRate || 0,
       cancellationRate: cancellationRate[0]?.cancellationRate || 0,
       monthlyTrendChart: monthlyTrend,
