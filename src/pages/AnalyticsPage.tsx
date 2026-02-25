@@ -30,8 +30,8 @@ const AnalyticsPage: React.FC = () => {
     patientChartQuery.isLoading;
 
   // Determine which dashboard to show
-  const showProviderDashboard = role === 'provider' || providerId;
-  const showPatientDashboard = role === 'patient' || patientId;
+  const showProviderDashboard = role ? role === 'provider' : !!providerId;
+  const showPatientDashboard = role ? role === 'patient' : !!patientId;
 
   return (
     <div className="min-h-screen bg-gray-50">
