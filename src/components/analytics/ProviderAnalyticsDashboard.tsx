@@ -58,16 +58,17 @@ export const ProviderAnalyticsDashboard: React.FC<
   const availabilityData = availabilityQuery.data;
 
   // Calculate metrics
-  const completionRate = bookingData
-    ? (
-        (bookingData.completedBookings / bookingData.totalBookings) *
-        100
-      ).toFixed(1)
-    : 0;
   const totalBookings = bookingData?.totalBookings || 0;
   const completedBookings = bookingData?.completedBookings || 0;
   const cancelledBookings = bookingData?.cancelledBookings || 0;
   const pendingBookings = bookingData?.pendingBookings || 0;
+  const completionRate =
+    bookingData && bookingData.totalBookings > 0
+      ? (
+          (bookingData.completedBookings / bookingData.totalBookings) *
+          100
+        ).toFixed(1)
+      : '0.0';
 
   // Prepare stat cards
   const statCards = [
