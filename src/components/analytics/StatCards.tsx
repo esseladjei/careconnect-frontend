@@ -221,7 +221,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   color = 'blue',
   showPercentage = true,
 }) => {
-  const percentage = (value / max) * 100;
+  const clampedValue = Math.min(Math.max(value, 0), max);
+  const percentage = max <= 0 ? 0 : (clampedValue / max) * 100;
 
   const colorClasses = {
     blue: 'bg-blue-500',
