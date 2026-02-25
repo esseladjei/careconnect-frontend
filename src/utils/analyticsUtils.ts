@@ -96,7 +96,7 @@ export const calculateMovingAverage = (
   values: number[],
   windowSize: number = 3
 ): number[] => {
-  const result = [];
+  const result: number[] = [];
 
   for (let i = 0; i < values.length; i++) {
     const start = Math.max(0, i - Math.floor(windowSize / 2));
