@@ -1,25 +1,21 @@
 import React from 'react';
-import RatingSummary from './RatingSummary';
-import ReviewList from './ReviewList';
-
-interface Review {
-  id: string;
-  patientName: string;
-  rating: number;
-  date: string;
-  comment: string;
-  verified: boolean;
-}
+import ProviderRatingSummary from '../reviews/ProviderRatingSummary';
+import type { IProviderRatingSummary } from '../../types/reviews';
 
 interface Props {
-  reviews: Review[];
+  ratingSummary?: IProviderRatingSummary | null;
 }
 
-const ReviewsTab: React.FC<Props> = ({ reviews }) => {
+const ReviewsTab: React.FC<Props> = ({ ratingSummary }) => {
   return (
     <div className="space-y-6 p-6">
-      <RatingSummary reviews={reviews} />
-      <ReviewList reviews={reviews} />
+      <div className="bg-white rounded-xl border border-gray-200">
+        <ProviderRatingSummary rating={ratingSummary} />
+      </div>
+      <p className="text-sm text-gray-500">
+        Public profiles show only overall rating and review count. Detailed
+        comments are available to admins.
+      </p>
     </div>
   );
 };

@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
   useCancelAppointment,
+  useCheckInAppointment,
+  useCheckOutAppointment,
   useConfirmAppointment,
   useFetchAppointments,
 } from '../hooks/useAppointments';
@@ -48,6 +50,10 @@ const AppointmentHistoryPage: React.FC = () => {
     useCancelAppointment();
   const { mutate: confirmAppointment, isPending: isConfirming } =
     useConfirmAppointment();
+  const { mutate: checkInAppointment, isPending: isCheckingIn } =
+    useCheckInAppointment();
+  const { mutate: checkOutAppointment, isPending: isCheckingOut } =
+    useCheckOutAppointment();
 
   const handleCancel = (appointmentId: string, cancelledBy: string) => {
     cancelAppointment({
@@ -61,11 +67,25 @@ const AppointmentHistoryPage: React.FC = () => {
     confirmAppointment({ appointmentId, status: 'confirmed' });
   };
 
+  const handleCheckIn = (appointmentId: string) => {
+    checkInAppointment({ appointmentId });
+  };
+
+  const handleCheckOut = (appointmentId: string) => {
+    checkOutAppointment({ appointmentId });
+  };
+
   const upcomingAppointments = appointments.filter(
-    (a) => a.status === 'confirmed' || a.status === 'pending'
+    (a) =>
+      a.status === 'confirmed' ||
+      a.status === 'pending' ||
+      a.status === 'checked-in'
   );
   const pastAppointments = appointments.filter(
-    (a) => a.status === 'completed' || a.status === 'cancelled'
+    (a) =>
+      a.status === 'completed' ||
+      a.status === 'cancelled' ||
+      a.status === 'no-show'
   );
 
   const appointmentsToShow =
@@ -219,7 +239,11 @@ const AppointmentHistoryPage: React.FC = () => {
                 appointment={app}
                 onCancel={handleCancel}
                 onConfirm={handleConfirm}
-                isLoading={isCanceling || isConfirming}
+                onCheckIn={handleCheckIn}
+                onCheckOut={handleCheckOut}
+                isLoading={
+                  isCanceling || isConfirming || isCheckingIn || isCheckingOut
+                }
               />
             ))
           ) : (

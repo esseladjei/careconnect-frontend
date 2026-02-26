@@ -4,6 +4,7 @@ import type { SearchResult } from '../types/search.ts';
 import { useGetDayMonthOnly } from '../hooks/useDate.ts';
 import useCapitalizeFirst from '../hooks/useCapitalizeFirst.ts';
 import { CheckBadgeIcon } from '@heroicons/react/16/solid';
+import ProviderRatingBadge from './reviews/ProviderRatingBadge';
 
 interface SearchResultItemProps {
   result: SearchResult;
@@ -52,6 +53,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
               <span className="text-sm text-gray-500 font-medium">
                 / Booking session
               </span>
+            </div>
+            <div className="mt-2">
+              <ProviderRatingBadge providerId={result.provider._id} />
             </div>
           </div>
         </div>

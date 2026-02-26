@@ -19,6 +19,7 @@ import Home from './pages/Home';
 import { useAuth } from './hooks/useAuth';
 import Spinner from './components/Spinner';
 import './App.css';
+import AppointmentReviewPage from './pages/AppointmentReviewPage';
 
 function App() {
   const { isLoggedIn, isSessionLoading } = useAuth();
@@ -83,6 +84,12 @@ function App() {
         <Route
           path="/referral/patient/:userId"
           element={isLoggedIn ? <ReferralPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/appointments/:appointmentId/review"
+          element={
+            isLoggedIn ? <AppointmentReviewPage /> : <Navigate to="/login" />
+          }
         />
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFoundPage />} />
