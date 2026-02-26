@@ -12,11 +12,11 @@ import {
 } from '@heroicons/react/24/solid';
 import useCapitalizeFirst from '../../hooks/useCapitalizeFirst';
 import type { IProviderListing } from '../../types/providerListing.ts';
-import type { ProviderRatingSummary } from '../../types/reviews';
+import type { IProviderRatingSummary } from '../../types/reviews';
 
 interface Props {
   offer: IProviderListing;
-  ratingSummary?: ProviderRatingSummary | null;
+  ratingSummary?: IProviderRatingSummary | null;
 }
 
 const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
