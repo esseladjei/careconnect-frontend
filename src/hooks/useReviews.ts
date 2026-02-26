@@ -6,7 +6,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import reviewsApi from '../api/reviewsApi';
-import type { ProviderRatingSummary, SubmitFlagPayload, SubmitReviewPayload, } from '../types/reviews';
+import type { IProviderRatingSummary, SubmitFlagPayload, SubmitReviewPayload, } from '../types/reviews';
 import toast from 'react-hot-toast';
 
 export const reviewQueryKeys = {
@@ -21,7 +21,7 @@ export const reviewQueryKeys = {
 
 export const useProviderRating = (
   providerId?: string
-): UseQueryResult<ProviderRatingSummary, Error> => {
+): UseQueryResult<IProviderRatingSummary, Error> => {
   return useQuery({
     queryKey: providerId ? reviewQueryKeys.rating(providerId) : [],
     queryFn: () => reviewsApi.getProviderRating(providerId as string),
