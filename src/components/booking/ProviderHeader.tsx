@@ -12,13 +12,14 @@ import {
 } from '@heroicons/react/24/solid';
 import useCapitalizeFirst from '../../hooks/useCapitalizeFirst';
 import type { IProviderListing } from '../../types/providerListing.ts';
+import type { IProviderRatingSummary } from '../../types/reviews';
 
 interface Props {
   offer: IProviderListing;
-  averageRating: number;
+  ratingSummary?: IProviderRatingSummary | null;
 }
 
-const ProviderHeader: React.FC<Props> = ({ offer, averageRating }) => {
+const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
@@ -88,22 +89,38 @@ const ProviderHeader: React.FC<Props> = ({ offer, averageRating }) => {
 
                 {/* Rating */}
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <StarIconSolid
-                        key={star}
-                        className={`w-5 h-5 ${
-                          star <= Math.floor(averageRating)
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-gray-700 font-semibold">
-                    {averageRating}
-                  </span>
-                  <span className="text-gray-500">(3 reviews)</span>
+                  {ratingSummary &&
+                  (ratingSummary.status === 'new-provider' ||
+                    ratingSummary.totalReviews < 3) ? (
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">
+                      ⭐ New Provider
+                    </span>
+                  ) : ratingSummary ? (
+                    <>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <StarIconSolid
+                            key={star}
+                            className={`w-5 h-5 ${
+                              star <= Math.floor(ratingSummary.overallAvg)
+                                ? 'text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-gray-700 font-semibold">
+                        {ratingSummary.overallAvg.toFixed(1)}
+                      </span>
+                      <span className="text-gray-500">
+                        ({ratingSummary.totalReviews} reviews)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500">
+                      Ratings unavailable
+                    </span>
+                  )}
                 </div>
               </div>
 

@@ -7,8 +7,11 @@ import type {
 import type {
   Appointment,
   CancelAppointmentParams,
+  CheckInAppointmentParams,
+  CheckOutAppointmentParams,
   ConfirmAppointmentParams,
   FetchAppointmentsParams,
+  IGetAppointmentParams,
 } from '../types/appointment.ts';
 
 export const appointmentsApi = {
@@ -94,7 +97,14 @@ export const appointmentsApi = {
     );
     return response.data;
   },
-
+  // Fetch user appointment By AppointmentId
+  fetchUserAppointment: async (
+    params: IGetAppointmentParams
+  ): Promise<Appointment> => {
+    const { appointmentId } = params;
+    const response = await axiosClient.get(`/appointments/${appointmentId}`);
+    return response.data;
+  },
   // Confirm an appointment
   confirmAppointment: async (
     params: ConfirmAppointmentParams
@@ -115,6 +125,28 @@ export const appointmentsApi = {
     const response = await axiosClient.patch(
       `/appointments/${appointmentId}/cancel`,
       data
+    );
+    return response.data;
+  },
+
+  // Check in an appointment
+  checkInAppointment: async (
+    params: CheckInAppointmentParams
+  ): Promise<Appointment> => {
+    const { appointmentId } = params;
+    const response = await axiosClient.patch(
+      `/appointments/${appointmentId}/check-in`
+    );
+    return response.data;
+  },
+
+  // Check out an appointment
+  checkOutAppointment: async (
+    params: CheckOutAppointmentParams
+  ): Promise<Appointment> => {
+    const { appointmentId } = params;
+    const response = await axiosClient.patch(
+      `/appointments/${appointmentId}/check-out`
     );
     return response.data;
   },
