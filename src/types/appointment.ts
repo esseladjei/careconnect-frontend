@@ -15,7 +15,13 @@ export interface Appointment {
   specialisation: string;
   type: 'In-Person' | 'Phone Consultation' | 'Home Visit';
   location: string;
-  status: 'confirmed' | 'completed' | 'cancelled' | 'pending';
+  status:
+    | 'confirmed'
+    | 'completed'
+    | 'cancelled'
+    | 'pending'
+    | 'no-show'
+    | 'checked-in';
   appointmentType: string;
   providerId: IProvider;
   availabilityId: IProviderListing;
@@ -23,6 +29,7 @@ export interface Appointment {
   patientId: {
     userId: IUser;
   };
+  paymentStatus?: 'pending' | 'paid' | 'failed';
 }
 
 export interface FetchAppointmentsParams {
@@ -42,4 +49,16 @@ export interface CancelAppointmentParams {
   appointmentId: string;
   cancelledBy: string;
   reason?: string;
+}
+
+export interface CheckInAppointmentParams {
+  appointmentId: string;
+}
+
+export interface CheckOutAppointmentParams {
+  appointmentId: string;
+}
+
+export interface IGetAppointmentParams {
+  appointmentId: string;
 }

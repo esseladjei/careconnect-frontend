@@ -46,7 +46,7 @@ export interface ICreateListingParams {
 
 export interface IProvider {
   _id: string;
-  userId: string;
+  userId: IUser;
   serviceDescription: string;
   specialties: string[];
   available: string;

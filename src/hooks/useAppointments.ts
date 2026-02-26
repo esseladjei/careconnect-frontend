@@ -9,8 +9,11 @@ import {
 import {
   type Appointment,
   type CancelAppointmentParams,
+  type CheckInAppointmentParams,
+  type CheckOutAppointmentParams,
   type ConfirmAppointmentParams,
   type FetchAppointmentsParams,
+  type IGetAppointmentParams,
 } from '../types/appointment';
 
 import appointmentsApi from '../api/appointmentsApi.ts';
@@ -39,6 +42,22 @@ export const useFetchAppointments = (
   return useQuery({
     queryKey: appointmentQueryKeys.list(params),
     queryFn: () => appointmentsApi.fetchUserAppointments(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  });
+};
+
+/**
+ * Hook to fetch user appointment by Appointment ID
+ * @param params - AppointmentId Filter parameter for appointments
+ * @returns Query result with appointment data
+ */
+export const useGetAppointment = (
+  params: IGetAppointmentParams
+): UseQueryResult<Appointment, Error> => {
+  return useQuery({
+    queryKey: appointmentQueryKeys.detail(params.appointmentId),
+    queryFn: () => appointmentsApi.fetchUserAppointment(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
   });
@@ -98,6 +117,62 @@ export const useCancelAppointment = (): UseMutationResult<
     onError: (error: Error) => {
       toast.error(
         `Failed to cancel appointment: ${error.message || 'Unknown error'}`
+      );
+    },
+  });
+};
+
+/**
+ * Hook to check in an appointment
+ * @returns Mutation result for checking in appointments
+ */
+export const useCheckInAppointment = (): UseMutationResult<
+  Appointment,
+  Error,
+  CheckInAppointmentParams
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: CheckInAppointmentParams) =>
+      appointmentsApi.checkInAppointment(params),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: appointmentQueryKeys.all,
+      });
+      toast.success(`Appointment checked in successfully! ${data.status}`);
+    },
+    onError: (error: Error) => {
+      toast.error(
+        `Failed to check in appointment: ${error.message || 'Unknown error'}`
+      );
+    },
+  });
+};
+
+/**
+ * Hook to check out an appointment
+ * @returns Mutation result for checking out appointments
+ */
+export const useCheckOutAppointment = (): UseMutationResult<
+  Appointment,
+  Error,
+  CheckOutAppointmentParams
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: CheckOutAppointmentParams) =>
+      appointmentsApi.checkOutAppointment(params),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: appointmentQueryKeys.all,
+      });
+      toast.success(`Appointment checked out successfully! ${data.status}`);
+    },
+    onError: (error: Error) => {
+      toast.error(
+        `Failed to check out appointment: ${error.message || 'Unknown error'}`
       );
     },
   });

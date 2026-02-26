@@ -17,7 +17,7 @@ import {
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { IProviderListing, IProviderSlot } from '../types/providerListing';
 import { useAuth } from '../hooks/useAuth.ts';
-import { mockReviews } from '../types/reviews.ts';
+import { useProviderRating } from '../hooks/useReviews';
 
 interface TimeSlot {
   time: string;
@@ -108,7 +108,11 @@ const BookingPage: React.FC = () => {
     },
   });
 
-  const averageRating = 4.7;
+  const { data: providerRating } = useProviderRating(
+    providerOfferData?.providerId
+  );
+
+  const averageRating = providerRating?.overallAvg ?? 0;
 
   // Update page metadata
   useEffect(() => {
@@ -128,7 +132,7 @@ const BookingPage: React.FC = () => {
       }
       setSelectedDate(new Date(providerOfferData.start));
     }
-  }, [providerOfferData]);
+  }, [providerOfferData, averageRating]);
 
   // Check if selected date is a working day
   const isWorkingDay = (date: Date): boolean => {
@@ -169,8 +173,6 @@ const BookingPage: React.FC = () => {
     const diffMinutes = diffMs / (1000 * 60);
     return diffMinutes / 60;
   }
-
-  console.log(isSlotPast('09:00', '11:00')); // true if current time is 14:00
 
   // Generate time slots from fetched slots data
   const generateTimeSlots = (): TimeSlot[] => {
@@ -333,14 +335,14 @@ const BookingPage: React.FC = () => {
             {/* Provider Header */}
             <ProviderHeader
               offer={providerOfferData}
-              averageRating={averageRating}
+              ratingSummary={providerRating}
             />
 
             {/* Tab Navigation */}
             <ProviderTabs
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              reviewCount={mockReviews.length}
+              reviewCount={providerRating?.totalReviews ?? 0}
             />
 
             {/* Tab Content */}
@@ -349,7 +351,9 @@ const BookingPage: React.FC = () => {
                 <OverviewTab offer={providerOfferData} />
               )}
 
-              {activeTab === 'reviews' && <ReviewsTab reviews={mockReviews} />}
+              {activeTab === 'reviews' && (
+                <ReviewsTab ratingSummary={providerRating} />
+              )}
             </div>
           </div>
 
@@ -392,11 +396,13 @@ const BookingPage: React.FC = () => {
           },
           telephone: providerOfferData.user.email,
           medicalSpecialty: providerOfferData.provider.specialties,
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: averageRating,
-            reviewCount: mockReviews.length,
-          },
+          aggregateRating: providerRating
+            ? {
+                '@type': 'AggregateRating',
+                ratingValue: providerRating.overallAvg,
+                reviewCount: providerRating.totalReviews,
+              }
+            : undefined,
         })}
       </script>
 
