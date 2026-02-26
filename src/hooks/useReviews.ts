@@ -6,7 +6,11 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import reviewsApi from '../api/reviewsApi';
-import type { IProviderRatingSummary, SubmitFlagPayload, SubmitReviewPayload, } from '../types/reviews';
+import type {
+  IProviderRatingSummary,
+  SubmitFlagPayload,
+  SubmitReviewPayload,
+} from '../types/reviews';
 import toast from 'react-hot-toast';
 
 export const reviewQueryKeys = {
