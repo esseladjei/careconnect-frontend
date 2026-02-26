@@ -49,9 +49,7 @@ const AppointmentCard: React.FC<{
   const canCheckOut =
     role === 'provider' && appointment.status === 'checked-in';
   const canConfirm = role === 'provider' && appointment.status === 'pending';
-  const patientId =
-    (appointment.patientId as { _id?: string })?._id ||
-    appointment.patientId.userId._id;
+  const patientId = appointment.patientId?.userId?._id;
   const target =
     role === 'provider'
       ? (appointment?.patientId?.userId as IUser)
