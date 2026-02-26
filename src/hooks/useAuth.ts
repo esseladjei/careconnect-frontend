@@ -29,6 +29,8 @@ export const useAuth = () => {
     role: localStorage.getItem('role') ?? '',
     providerId: localStorage.getItem('providerId') ?? '',
     patientId: localStorage.getItem('patientId') ?? '',
+    firstName: localStorage.getItem('firstName') ?? '',
+    lastName: localStorage.getItem('lastName') ?? '',
   });
 
   // Check if we have a stored userId to decide if query should run
@@ -52,13 +54,15 @@ export const useAuth = () => {
   // If session is valid, sync server data with local state
   useEffect(() => {
     if (sessionData) {
-      const { userId, role, providerId, patientId } =
+      const { userId, role, providerId, patientId, user } =
         sessionData as SessionData;
       setAuthState({
         userId,
         role,
         providerId: providerId ?? '',
         patientId: patientId ?? '',
+        firstName: user?.firstName ?? '',
+        lastName: user?.lastName ?? '',
       });
 
       // Update localStorage with latest server state
@@ -66,6 +70,8 @@ export const useAuth = () => {
       localStorage.setItem('role', role);
       if (providerId) localStorage.setItem('providerId', providerId);
       if (patientId) localStorage.setItem('patientId', patientId);
+      if (user?.firstName) localStorage.setItem('firstName', user.firstName);
+      if (user?.lastName) localStorage.setItem('lastName', user.lastName);
     }
   }, [sessionData]);
 
@@ -76,11 +82,15 @@ export const useAuth = () => {
       localStorage.removeItem('role');
       localStorage.removeItem('providerId');
       localStorage.removeItem('patientId');
+      localStorage.removeItem('firstName');
+      localStorage.removeItem('lastName');
       setAuthState({
         userId: '',
         role: '',
         providerId: '',
         patientId: '',
+        firstName: '',
+        lastName: '',
       });
     }
   }, [sessionError]);
@@ -92,10 +102,15 @@ export const useAuth = () => {
   const isLoading = hasStoredUserId ? sessionLoading : false;
   const isValid = hasStoredUserId && !sessionError && !sessionLoading;
 
+  const fullName = [authState.firstName, authState.lastName]
+    .filter(Boolean)
+    .join(' ');
+
   return {
     userId: authState.userId,
     role: authState.role,
     actorId,
+    fullName,
     isLoggedIn: Boolean(authState.userId && authState.role && isValid),
     isSessionLoading: isLoading,
     isSessionValid: isValid,
