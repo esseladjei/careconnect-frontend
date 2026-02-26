@@ -84,7 +84,19 @@ const AppointmentReviewPage: React.FC = () => {
       }
     );
   };
-  if (role && role !== 'patient') {
+  if (!role) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <main className="container mx-auto px-4 py-20 flex justify-center">
+          <Spinner />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (role !== 'patient') {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
