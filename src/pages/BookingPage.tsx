@@ -396,13 +396,13 @@ const BookingPage: React.FC = () => {
           },
           telephone: providerOfferData.user.email,
           medicalSpecialty: providerOfferData.provider.specialties,
-          aggregateRating: providerRating
-            ? {
-                '@type': 'AggregateRating',
-                ratingValue: providerRating.overallAvg,
-                reviewCount: providerRating.totalReviews,
-              }
-            : undefined,
+          ...(providerRating && {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: providerRating.overallAvg,
+              reviewCount: providerRating.totalReviews,
+            },
+          }),
         })}
       </script>
 
