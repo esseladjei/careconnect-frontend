@@ -192,6 +192,6 @@ const SearchPage: React.FC = () => {
       <Footer />
     </div>
   );
-};;;
+};
 
 export default SearchPage;
