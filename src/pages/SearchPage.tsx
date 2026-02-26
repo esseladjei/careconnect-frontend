@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axiosClient from '../api/axiosClient';
 import SearchFilterPanel from '../components/SearchFilterPanel';
@@ -11,12 +11,18 @@ import type { SearchQuery, SearchResult } from '../types/search.ts';
 import { getFormattedDate } from '../hooks/useDate.ts';
 
 const SearchPage: React.FC = () => {
+  // Get location from URL query parameter
+  const getInitialLocation = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('location') || '';
+  };
+
   // Helper function to format date as DD-MM-YYYY
   const [query, setQuery] = useState<SearchQuery>({
     search: {
       startDate: getFormattedDate(0), // Today
       endDate: getFormattedDate(30), // 30 days from today
-      location: '',
+      location: getInitialLocation(),
     },
     filters: {
       specialties: [],
@@ -25,6 +31,15 @@ const SearchPage: React.FC = () => {
       maxPrice: 500,
     },
   });
+
+  // Update URL when location changes
+  useEffect(() => {
+    if (query.search.location) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('location', query.search.location);
+      window.history.replaceState(null, '', `?${params.toString()}`);
+    }
+  }, [query.search.location]);
 
   // TanStack Query hook to fetch filtered appointments
   const {
@@ -177,6 +192,6 @@ const SearchPage: React.FC = () => {
       <Footer />
     </div>
   );
-};
+};;;
 
 export default SearchPage;

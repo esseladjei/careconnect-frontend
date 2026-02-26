@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 text-white p-4 shadow-md">
+    <nav className="sticky top-0 z-50 bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and App Name */}
         <a href="/" aria-label="Back to Homepage" className="hover:opacity-95">
