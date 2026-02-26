@@ -132,7 +132,7 @@ const BookingPage: React.FC = () => {
       }
       setSelectedDate(new Date(providerOfferData.start));
     }
-  }, [providerOfferData, averageRating]);
+  }, [providerOfferData]);
 
   // Check if selected date is a working day
   const isWorkingDay = (date: Date): boolean => {
