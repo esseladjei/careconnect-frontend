@@ -31,123 +31,153 @@ const SideBarFilter: React.FC<SideBarFilterProps> = ({
   } = useSpecialties();
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg h-full sticky top-4">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">
-        Showing {resultsCount} Results in {location || 'all locations'}
-      </h3>
-      {/* --- Checkbox Filter: Health Specialisation --- */}
-      <div className="mb-8 pb-4 border-b border-gray-200">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">
-          Specialisation
-        </h4>
-        <div className="space-y-2">
-          {specialtiesLoading && (
-            <p className="text-sm text-gray-500">Loading specialties...</p>
-          )}
-          {specialtiesError && !specialtiesLoading && (
-            <p className="text-sm text-red-500">Unable to load specialties.</p>
-          )}
-          {!specialtiesLoading &&
-            !specialtiesError &&
-            specialties.length === 0 && (
-              <p className="text-sm text-gray-500">No specialties available.</p>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-700 via-blue-700 to-blue-800 px-6 py-5">
+        <h3 className="text-lg font-bold text-white mb-1">
+          Refine Your Search
+        </h3>
+        <p className="text-blue-50 text-sm">
+          {resultsCount} provider{resultsCount !== 1 ? 's' : ''}
+          {location && ` in ${location}`}
+        </p>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* --- Checkbox Filter: Health Specialisation --- */}
+        <div>
+          <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+            Specialization
+          </h4>
+          <div className="space-y-2.5">
+            {specialtiesLoading && (
+              <p className="text-sm text-gray-500 py-2">
+                Loading specialties...
+              </p>
             )}
-          {specialties.map((spec: string) => (
-            <div key={spec} className="flex items-center">
-              <input
-                id={`check-${spec}`}
-                type="checkbox"
-                checked={filters.specialties.includes(spec)}
-                onChange={() => toggleSpec(spec)}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
+            {specialtiesError && !specialtiesLoading && (
+              <p className="text-sm text-red-600">
+                Unable to load specialties.
+              </p>
+            )}
+            {!specialtiesLoading &&
+              !specialtiesError &&
+              specialties.length === 0 && (
+                <p className="text-sm text-gray-500">
+                  No specialties available.
+                </p>
+              )}
+            {specialties.map((spec: string) => (
               <label
-                htmlFor={`check-${spec}`}
-                className="ml-3 text-sm text-gray-700"
+                key={spec}
+                className="flex items-center cursor-pointer group"
               >
-                {spec}
+                <input
+                  id={`check-${spec}`}
+                  type="checkbox"
+                  checked={filters.specialties.includes(spec)}
+                  onChange={() => toggleSpec(spec)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                  {spec}
+                </span>
               </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* --- Radio Button Filter: Appointment Type --- */}
-      <div className="mb-8 pb-4 border-b border-gray-200">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">
-          Type of Appointment
-        </h4>
-        <div className="space-y-2">
-          {/* ['In-Person', 'Phone Consultation', 'Home Visit']
-          change this to read from the database
-         */}
-          {['In-Person', 'Home Visit', 'Phone Consultation'].map((type) => (
-            <div key={type} className="flex items-center">
-              <input
-                id={`radio-${type}`}
-                name="appointment-type"
-                type="radio"
-                checked={filters.appointmentType === type}
-                onChange={() =>
-                  onChange({ ...filters, appointmentType: type as any })
-                }
-                className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-              />
-              <label
-                htmlFor={`radio-${type}`}
-                className="ml-3 text-sm text-gray-700"
-              >
-                {type}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* --- Price Range Filter (Consultation Fee) --- */}
-      <div className="mb-6">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">
-          Consultation Fee (GH¢)
-        </h4>
-
-        {/* Price Range Inputs */}
-        <div className="flex justify-between items-center space-x-4">
-          <div>
-            <label
-              htmlFor="min-price"
-              className="block text-xs text-gray-500 mb-1"
-            >
-              Min(GH¢)
-            </label>
-            <input
-              type="number"
-              id="min-price"
-              placeholder="¢50"
-              value={filters.minPrice}
-              onChange={(e) =>
-                onChange({ ...filters, minPrice: e.target.value as any })
-              }
-              className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500"
-            />
+            ))}
           </div>
-          <span className="text-gray-500 mt-4">—</span>
-          <div>
-            <label
-              htmlFor="max-price"
-              className="block text-xs text-gray-500 mb-1"
-            >
-              Max(GH¢)
-            </label>
-            <input
-              type="number"
-              id="max-price"
-              placeholder="¢200"
-              value={filters.maxPrice}
-              onChange={(e) =>
-                onChange({ ...filters, maxPrice: e.target.value as any })
-              }
-              className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500"
-            />
+        </div>
+
+        <div className="border-t border-gray-200"></div>
+
+        {/* --- Radio Button Filter: Appointment Type --- */}
+        <div>
+          <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+            Appointment Type
+          </h4>
+          <div className="space-y-2.5">
+            {['In-Person', 'Home Visit', 'Phone Consultation'].map((type) => (
+              <label
+                key={type}
+                className="flex items-center cursor-pointer group"
+              >
+                <input
+                  id={`radio-${type}`}
+                  name="appointment-type"
+                  type="radio"
+                  checked={filters.appointmentType === type}
+                  onChange={() =>
+                    onChange({ ...filters, appointmentType: type as any })
+                  }
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                  {type}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200"></div>
+
+        {/* --- Price Range Filter (Consultation Fee) --- */}
+        <div>
+          <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+            Consultation Fee (₵)
+          </h4>
+
+          <div className="space-y-3">
+            {/* Min Price */}
+            <div>
+              <label
+                htmlFor="min-price"
+                className="block text-xs font-semibold text-gray-600 mb-2"
+              >
+                Minimum
+              </label>
+              <input
+                type="number"
+                id="min-price"
+                placeholder="₵50"
+                value={filters.minPrice}
+                onChange={(e) =>
+                  onChange({ ...filters, minPrice: e.target.value as any })
+                }
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  transition-all hover:border-gray-400"
+              />
+            </div>
+
+            {/* Max Price */}
+            <div>
+              <label
+                htmlFor="max-price"
+                className="block text-xs font-semibold text-gray-600 mb-2"
+              >
+                Maximum
+              </label>
+              <input
+                type="number"
+                id="max-price"
+                placeholder="₵500"
+                value={filters.maxPrice}
+                onChange={(e) =>
+                  onChange({ ...filters, maxPrice: e.target.value as any })
+                }
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  transition-all hover:border-gray-400"
+              />
+            </div>
+
+            {/* Price Range Display */}
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 text-center">
+              <p className="text-xs text-gray-600">Price Range</p>
+              <p className="text-sm font-bold text-blue-600">
+                ₵{filters.minPrice} — ₵{filters.maxPrice}
+              </p>
+            </div>
           </div>
         </div>
       </div>

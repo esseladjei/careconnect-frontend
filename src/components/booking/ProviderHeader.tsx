@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import {
   AcademicCapIcon,
+  BriefcaseIcon,
   CheckBadgeIcon,
+  GlobeAltIcon,
   HeartIcon,
+  LinkIcon,
   MapPinIcon,
+  PaperAirplaneIcon,
   ShareIcon,
+  SparklesIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import {
   HeartIcon as HeartIconSolid,
@@ -65,8 +71,11 @@ const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
       <div className="px-6 pb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-16 relative">
           {/* Avatar */}
-          <div className="w-32 h-32 rounded-2xl bg-white p-2 shadow-xl flex items-center justify-center text-6xl border-4 border-white z-10">
-            👨‍⚕️
+          <div className="w-32 h-32 rounded-2xl bg-white p-2 shadow-xl flex items-center justify-center border-4 border-white z-10">
+            <UserCircleIcon
+              className="h-16 w-16 text-blue-600"
+              aria-hidden="true"
+            />
           </div>
 
           <div className="flex-1 mt-4 sm:mt-0">
@@ -93,7 +102,11 @@ const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
                   (ratingSummary.status === 'new-provider' ||
                     ratingSummary.totalReviews < 3) ? (
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">
-                      ⭐ New Provider
+                      <SparklesIcon
+                        className="h-4 w-4 text-purple-600"
+                        aria-hidden="true"
+                      />
+                      New Provider
                     </span>
                   ) : ratingSummary ? (
                     <>
@@ -157,25 +170,41 @@ const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
                         onClick={() => handleShare('facebook')}
                         className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
                       >
-                        <span>📘</span> Facebook
+                        <GlobeAltIcon
+                          className="h-4 w-4 text-blue-600"
+                          aria-hidden="true"
+                        />
+                        Facebook
                       </button>
                       <button
                         onClick={() => handleShare('twitter')}
                         className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
                       >
-                        <span>🐦</span> Twitter
+                        <PaperAirplaneIcon
+                          className="h-4 w-4 text-sky-500"
+                          aria-hidden="true"
+                        />
+                        Twitter
                       </button>
                       <button
                         onClick={() => handleShare('linkedin')}
                         className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
                       >
-                        <span>💼</span> LinkedIn
+                        <BriefcaseIcon
+                          className="h-4 w-4 text-blue-700"
+                          aria-hidden="true"
+                        />
+                        LinkedIn
                       </button>
                       <button
                         onClick={() => handleShare('copy')}
                         className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
                       >
-                        <span>🔗</span> Copy Link
+                        <LinkIcon
+                          className="h-4 w-4 text-gray-600"
+                          aria-hidden="true"
+                        />
+                        Copy Link
                       </button>
                     </div>
                   )}

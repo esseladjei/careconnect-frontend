@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GiftIcon } from '@heroicons/react/24/outline';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -415,10 +416,13 @@ const Register: React.FC = () => {
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              🎁 Use a friend's referral code to get a discount on your first
-              service!
-            </p>
+            <div className="inline-flex items-center gap-2">
+              <GiftIcon className="h-4 w-4 text-amber-500" aria-hidden="true" />
+              <span>
+                Use a friend's referral code to get a discount on your first
+                booking.
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
@@ -103,7 +104,12 @@ const AppointmentHistoryPage: React.FC = () => {
         {/* Date Filter Section */}
         <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="text-xl">📅</span>
+            <span className="inline-flex items-center justify-center rounded-full bg-blue-50 p-2">
+              <CalendarDaysIcon
+                className="h-5 w-5 text-blue-600"
+                aria-hidden="true"
+              />
+            </span>
             Filter by Date Range
           </h2>
           <div className="flex flex-col md:flex-row gap-4 items-end">

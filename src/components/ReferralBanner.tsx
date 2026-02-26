@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { GiftIcon } from '@heroicons/react/24/outline';
 
 /**
  * ReferralBanner - A simple banner component to promote the referral program
@@ -14,7 +15,9 @@ const ReferralBanner: React.FC = () => {
     <div className="bg-linear-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-lg shadow-lg p-6 mb-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="text-4xl">🎁</div>
+          <div className="text-4xl text-amber-500">
+            <GiftIcon className="h-9 w-9" aria-hidden="true" />
+          </div>
           <div>
             <h3 className="text-white font-bold text-lg">
               Earn GH¢50 for Every Referral!

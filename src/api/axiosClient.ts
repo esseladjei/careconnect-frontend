@@ -60,7 +60,7 @@ axiosClient.interceptors.response.use(
     // ✅ FIX: Don't redirect to login for /auth/me 401 errors
     // These are expected when session is invalid
     if (isAuthMeRequest && error.response?.status === 401) {
-      console.log('📍 Session verification failed - user not authenticated');
+      console.log('Session verification failed - user not authenticated');
       // Just return the error, don't redirect
       return Promise.reject(error);
     }

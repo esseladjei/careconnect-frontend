@@ -4,6 +4,7 @@ import PatientFlagModal from './PatientFlagModal';
 import type { Appointment } from '../types/appointment.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import type { IUser } from '../types/user.ts';
+import { CalendarDaysIcon, MapPinIcon } from '@heroicons/react/24/outline';
 // --- Status Styling Helper ---
 const getStatusClasses = (status: Appointment['status']) => {
   switch (status) {
@@ -67,7 +68,10 @@ const AppointmentCard: React.FC<{
 
         <div className="flex items-center text-gray-600 text-sm pt-1">
           <span className="mr-3">
-            🗓️{' '}
+            <CalendarDaysIcon
+              className="h-4 w-4 text-blue-600"
+              aria-hidden="true"
+            />
             {new Date(appointment.scheduledAt).toLocaleDateString('en-GB', {
               year: 'numeric',
               month: 'long',
@@ -78,9 +82,10 @@ const AppointmentCard: React.FC<{
             {appointment.appointmentType}
           </span>
         </div>
-        <p className="text-gray-500 text-sm">
-          📍 {appointment?.availabilityId?.location}
-        </p>
+        <div className="flex items-center gap-2">
+          <MapPinIcon className="h-4 w-4 text-gray-600" aria-hidden="true" />
+          <span>{appointment?.availabilityId?.location}</span>
+        </div>
         <div className="flex flex-wrap items-center gap-3 pt-3 mt-2 border-t border-gray-200">
           {/* Time Slot */}
           <div className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-purple-50 to-purple-100 rounded-xl shadow-sm border border-purple-200 hover:shadow-md transition-shadow">

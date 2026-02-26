@@ -5,6 +5,7 @@ import { useSendMFACode } from '../hooks/useSendMFACode';
 import MFAVerificationModal from '../components/MFAVerificationModal';
 import type { MFARequirements } from '../api/forgotPasswordApi';
 import toast from 'react-hot-toast';
+import { KeyIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -94,7 +95,9 @@ const ForgotPassword: React.FC = () => {
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🔑</div>
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+            <KeyIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Forgot Password?
           </h1>
@@ -120,8 +123,14 @@ const ForgotPassword: React.FC = () => {
             {/* Check Email Reminder */}
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-gray-700">
-                <span className="font-semibold">💡 Tip:</span> If you don't see
-                the email, check your spam folder.
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <LightBulbIcon
+                    className="h-4 w-4 text-amber-500"
+                    aria-hidden="true"
+                  />
+                  Tip:
+                </span>{' '}
+                If you don't see the email, check your spam folder.
               </p>
             </div>
 
