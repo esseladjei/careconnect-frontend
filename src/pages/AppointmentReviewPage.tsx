@@ -21,6 +21,11 @@ const AppointmentReviewPage: React.FC = () => {
     punctuality: 0,
     empathy: 0,
   });
+  const { data: appointment, isLoading } = useGetAppointment({
+    appointmentId: appointmentId ?? '',
+  });
+  const { mutate: submitReview, isPending } = useSubmitReview();
+
   if (!appointmentId) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -40,9 +45,6 @@ const AppointmentReviewPage: React.FC = () => {
       </div>
     );
   }
-  const { data: appointment, isLoading } = useGetAppointment({ appointmentId });
-
-  const { mutate: submitReview, isPending } = useSubmitReview();
 
   const isEligible =
     appointment?.status === 'completed' &&
