@@ -231,9 +231,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
       {/* CTA Button */}
       <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 group-hover:bg-white transition-colors">
         <Link
-          to={`/offerdetails/${result.id}`}
+          to={`/offerdetails/${result.availability.id}`}
           className="block w-full px-4 py-3 text-center text-base font-semibold text-white 
-            bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+            bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
             active:from-blue-800 active:to-blue-900 rounded-xl
             focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
             transition-all duration-300 transform hover:shadow-lg hover:-translate-y-0.5"

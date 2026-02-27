@@ -142,19 +142,27 @@ const BookingPage: React.FC = () => {
     return providerOfferData.workingDays.includes(normalizedDay);
   };
 
-  function isSlotPast(startTime: string, endTime: string): boolean {
+  function isSlotPast(
+    slotDate: string,
+    startTime: string,
+    endTime: string
+  ): boolean {
+    //'past' | 'ongoing' | 'upcoming';
     const now = new Date();
+    const date = new Date(slotDate);
 
-    // Build Date objects for today with the given times
     const [startHour, startMinute] = startTime.split(':').map(Number);
     const [endHour, endMinute] = endTime.split(':').map(Number);
 
-    const start = new Date(now);
+    const start = new Date(date);
     start.setHours(startHour, startMinute, 0, 0);
 
-    const end = new Date(now);
+    const end = new Date(date);
     end.setHours(endHour, endMinute, 0, 0);
-    return end < now; // slot is past if the END is before now
+
+    if (now < start) return false; //'upcoming';
+    if (now > end) return true; //'past';
+    return false; //'ongoing';
   }
 
   function getDuration(startTime: string, endTime: string): number {
@@ -185,7 +193,7 @@ const BookingPage: React.FC = () => {
       time: `${slot.startTime} - ${slot.endTime}`,
       available:
         slot.status === 'available' &&
-        !isSlotPast(slot.startTime, slot.endTime),
+        !isSlotPast(slot.date, slot.startTime, slot.endTime),
       slotId: slot._id,
     }));
   };
@@ -248,7 +256,6 @@ const BookingPage: React.FC = () => {
     setSelectedDate(new Date(value));
   };
   const timeSlots = generateTimeSlots();
-
   // Loading state
   if (isLoading) {
     return (
