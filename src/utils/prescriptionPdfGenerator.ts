@@ -164,14 +164,14 @@ const downloadPrescriptionPDF = (data: PrescriptionData) => {
             <value>${appointmentTime || 'N/A'}</value>
           </div>
         </div>
-      
+      <!-- 
        <div class="section">
           <div class="section-title">Consultation Notes</div>
           <div class="section-content">
-            ${consultationNotes || '<em>No consultation notes</em>'}
+            ${consultationNotes || '<em style="color: #999;">No consultation notes provided</em>'}
           </div>
         </div>
-       
+       -->
         <div class="section">
           <div class="section-title">Prescription Information</div>
           <div class="section-content">
