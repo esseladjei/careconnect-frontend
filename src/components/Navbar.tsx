@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const { userId, isLoggedIn, role } = useAuth();
+  const { userId, isLoggedIn, role, fullName } = useAuth();
   // Navigation Links
   const navLinks = [
     {
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 text-white p-4 shadow-md">
+    <nav className="sticky top-0 z-50 bg-linear-to-l from-blue-700 via-blue-800 to-gray-900 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and App Name */}
         <a href="/" aria-label="Back to Homepage" className="hover:opacity-95">
@@ -107,13 +107,23 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Menu and Toggle */}
         <div className="hidden md:flex items-center space-x-6">
+          {isLoggedIn && (
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white">
+              <span className="max-w-[160px] truncate">
+                {fullName || 'Account'}
+              </span>
+              <span className="text-blue-200">•</span>
+              <span className="capitalize text-blue-200">{role}</span>
+            </div>
+          )}
+
           {isLoggedIn &&
             filteredNavLinksWithSubmenu.map((link) => (
               <div key={link.name} className="relative group">
                 <a
                   href={link.href}
                   title={link.title}
-                  className="text-sm font-medium hover:text-blue-300 transition-colors flex items-center"
+                  className="text-sm font-medium hover:text-blue-300 transition-colors flex items-center py-2"
                 >
                   {link.name}
                   {link.submenu && (
@@ -125,7 +135,7 @@ const Navbar: React.FC = () => {
 
                 {/* Desktop Dropdown */}
                 {link.submenu && (
-                  <div className="absolute left-0 mt-1 w-48 bg-blue-800 border border-blue-600 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <div className="absolute left-0 top-full w-48 bg-blue-800 border border-blue-600 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     {link.submenu.map((item) => (
                       <a
                         key={item.name}
@@ -170,6 +180,15 @@ const Navbar: React.FC = () => {
       {/* Mobile Menu Dropdown */}
       {isOpen && (
         <div className="md:hidden mt-4 space-y-2 bg-blue-800 p-3 rounded-md">
+          {isLoggedIn && (
+            <div className="px-3 py-2 text-sm font-semibold text-blue-100 border border-blue-700 rounded-md">
+              <span className="block truncate">{fullName || 'Account'}</span>
+              <span className="block text-xs text-blue-300 capitalize">
+                {role}
+              </span>
+            </div>
+          )}
+
           {isLoggedIn &&
             filteredNavLinksWithSubmenu.map((link) => (
               <div key={link.name}>

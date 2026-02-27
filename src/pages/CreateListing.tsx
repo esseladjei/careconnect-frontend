@@ -7,10 +7,11 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import {
-  CalendarIcon,
+  CalendarDaysIcon,
   CheckCircleIcon,
   ClockIcon,
   CurrencyDollarIcon,
+  LockClosedIcon,
   MapPinIcon,
 } from '@heroicons/react/24/outline';
 import type { ICreateListingParams } from '../types/providerListing';
@@ -213,7 +214,7 @@ const CreateListing: React.FC = () => {
             {/* Date Range Section */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                <CalendarIcon className="w-6 h-6 text-blue-600" />
+                <CalendarDaysIcon className="w-6 h-6 text-blue-600" />
                 Availability Period
               </h2>
 
@@ -526,7 +527,9 @@ const CreateListing: React.FC = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="text-blue-600 text-3xl mb-3">📅</div>
+            <div className="text-blue-600 mb-3">
+              <CalendarDaysIcon className="h-8 w-8" aria-hidden="true" />
+            </div>
             <h3 className="font-semibold text-gray-900 mb-2">
               Flexible Scheduling
             </h3>
@@ -536,7 +539,9 @@ const CreateListing: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="text-blue-600 text-3xl mb-3">⚡</div>
+            <div className="text-blue-600 mb-3">
+              <CheckCircleIcon className="h-8 w-8" aria-hidden="true" />
+            </div>
             <h3 className="font-semibold text-gray-900 mb-2">
               Automatic Slots
             </h3>
@@ -546,7 +551,9 @@ const CreateListing: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="text-blue-600 text-3xl mb-3">🔒</div>
+            <div className="text-blue-600 mb-3">
+              <LockClosedIcon className="h-8 w-8" aria-hidden="true" />
+            </div>
             <h3 className="font-semibold text-gray-900 mb-2">Slot Locking</h3>
             <p className="text-sm text-gray-600">
               Booked slots are automatically locked to prevent double booking

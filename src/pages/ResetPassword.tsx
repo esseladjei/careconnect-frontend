@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useResetPassword } from '../hooks/useResetPassword';
 import toast from 'react-hot-toast';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  LightBulbIcon,
+  LockClosedIcon,
+} from '@heroicons/react/24/outline';
 
 interface FormData {
   newPassword: string;
@@ -194,9 +200,13 @@ const ResetPassword: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700"
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? (
+                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                )}
               </button>
             </div>
             {errors.newPassword && (
@@ -243,8 +253,12 @@ const ResetPassword: React.FC = () => {
                   >
                     ✓ At least 6 characters
                   </li>
-                  <li>
-                    💡 Use uppercase, numbers, and special characters for
+                  <li className="inline-flex items-center gap-2 font-semibold">
+                    <LightBulbIcon
+                      className="h-4 w-4 text-amber-500"
+                      aria-hidden="true"
+                    />
+                    Tip: Use uppercase, numbers, and special characters for
                     stronger password
                   </li>
                 </ul>
@@ -277,9 +291,13 @@ const ResetPassword: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700"
               >
-                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                {showConfirmPassword ? (
+                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                )}
               </button>
             </div>
             {errors.confirmPassword && (
@@ -356,10 +374,14 @@ const ResetPassword: React.FC = () => {
 
         {/* Info Box */}
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-gray-600">
-            <span className="font-semibold text-gray-900">
-              🔒 Security Tip:
-            </span>{' '}
+          <div className="flex items-center gap-2">
+            <LockClosedIcon
+              className="h-4 w-4 text-gray-600"
+              aria-hidden="true"
+            />
+            <span className="font-semibold">Security Tip:</span>
+          </div>
+          <p className="text-xs text-gray-600 mt-1">
             Use a strong password with uppercase letters, numbers, and special
             characters for better security.
           </p>

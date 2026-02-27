@@ -164,3 +164,787 @@ a[aria-label*="Book appointment"]:hover::before {
     color: #d1d5db;
   }
 }*/
+
+/* ============================================ */
+/* User Profile Page Enhancements */
+/* ============================================ */
+
+/* Profile hero section gradient matching SearchPage (light gradient) */
+.profile-hero-section {
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.05) 0%, rgba(191, 219, 254, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+  position: relative;
+  overflow: visible;
+}
+
+/* Avatar styling */
+.profile-avatar {
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(37, 99, 235));
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* Tab button styling with icons - Clear cursor feedback */
+.profile-tab-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.profile-tab-button:hover::before {
+  left: 100%;
+}
+
+.profile-tab-button.active {
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.profile-tab-button.active svg {
+  animation: iconPulse 0.3s ease-out;
+}
+
+@keyframes iconPulse {
+  0% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Profile card styling */
+.profile-card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth section transitions */
+.profile-section-content {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button styling improvements */
+.profile-primary-btn {
+  background: linear-gradient(135deg, rgb(37, 99, 235), rgb(30, 144, 255));
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-primary-btn:hover {
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.profile-primary-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* Icon styling */
+.profile-icon {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.profile-tab-button:hover .profile-icon {
+  transform: scale(1.1);
+}
+
+.profile-tab-button.active .profile-icon {
+  animation: iconBounce 0.3s ease-out;
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.15) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Language checkbox improvements */
+.language-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.language-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.language-checkbox-label:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.language-checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.language-checkbox-label input[type="checkbox"]:checked {
+  background-color: rgb(59, 130, 246);
+}
+
+/* Form input improvements */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="tel"]:hover,
+input[type="date"]:hover,
+select:hover {
+  border-color: rgb(191, 219, 254);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: rgb(59, 130, 246);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Loading spinner enhancements */
+.profile-spinner {
+  animation: spinnerRotate 1s linear infinite;
+}
+
+@keyframes spinnerRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive improvements for profile page */
+@media (max-width: 768px) {
+  .profile-tab-button {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .profile-avatar {
+    width: 5rem;
+    height: 5rem;
+    font-size: 2rem;
+  }
+
+  .language-checkbox-group {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* Focus states for accessibility */
+.profile-tab-button:focus {
+  outline: 2px solid rgb(37, 99, 235);
+  outline-offset: 2px;
+}
+
+.profile-primary-btn:focus {
+  outline: 2px solid rgb(37, 99, 235);
+  outline-offset: 2px;
+}
+
+/* Form section styling */
+.form-section {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Section headers with icons */
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgb(31, 41, 55);
+  margin-bottom: 0.75rem;
+}
+
+.form-section-title svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Compact form grid */
+.form-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.form-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+/* Form input styling enhancements */
+.form-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(75, 85, 99);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-label svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.form-input {
+  transition: all 0.2s ease;
+}
+
+.form-input:hover:not(:disabled) {
+  border-color: rgb(191, 219, 254);
+  background-color: rgba(191, 219, 254, 0.05);
+}
+
+.form-input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: rgb(59, 130, 246);
+}
+
+/* Helper text styling */
+.form-helper-text {
+  font-size: 0.75rem;
+  color: rgb(107, 114, 128);
+  margin-top: 0.125rem;
+}
+
+/* Disabled input styling */
+.form-input:disabled {
+  background-color: rgb(249, 250, 251);
+  color: rgb(156, 163, 175);
+  cursor: not-allowed;
+}
+
+/* ============================================ */
+/* Appointment Page Enhancements */
+/* ============================================ */
+
+/* Appointment Card Styling - More Compact */
+.appointment-card {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.appointment-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15);
+}
+
+/* Appointment Card Top Border */
+.appointment-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgb(59, 130, 246), rgb(37, 99, 235), rgb(30, 144, 255));
+  border-radius: 8px 8px 0 0;
+}
+
+/* Appointment Title Link */
+.appointment-title-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.appointment-title-link:hover {
+  color: rgb(37, 99, 235);
+}
+
+.appointment-title-link svg {
+  transition: transform 0.3s ease;
+}
+
+.appointment-title-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* Info Badges - Compact */
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(249, 250, 251, 1);
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.info-badge:hover {
+  background: rgba(243, 244, 246, 1);
+  border-color: rgba(209, 213, 219, 1);
+}
+
+/* Status Badge - Compact */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  transition: all 0.3s ease;
+}
+
+/* Appointment Button Styling - Compact */
+.appointment-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.appointment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.appointment-btn:hover::before {
+  left: 100%;
+}
+
+/* Filter Section - Improved */
+.filter-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(239, 246, 255, 1));
+  border: 1px solid rgba(191, 219, 254, 1);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.filter-section:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Filter Input Group */
+.filter-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.filter-input-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(55, 65, 81);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.filter-input-group input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.filter-input-group input:hover {
+  border-color: rgb(156, 163, 175);
+}
+
+.filter-input-group input:focus {
+  border-color: rgb(59, 130, 246);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+/* Quick Filter Buttons - Compact */
+.quick-filter-btn {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+.quick-filter-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.quick-filter-btn:active {
+  transform: translateY(0);
+}
+
+/* Hero Section */
+.appointment-hero {
+  background: linear-gradient(135deg, rgb(55, 65, 81) 0%, rgb(37, 99, 235) 50%, rgb(30, 144, 255) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.appointment-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent 50%),
+  radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.2), transparent 50%);
+  pointer-events: none;
+}
+
+/* Tab Navigation - Compact */
+.appointment-tab {
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.appointment-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgb(37, 99, 235), rgb(30, 144, 255));
+  transition: width 0.3s ease;
+}
+
+.appointment-tab.active::after {
+  width: 100%;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Textarea Focus Enhancement */
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Notes Section */
+.notes-section {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.03));
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.notes-section:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.05));
+}
+
+/* Referral Page Enhancements */
+/* ============================================ */
+
+/* Referral Stats Cards - Compact */
+.referral-stat-card {
+  transition: all 0.3s ease;
+  border-left-width: 4px;
+}
+
+.referral-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Share Section */
+.referral-share-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(239, 246, 255, 1));
+  border: 1px solid rgba(191, 219, 254, 1);
+  transition: all 0.3s ease;
+}
+
+.referral-share-section:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Referral Input */
+.referral-input {
+  transition: all 0.2s ease;
+}
+
+.referral-input:focus {
+  transform: scale(1.01);
+}
+
+.referral-code-input {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+/* Copy Button Animation */
+.copy-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.copy-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.copy-btn:hover::before {
+  left: 100%;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+/* How It Works Cards */
+.how-it-works-card {
+  transition: all 0.3s ease;
+}
+
+.how-it-works-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Referral Table */
+.referral-table {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.referral-table thead {
+  background: linear-gradient(135deg, rgb(249, 250, 251), rgb(243, 244, 246));
+}
+
+.referral-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.referral-table tbody tr:hover {
+  background-color: rgba(249, 250, 251, 0.7);
+}
+
+/* Status Badge Animation */
+.status-badge {
+  animation: fadeIn 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Empty State */
+.referral-empty-state {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bonus Amount Animation */
+.bonus-amount {
+  transition: all 0.3s ease;
+}
+
+.bonus-amount:hover {
+  transform: scale(1.05);
+}
+
+/* Hero Section for Referral */
+.referral-hero {
+  background: linear-gradient(135deg, rgb(37, 99, 235) 0%, rgb(59, 130, 246) 50%, rgb(96, 165, 250) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.referral-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent 50%),
+  radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.2), transparent 50%);
+  pointer-events: none;
+}
+
+/* Info Banner */
+.referral-info-banner {
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .referral-stat-card {
+    padding: 1rem;
+  }
+
+  .referral-share-section {
+    padding: 1rem;
+  }
+
+  .how-it-works-card {
+    padding: 0.75rem;
+  }
+
+  .referral-table {
+    font-size: 0.875rem;
+  }
+
+  .referral-table th,
+  .referral-table td {
+    padding: 0.5rem;
+  }
+}

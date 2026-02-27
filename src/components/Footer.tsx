@@ -5,34 +5,66 @@ const Footer: React.FC = () => {
     {
       title: 'Support',
       links: [
-        'Help Center',
-        'AirCover',
-        'Anti-discrimination',
-        'Disability Support',
-        'Cancellation options',
-        'Report neighborhood concern',
+        {
+          name: 'Support',
+          title: 'Support center for help and FAQs',
+          href: '/help',
+        },
+        {
+          name: 'Cancellation options',
+          title: 'Learn about cancellation policies and options',
+          href: '/cancellation-options',
+        },
+        {
+          name: 'New features',
+          title: 'Learn about cancellation policies and options',
+          href: '/New features',
+        },
       ],
     },
     {
       title: 'Providers Quick Links',
       links: [
-        'Providers In Sunyani',
-        'Providers in Kumasi',
-        'Providers in Accra',
-        'Providers in Takoradi',
-        'Hosting responsibly',
-        'Join a free Hosting class',
+        {
+          name: 'Providers In Sunyani',
+          title: 'Search for a medical professionals in Sunyani',
+          href: '/search?location=Sunyani',
+        },
+        {
+          name: 'Providers In Kumasi',
+          title: 'Search for a medical professionals in Kumasi',
+          href: '/search?location=Kumasi',
+        },
+        {
+          name: 'Providers In Accra',
+          title: 'Search for a medical professionals in Accra',
+          href: '/search?location=Accra',
+        },
+        {
+          name: 'Providers In Takoradi',
+          title: 'Search for a medical professionals in Takoradi',
+          href: '/search?location=Takoradi',
+        },
       ],
     },
     {
-      title: 'Airbnb',
+      title: 'CareConnect',
       links: [
-        'Newsroom',
-        'New features',
-        'Careers',
-        'Investors',
-        'Gift cards',
-        'Airbnb.org emergency stays',
+        {
+          name: 'About Us',
+          title: 'Learn more about CareConnect and our mission',
+          href: '/about',
+        },
+        {
+          name: 'Careers',
+          title: 'Explore career opportunities at CareConnect',
+          href: '/careers',
+        },
+        {
+          name: 'Investors',
+          title: 'Information for investors interested in CareConnect',
+          href: '/investors',
+        },
       ],
     },
   ];
@@ -48,13 +80,13 @@ const Footer: React.FC = () => {
                 {section.title}
               </h3>
               <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link}>
+                {section.links.map((link, index) => (
+                  <li key={index}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-gray-600 text-sm hover:text-gray-900 transition-colors"
                     >
-                      {link}
+                      {link.name}
                     </a>
                   </li>
                 ))}

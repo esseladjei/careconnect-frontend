@@ -10,6 +10,16 @@ import {
 } from '../hooks/useAnalytics';
 import { BarChart, LineChart } from '../components/charts';
 import Spinner from '../components/Spinner';
+import {
+  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
+  PresentationChartLineIcon,
+  SignalIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
 
 const AnalyticsPage: React.FC = () => {
   const [view, setView] = useState<'personal' | 'overview'>('personal');
@@ -161,7 +171,10 @@ const AnalyticsPage: React.FC = () => {
                             Total Platform Activity
                           </p>
                           <p className="mt-2 text-3xl font-bold text-blue-600">
-                            📊
+                            <ChartBarIcon
+                              className="h-8 w-8"
+                              aria-hidden="true"
+                            />
                           </p>
                           <p className="mt-2 text-sm text-gray-500">
                             Comprehensive analytics tracking enabled
@@ -173,7 +186,10 @@ const AnalyticsPage: React.FC = () => {
                             Data Collection
                           </p>
                           <p className="mt-2 text-3xl font-bold text-green-600">
-                            ✅
+                            <CheckCircleIcon
+                              className="h-8 w-8"
+                              aria-hidden="true"
+                            />
                           </p>
                           <p className="mt-2 text-sm text-gray-500">
                             Real-time data collection active
@@ -183,7 +199,10 @@ const AnalyticsPage: React.FC = () => {
                         <div className="rounded-lg border border-gray-200 bg-white p-6">
                           <p className="text-sm text-gray-600">System Status</p>
                           <p className="mt-2 text-3xl font-bold text-green-600">
-                            🟢
+                            <SignalIcon
+                              className="h-8 w-8"
+                              aria-hidden="true"
+                            />
                           </p>
                           <p className="mt-2 text-sm text-gray-500">
                             All systems operational
@@ -203,7 +222,10 @@ const AnalyticsPage: React.FC = () => {
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <div className="flex gap-4">
-                    <span className="text-2xl">📈</span>
+                    <ArrowTrendingUpIcon
+                      className="h-6 w-6 text-blue-600"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         Booking Trends
@@ -215,7 +237,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-2xl">⭐</span>
+                    <SparklesIcon
+                      className="h-6 w-6 text-yellow-500"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         Performance Metrics
@@ -227,7 +252,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-2xl">📊</span>
+                    <PresentationChartLineIcon
+                      className="h-6 w-6 text-indigo-600"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         Visual Charts
@@ -239,7 +267,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-2xl">💹</span>
+                    <ArrowTrendingUpIcon
+                      className="h-6 w-6 text-green-600"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         Growth Analysis
@@ -251,7 +282,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-2xl">🎯</span>
+                    <ClipboardDocumentCheckIcon
+                      className="h-6 w-6 text-blue-600"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         KPI Tracking
@@ -263,7 +297,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-2xl">💡</span>
+                    <LightBulbIcon
+                      className="h-6 w-6 text-amber-500"
+                      aria-hidden="true"
+                    />
                     <div>
                       <h4 className="font-semibold text-gray-900">
                         Smart Insights

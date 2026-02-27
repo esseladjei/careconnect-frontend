@@ -4,6 +4,7 @@ import {
   CalendarIcon,
   CheckCircleIcon,
   ClockIcon,
+  LockClosedIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/outline';
 
@@ -77,7 +78,9 @@ const ProviderQuickActions: React.FC<Props> = ({ providerId }) => {
           </p>
         </div>
         <div className="bg-white rounded-lg p-4 text-center border border-purple-200">
-          <div className="text-2xl mb-1">🔒</div>
+          <div className="text-2xl mb-1 text-blue-600">
+            <LockClosedIcon className="h-6 w-6" aria-hidden="true" />
+          </div>
           <p className="text-xs text-gray-600 font-medium">
             Slot
             <br />

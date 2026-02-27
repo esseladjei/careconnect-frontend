@@ -7,6 +7,11 @@ import MFAVerificationModal from '../components/MFAVerificationModal';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import {
+  CheckBadgeIcon,
+  ShieldCheckIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
 import type {
   PatientProfile,
   ProviderProfile,
@@ -237,50 +242,61 @@ const UserProfilePage: React.FC = () => {
   const user = userResponse.user;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
       <Navbar />
 
-      <main className="container mx-auto p-4 md:p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Account Settings
-        </h1>
+      {/* Hero Header Section with Gradient - Matching SearchPage */}
+      <section className="bg-gradient-to-b from-slate-50 via-blue-50 to-white pt-8 pb-12 relative border-b border-blue-100">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight text-gray-900">
+              Account Settings
+            </h1>
+            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+              Manage your profile, security preferences, and two-factor
+              authentication
+            </p>
+          </div>
+        </div>
+      </section>
 
+      <main className="container mx-auto px-4 md:px-8 py-8 -mt-6 relative z-10">
         {/* Loading Skeleton */}
         {isLoading ? (
-          <div className="bg-white rounded-xl shadow-2xl p-6 lg:p-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-10">
             {/* Avatar Skeleton */}
-            <div className="flex items-center space-x-6 pb-6 border-b border-gray-200 mb-6">
-              <div className="h-24 w-24 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="flex items-center space-x-6 pb-8 border-b border-gray-200 mb-8">
+              <div className="h-24 w-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full animate-pulse"></div>
               <div className="flex-1">
-                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2 animate-pulse"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-3 animate-pulse"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/4 mb-2 animate-pulse"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/5 animate-pulse"></div>
               </div>
             </div>
 
             {/* Tab Skeleton */}
-            <div className="flex border-b border-gray-200 mb-6">
-              <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
-              <div className="h-10 bg-gray-200 rounded w-32 ml-4 animate-pulse"></div>
+            <div className="flex border-b border-gray-200 mb-8">
+              <div className="h-12 bg-gray-200 rounded w-40 animate-pulse"></div>
+              <div className="h-12 bg-gray-200 rounded w-40 ml-6 animate-pulse"></div>
             </div>
 
             {/* Form Content Skeleton */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-12 bg-gray-200 rounded animate-pulse"
+                  className="h-12 bg-gray-200 rounded-lg animate-pulse"
                 ></div>
               ))}
             </div>
           </div>
         ) : isError ? (
           /* Error State */
-          <div className="bg-white rounded-xl shadow-2xl p-6 lg:p-8">
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="text-red-500 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-10">
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="text-red-500 mb-6">
                 <svg
-                  className="h-16 w-16"
+                  className="h-20 w-20"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -293,15 +309,15 @@ const UserProfilePage: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Unable to load profile
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-8 text-center max-w-sm">
                 We encountered an error while fetching your profile data.
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg"
               >
                 Try Again
               </button>
@@ -309,70 +325,101 @@ const UserProfilePage: React.FC = () => {
           </div>
         ) : (
           /* Profile Card Container */
-          <div className="bg-white rounded-xl shadow-2xl p-6 lg:p-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
             {/* Top Header/Avatar Section */}
-            <div className="flex items-center space-x-6 pb-6 border-b border-gray-200 mb-6">
-              <div className="h-24 w-24 bg-blue-100 rounded-full flex items-center justify-center text-4xl text-blue-500 font-bold overflow-hidden shrink-0">
+            <div className="flex flex-col md:flex-row items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 pb-6 border-b border-gray-200 mb-8">
+              <div className="h-20 w-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-4xl text-white font-bold overflow-hidden shrink-0 shadow-lg">
                 {/* Display user initials */}
                 {user.firstName?.[0]}
                 {user.lastName?.[0]}
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">
                   {user.title} {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-600 text-sm mb-2">{user.email}</p>
+                <p className="text-gray-500 text-xs mb-3">
                   Member since{' '}
                   {user.createdAt
                     ? new Date(user.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         day: 'numeric',
                       })
                     : 'Recently'}
                 </p>
-                <button className="text-blue-600 text-sm mt-1 hover:text-blue-700">
-                  Change Photo
-                </button>
               </div>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200 mb-6">
+            {/* Tab Navigation with Icons - Cursor Pointer */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group ${
                   activeTab === 'profile'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-500 shadow-md'
+                    : 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
                 }`}
               >
-                Profile Details
+                <UserCircleIcon
+                  className={`h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                    activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'
+                  }`}
+                />
+                <span
+                  className={`font-semibold text-sm transition-colors ${
+                    activeTab === 'profile' ? 'text-blue-700' : 'text-gray-700'
+                  }`}
+                >
+                  Profile
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('security')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group ${
                   activeTab === 'security'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-500 shadow-md'
+                    : 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
                 }`}
               >
-                Security & Access
+                <ShieldCheckIcon
+                  className={`h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                    activeTab === 'security' ? 'text-blue-600' : 'text-gray-500'
+                  }`}
+                />
+                <span
+                  className={`font-semibold text-sm transition-colors ${
+                    activeTab === 'security' ? 'text-blue-700' : 'text-gray-700'
+                  }`}
+                >
+                  Security
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('mfa')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group ${
                   activeTab === 'mfa'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-500 shadow-md'
+                    : 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
                 }`}
               >
-                Two-Factor Auth
+                <CheckBadgeIcon
+                  className={`h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                    activeTab === 'mfa' ? 'text-blue-600' : 'text-gray-500'
+                  }`}
+                />
+                <span
+                  className={`font-semibold text-sm transition-colors ${
+                    activeTab === 'mfa' ? 'text-blue-700' : 'text-gray-700'
+                  }`}
+                >
+                  2FA
+                </span>
               </button>
             </div>
 
             {/* Tab Content with Loading Indicator */}
-            <div>
+            <div className="mt-6">
               {saveUserMutation.isPending || savePasswordMutation.isPending ? (
                 <div className="flex items-center justify-center py-12">
                   <Spinner size="lg" className="mr-3" />
@@ -400,9 +447,13 @@ const UserProfilePage: React.FC = () => {
                       onLogoutAll={async () => {
                         try {
                           await logoutAll();
-                          toast.success('You have been logged out from all devices.');
+                          toast.success(
+                            'You have been logged out from all devices.'
+                          );
                         } catch (error) {
-                          toast.error('Failed to log out from all devices. Please try again.');
+                          toast.error(
+                            'Failed to log out from all devices. Please try again.'
+                          );
                         }
                       }}
                     />

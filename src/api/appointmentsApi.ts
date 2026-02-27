@@ -26,6 +26,24 @@ export const appointmentsApi = {
     return response.data;
   },
 
+  checkExistingReview: async (
+    appointmentId: string,
+    patientId: string
+  ): Promise<{ existing: boolean }> => {
+    const response = await axiosClient.get(
+      `/reviews/${appointmentId}/${patientId}/check-review`
+    );
+    return response.data;
+  },
+  checkExistingFlag: async (
+    appointmentId: string,
+    providerId: string
+  ): Promise<{ existing: boolean }> => {
+    const response = await axiosClient.get(
+      `/reviews/${appointmentId}/${providerId}/check-flag`
+    );
+    return response.data;
+  },
   publishAvailability: async (
     data: ICreateListingParams
   ): Promise<IProviderListing> => {

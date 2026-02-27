@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PatientFlagModal from './PatientFlagModal';
 import type { Appointment } from '../types/appointment.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import type { IUser } from '../types/user.ts';
+import {
+  CalendarDaysIcon,
+  ChevronRightIcon,
+  MapPinIcon,
+} from '@heroicons/react/24/outline';
+import {
+  useCheckExistingFlag,
+  useCheckExistingReview,
+} from '../hooks/useAppointments';
 // --- Status Styling Helper ---
 const getStatusClasses = (status: Appointment['status']) => {
   switch (status) {
@@ -38,153 +47,226 @@ const AppointmentCard: React.FC<{
 }) => {
   const { role } = useAuth();
   const [showFlagModal, setShowFlagModal] = useState(false);
+  const patientId = appointment.patientId?.userId?._id;
+  const providerId = appointment.providerId?.userId?._id;
+  const navigate = useNavigate();
+  // Call hooks unconditionally at top level (required by React Rules of Hooks)
+  const { data: reviewCheckData } = useCheckExistingReview(
+    appointment._id,
+    patientId || ''
+  );
+  const { data: flagCheckData } = useCheckExistingFlag(
+    appointment._id,
+    providerId || ''
+  );
+
+  // Determine which data to use based on role
+  const existingReview = role === 'patient' ? reviewCheckData?.existing : false;
+  const existingFlag = role === 'provider' ? flagCheckData?.existing : false;
+
   const canReview =
     role === 'patient' &&
     appointment.status === 'completed' &&
     appointment.paymentStatus === 'paid';
+
   const canFlag =
     role === 'provider' &&
     ['completed', 'no-show', 'cancelled'].includes(appointment.status);
+
   const canCheckIn = role === 'provider' && appointment.status === 'confirmed';
   const canCheckOut =
     role === 'provider' && appointment.status === 'checked-in';
   const canConfirm = role === 'provider' && appointment.status === 'pending';
-  const patientId = appointment.patientId?.userId?._id;
+
   const target =
     role === 'provider'
       ? (appointment?.patientId?.userId as IUser)
       : appointment?.providerId?.userId;
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-600 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 hover:shadow-xl transition-shadow duration-300">
-      {/* Details (Left Side) */}
-      <div className="grow space-y-1">
-        <h3 className="text-xl font-bold text-gray-900">
-          {appointment.doctor}
-        </h3>
-        <p className="text-blue-600 font-medium">
-          {appointment.providerId.specialties.join('-')} Appointment
-        </p>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group">
+      {/* Top Border Accent */}
+      <div className="h-1 bg-linear-to-r from-blue-500 via-blue-600 to-blue-700"></div>
 
-        <div className="flex items-center text-gray-600 text-sm pt-1">
-          <span className="mr-3">
-            🗓️{' '}
-            {new Date(appointment.scheduledAt).toLocaleDateString('en-GB', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}{' '}
-          </span>
-          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
-            {appointment.appointmentType}
-          </span>
-        </div>
-        <p className="text-gray-500 text-sm">
-          📍 {appointment?.availabilityId?.location}
-        </p>
-        <div className="flex flex-wrap items-center gap-3 pt-3 mt-2 border-t border-gray-200">
-          {/* Time Slot */}
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-purple-50 to-purple-100 rounded-xl shadow-sm border border-purple-200 hover:shadow-md transition-shadow">
-            <span className="text-xl">⏰</span>
-            <div className="flex flex-col">
-              <span className="text-xs text-purple-600 font-semibold uppercase tracking-wide">
-                Appointment Time
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+          {/* Left Content Section */}
+          <div className="flex-1 space-y-2">
+            {/* Clickable Title */}
+            <Link
+              to={`/appointments/${appointment._id}/details`}
+              className="group/link inline-flex items-center gap-1 hover:gap-2 transition-all"
+            >
+              <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                {appointment.doctor}
+              </h3>
+              <ChevronRightIcon className="h-4 w-4 text-gray-400 group-hover/link:text-blue-600 transition-all" />
+            </Link>
+
+            {/* Specialty & Type */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-blue-600 font-medium">
+                {appointment.providerId.specialties.join(' • ')}
               </span>
-              <span className="text-sm font-bold text-purple-900">
-                {appointment?.slotId?.startTime} -{' '}
-                {appointment?.slotId?.endTime}
+              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 uppercase">
+                {appointment.appointmentType}
               </span>
             </div>
-          </div>
-          {/* Patient Info */}
 
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-blue-50 to-blue-100 rounded-xl shadow-sm border border-blue-200 hover:shadow-md transition-shadow">
-            <span className="text-xl">👤</span>
-            <div className="flex flex-col">
-              <span className="text-xs text-blue-600 font-semibold uppercase tracking-wide">
-                {role === 'provider' ? 'Patient' : 'Provider'} Info
-              </span>
-              <span className="text-sm font-bold text-blue-900">
-                {target?.title} {target?.firstName} {target?.lastName}
-              </span>
+            {/* Date, Time & Location - Compact Row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm pt-1">
+              <div className="flex items-center gap-1.5 text-gray-700">
+                <CalendarDaysIcon className="h-3.5 w-3.5 text-blue-600" />
+                <span className="font-medium">
+                  {new Date(appointment.scheduledAt).toLocaleDateString(
+                    'en-GB',
+                    {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    }
+                  )}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-gray-700">
+                <span className="text-sm">⏰</span>
+                <span className="font-medium">
+                  {appointment?.slotId?.startTime} -{' '}
+                  {appointment?.slotId?.endTime}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-gray-700">
+                <MapPinIcon className="h-3.5 w-3.5 text-green-600" />
+                <span className="font-medium">
+                  {appointment?.availabilityId?.location}
+                </span>
+              </div>
+            </div>
+
+            {/* Provider/Patient Info - Compact */}
+            <div className="pt-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-50 rounded-lg">
+                <span className="text-sm">👤</span>
+                <div>
+                  <span className="text-xs text-gray-600 font-medium">
+                    {role === 'provider' ? 'Patient' : 'Provider'}:{' '}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {target?.firstName} {target?.lastName}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Actions & Status (Right Side) */}
-      <div className="flex flex-col items-start md:items-end space-y-10 pt-4 md:pt-0">
-        {/* Status Badge */}
-        <span
-          className={`px-3 py-1 text-xs leading-5 font-semibold rounded-full border ${getStatusClasses(appointment.status)}`}
-        >
-          {appointment.status}
-        </span>
+          {/* Right Section - Status & Actions */}
+          <div className="flex flex-col items-end space-y-2 w-full md:w-auto">
+            {/* Status Badge */}
+            <span
+              className={`px-3 py-1 text-xs leading-5 font-bold rounded-full border capitalize ${getStatusClasses(appointment.status)}`}
+            >
+              {appointment.status}
+            </span>
 
-        {/* Action Buttons */}
-        {appointment.status === 'confirmed' && (
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onCancel(appointment._id, role)}
-              disabled={isLoading}
-              className="px-3 py-1 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Canceling...' : 'Cancel'}
-            </button>
-            {canCheckIn && (
-              <button
-                onClick={() => onCheckIn(appointment._id)}
-                disabled={isLoading}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Checking in...' : 'Check in'}
-              </button>
-            )}
-          </div>
-        )}
-        {appointment.status === 'pending' && canConfirm && (
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onConfirm(appointment._id)}
-              disabled={isLoading}
-              className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Confirming...' : 'Confirm'}
-            </button>
-          </div>
-        )}
-        {appointment.status === 'checked-in' && canCheckOut && (
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onCheckOut(appointment._id)}
-              disabled={isLoading}
-              className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Checking out...' : 'Check out'}
-            </button>
-          </div>
-        )}
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4 mt-6">
+              {appointment.status === 'confirmed' && (
+                <>
+                  {canCheckIn && (
+                    <button
+                      onClick={() => onCheckIn(appointment._id)}
+                      disabled={isLoading}
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? 'Checking in...' : 'Check in'}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onCancel(appointment._id, role)}
+                    disabled={isLoading}
+                    className="px-3 py-1.5 text-xs font-semibold text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Canceling...' : 'Cancel'}
+                  </button>
+                </>
+              )}
 
-        {(canReview || canFlag) && (
-          <div className="flex flex-wrap gap-2">
-            {canReview && (
+              {appointment.status === 'pending' && canConfirm && (
+                <button
+                  onClick={() => onConfirm(appointment._id)}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Confirming...' : 'Confirm'}
+                </button>
+              )}
+
+              {appointment.status === 'checked-in' && canCheckOut && (
+                <button
+                  onClick={() => onCheckOut(appointment._id)}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Checking out...' : 'Check out'}
+                </button>
+              )}
+
+              {(canReview || canFlag) && (
+                <>
+                  {canReview && (
+                    <button
+                      onClick={() =>
+                        navigate(`/appointments/${appointment._id}/review`)
+                      }
+                      disabled={existingReview}
+                      title={
+                        existingReview
+                          ? 'You have already reviewed this appointment'
+                          : 'Leave a review for this appointment'
+                      }
+                      className={`${
+                        existingReview
+                          ? 'cursor-not-allowed disabled:cursor-not-allowed disabled:opacity-70'
+                          : ''
+                      } px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-blue-500 to-blue-600 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-center`}
+                    >
+                      Review
+                    </button>
+                  )}
+                  {canFlag && (
+                    <button
+                      type="button"
+                      onClick={() => setShowFlagModal(true)}
+                      disabled={existingFlag}
+                      title={
+                        existingFlag
+                          ? 'You have already reported this appointment'
+                          : 'Report this appointment'
+                      }
+                      className={`${
+                        existingFlag
+                          ? 'cursor-not-allowed disabled:cursor-not-allowed disabled:opacity-70'
+                          : ''
+                      } px-3 py-1.5 text-xs font-semibold border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-all `}
+                    >
+                      Report
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* View Details Link */}
               <Link
-                to={`/appointments/${appointment._id}/review`}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                to={`/appointments/${appointment._id}/details`}
+                className="px-3 py-1.5 text-xs font-semibold text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-all text-center"
               >
-                Leave Review
+                Details
               </Link>
-            )}
-            {canFlag && (
-              <button
-                type="button"
-                onClick={() => setShowFlagModal(true)}
-                className="px-3 py-1 text-sm border border-orange-300 text-orange-700 rounded-lg hover:bg-orange-50"
-              >
-                Report Issue
-              </button>
-            )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {showFlagModal && canFlag && (
@@ -197,4 +279,5 @@ const AppointmentCard: React.FC<{
     </div>
   );
 };
+
 export default AppointmentCard;
