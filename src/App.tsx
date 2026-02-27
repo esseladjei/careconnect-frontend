@@ -12,6 +12,7 @@ import CreateListing from './pages/CreateListing';
 import UserProfilePage from './pages/UserProfilepage';
 import Payments from './pages/PaymentsPages';
 import Appointments from './pages/AppointmentPage';
+import AppointmentDetailsPage from './pages/AppointmentDetailsPage';
 import ReferralPage from './pages/ReferalPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProviderOnboarding from './pages/ProviderOnboarding.tsx';
@@ -89,6 +90,12 @@ function App() {
           path="/appointments/:appointmentId/review"
           element={
             isLoggedIn ? <AppointmentReviewPage /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/appointments/:appointmentId/details"
+          element={
+            isLoggedIn ? <AppointmentDetailsPage /> : <Navigate to="/login" />
           }
         />
         <Route path="/" element={<Home />} />

@@ -25,7 +25,6 @@ export interface UserPassword {
 export type Role = 'patient' | 'provider';
 
 export interface PatientProfile {
-  dateOfBirth?: string;
   gender?: string;
   phone?: string;
   insuranceProvider?: string;
@@ -67,13 +66,17 @@ export interface UserResponse {
 
 export interface IUser {
   _id: string;
+  title: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
   emailVerified: boolean;
+  role: string;
+  dateOfBirth: string;
+  gender: string;
+  profilePicture: string;
+  address: string;
+  location: string;
   phone: string;
   languages: string[];
-  gender: string;
-  title: string;
 }

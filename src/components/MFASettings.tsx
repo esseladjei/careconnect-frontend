@@ -211,12 +211,12 @@ const MFASettings: React.FC<MFASettingsProps> = ({ userId, userEmail }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* MFA Enable/Disable Section */}
-      <div className="border border-gray-200 rounded-lg p-6 bg-blue-50">
+      <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-base font-semibold text-gray-900 mb-1">
               Two-Factor Authentication
             </h3>
             <p className="text-gray-600 text-sm">
@@ -225,7 +225,7 @@ const MFASettings: React.FC<MFASettingsProps> = ({ userId, userEmail }) => {
                 : 'Secure your account with two-factor authentication'}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {mfaSettings?.isMFAEnabled ? (
               <>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
@@ -295,11 +295,11 @@ const MFASettings: React.FC<MFASettingsProps> = ({ userId, userEmail }) => {
 
       {/* Enrolled Methods Section */}
       {mfaSettings?.isMFAEnabled && mfaSettings.mfaMethods.length > 0 && (
-        <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
             Enrolled Methods
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {mfaSettings.mfaMethods.map((method) => (
               <div
                 key={method.type}

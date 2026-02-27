@@ -27,26 +27,29 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+      <label
+        htmlFor={id}
+        className="block text-xs font-semibold text-gray-700 uppercase mb-1"
+      >
         {label}
       </label>
-      <div className="relative mt-1">
+      <div className="relative">
         <input
           type={showPassword ? 'text' : 'password'}
           id={id}
           onChange={(e) => onChange(e.target.value)}
           required={required}
-          className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10"
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600 transition-colors cursor-pointer"
         >
           {showPassword ? (
-            <EyeSlashIcon className="h-5 w-5" />
+            <EyeSlashIcon className="h-4 w-4" />
           ) : (
-            <EyeIcon className="h-5 w-5" />
+            <EyeIcon className="h-4 w-4" />
           )}
         </button>
       </div>
@@ -67,15 +70,15 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Password Change */}
       <div className="pb-4 border-b border-gray-200">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Change Password
         </h3>
         <form
           onSubmit={handlePasswordChangeSubmit}
-          className="space-y-4 max-w-lg"
+          className="space-y-3 max-w-md"
         >
           <PasswordInput
             id="current-password"
@@ -98,39 +101,39 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
           <button
             type="submit"
             disabled={savePasswordStatus}
-            className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-2"
           >
-            {savePasswordStatus ? 'Password changed...' : 'Update Password'}
+            {savePasswordStatus ? '✓ Password updated' : 'Update Password'}
           </button>
         </form>
       </div>
 
-      {/* Account Deactivation (Placeholder) */}
-      <div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-3">
+      {/* Account Deactivation */}
+      <div className="pb-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">
           Account Deactivation
         </h3>
         <p className="text-sm text-gray-600 mb-4">
           Permanently delete your account and all associated data. This action
           cannot be undone.
         </p>
-        <button className="px-4 py-2 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
+        <button className="px-4 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors cursor-pointer">
           Deactivate Account
         </button>
       </div>
 
       {/* Logout all devices */}
       <div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-3">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">
           Logout All Devices
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          Sign out of your account on all devices.
+          Sign out of your account on all devices for security.
         </p>
         <button
           type="button"
           onClick={onLogoutAll}
-          className="px-4 py-2 text-sm text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
         >
           Log out all devices
         </button>
