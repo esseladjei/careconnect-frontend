@@ -204,3 +204,30 @@ export const useCheckExistingFlag = (
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
   });
 };
+
+export const useSaveAppointmentNote = (): UseMutationResult<
+  Appointment,
+  Error,
+  { appointmentId: string; consultationNotes: string; prescriptions: string }
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ appointmentId, consultationNotes, prescriptions }) =>
+      appointmentsApi.saveAppointmentNote(appointmentId, {
+        consultationNotes,
+        prescriptions,
+      }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: appointmentQueryKeys.detail(data._id),
+      });
+      toast.success(`Appointment notes saved successfully!`);
+    },
+    onError: (error: Error) => {
+      toast.error(
+        `Failed to save appointment notes: ${error.message || 'Unknown error'}`
+      );
+    },
+  });
+};

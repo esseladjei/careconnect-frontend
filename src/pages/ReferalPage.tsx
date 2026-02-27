@@ -13,11 +13,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Spinner from '../components/Spinner';
 import { useReferralStats } from '../hooks/useReferrals';
-import { useAuth } from '../hooks/useAuth';
 
 const ReferralPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
-  const { role } = useAuth();
   const { data, isLoading, error } = useReferralStats(userId || '');
   const [isCopied, setIsCopied] = useState(false);
   const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
@@ -67,8 +65,6 @@ const ReferralPage: React.FC = () => {
       </div>
     );
   }
-
-  const referralType = role === 'provider' ? 'Patient' : 'Provider';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
@@ -366,14 +362,15 @@ const ReferralPage: React.FC = () => {
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-sm text-gray-600">
-                          {new Date(referral.createdAt).toLocaleDateString(
-                            'en-GB',
-                            {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            }
-                          )}
+                          {referral.completedAt &&
+                            new Date(referral.completedAt).toLocaleDateString(
+                              'en-GB',
+                              {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              }
+                            )}
                         </span>
                       </td>
                     </tr>

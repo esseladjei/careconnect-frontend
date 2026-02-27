@@ -50,7 +50,16 @@ export const appointmentsApi = {
     const response = await axiosClient.post('/appointments/publish', data);
     return response.data;
   },
-
+  saveAppointmentNote: async (
+    appointmentId: string,
+    data: { consultationNotes: string; prescriptions: string }
+  ): Promise<Appointment> => {
+    const response = await axiosClient.patch(
+      `/appointments/${appointmentId}/savenotes`,
+      data
+    );
+    return response.data;
+  },
   getAvailableSlots: async (
     availabilityId: string,
     date: string
