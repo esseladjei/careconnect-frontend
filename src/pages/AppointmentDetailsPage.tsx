@@ -499,7 +499,13 @@ const AppointmentDetailsPage: React.FC = () => {
                 <p className="text-gray-700 mb-4">
                   Your consultation has been completed. The provider may share
                   prescription and consultation notes here once they're
-                  available.
+                  available. You can check the medical documentation card for
+                  more info.
+                  <span className="text-sky-700 italic block mt-2">
+                    In the meantime, you can leave a review to share your
+                    experience and feedback about the provider and the
+                    appointment.
+                  </span>
                 </p>
                 <button
                   onClick={() =>
