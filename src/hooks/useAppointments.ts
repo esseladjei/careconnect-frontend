@@ -178,3 +178,29 @@ export const useCheckOutAppointment = (): UseMutationResult<
     },
   });
 };
+
+export const useCheckExistingReview = (
+  appointmentId: string,
+  patientId: string
+) => {
+  return useQuery({
+    queryKey: ['review', appointmentId, patientId],
+    queryFn: () =>
+      appointmentsApi.checkExistingReview(appointmentId, patientId),
+    enabled: Boolean(appointmentId && patientId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  });
+};
+export const useCheckExistingFlag = (
+  appointmentId: string,
+  providerId: string
+) => {
+  return useQuery({
+    queryKey: ['flag', appointmentId, providerId],
+    queryFn: () => appointmentsApi.checkExistingFlag(appointmentId, providerId),
+    enabled: Boolean(appointmentId && providerId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  });
+};

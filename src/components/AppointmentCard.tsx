@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PatientFlagModal from './PatientFlagModal';
 import type { Appointment } from '../types/appointment.ts';
 import { useAuth } from '../hooks/useAuth.ts';
@@ -9,7 +9,10 @@ import {
   ChevronRightIcon,
   MapPinIcon,
 } from '@heroicons/react/24/outline';
-
+import {
+  useCheckExistingFlag,
+  useCheckExistingReview,
+} from '../hooks/useAppointments';
 // --- Status Styling Helper ---
 const getStatusClasses = (status: Appointment['status']) => {
   switch (status) {
@@ -44,19 +47,37 @@ const AppointmentCard: React.FC<{
 }) => {
   const { role } = useAuth();
   const [showFlagModal, setShowFlagModal] = useState(false);
+  const patientId = appointment.patientId?.userId?._id;
+  const providerId = appointment.providerId?.userId?._id;
+  const navigate = useNavigate();
+  // Call hooks unconditionally at top level (required by React Rules of Hooks)
+  const { data: reviewCheckData } = useCheckExistingReview(
+    appointment._id,
+    patientId || ''
+  );
+  const { data: flagCheckData } = useCheckExistingFlag(
+    appointment._id,
+    providerId || ''
+  );
+
+  // Determine which data to use based on role
+  const existingReview = role === 'patient' ? reviewCheckData?.existing : false;
+  const existingFlag = role === 'provider' ? flagCheckData?.existing : false;
 
   const canReview =
     role === 'patient' &&
     appointment.status === 'completed' &&
     appointment.paymentStatus === 'paid';
+
   const canFlag =
     role === 'provider' &&
     ['completed', 'no-show', 'cancelled'].includes(appointment.status);
+
   const canCheckIn = role === 'provider' && appointment.status === 'confirmed';
   const canCheckOut =
     role === 'provider' && appointment.status === 'checked-in';
   const canConfirm = role === 'provider' && appointment.status === 'pending';
-  const patientId = appointment.patientId?.userId?._id;
+
   const target =
     role === 'provider'
       ? (appointment?.patientId?.userId as IUser)
@@ -65,7 +86,7 @@ const AppointmentCard: React.FC<{
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group">
       {/* Top Border Accent */}
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700"></div>
+      <div className="h-1 bg-linear-to-r from-blue-500 via-blue-600 to-blue-700"></div>
 
       <div className="p-4">
         <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -150,14 +171,14 @@ const AppointmentCard: React.FC<{
             </span>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-4 mt-6">
               {appointment.status === 'confirmed' && (
                 <>
                   {canCheckIn && (
                     <button
                       onClick={() => onCheckIn(appointment._id)}
                       disabled={isLoading}
-                      className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? 'Checking in...' : 'Check in'}
                     </button>
@@ -176,7 +197,7 @@ const AppointmentCard: React.FC<{
                 <button
                   onClick={() => onConfirm(appointment._id)}
                   disabled={isLoading}
-                  className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Confirming...' : 'Confirm'}
                 </button>
@@ -186,7 +207,7 @@ const AppointmentCard: React.FC<{
                 <button
                   onClick={() => onCheckOut(appointment._id)}
                   disabled={isLoading}
-                  className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Checking out...' : 'Check out'}
                 </button>
@@ -195,18 +216,40 @@ const AppointmentCard: React.FC<{
               {(canReview || canFlag) && (
                 <>
                   {canReview && (
-                    <Link
-                      to={`/appointments/${appointment._id}/review`}
-                      className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-center"
+                    <button
+                      onClick={() =>
+                        navigate(`/appointments/${appointment._id}/review`)
+                      }
+                      disabled={existingReview}
+                      title={
+                        existingReview
+                          ? 'You have already reviewed this appointment'
+                          : 'Leave a review for this appointment'
+                      }
+                      className={`${
+                        existingReview
+                          ? 'cursor-not-allowed disabled:cursor-not-allowed disabled:opacity-70'
+                          : ''
+                      } px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-blue-500 to-blue-600 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-center`}
                     >
                       Review
-                    </Link>
+                    </button>
                   )}
                   {canFlag && (
                     <button
                       type="button"
                       onClick={() => setShowFlagModal(true)}
-                      className="px-3 py-1.5 text-xs font-semibold border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-all"
+                      disabled={existingFlag}
+                      title={
+                        existingFlag
+                          ? 'You have already reported this appointment'
+                          : 'Report this appointment'
+                      }
+                      className={`${
+                        existingFlag
+                          ? 'cursor-not-allowed disabled:cursor-not-allowed disabled:opacity-70'
+                          : ''
+                      } px-3 py-1.5 text-xs font-semibold border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-all `}
                     >
                       Report
                     </button>
