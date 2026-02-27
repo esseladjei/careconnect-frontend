@@ -11,7 +11,6 @@ export interface Appointment {
   _id: string;
   scheduledAt: string;
   time: string;
-  doctor: string;
   specialisation: string;
   type: 'In-Person' | 'Phone Consultation' | 'Home Visit';
   location: string;
@@ -30,6 +29,8 @@ export interface Appointment {
     userId: IUser;
   };
   paymentStatus?: 'pending' | 'paid' | 'failed';
+  consultationNotes?: string;
+  prescriptions?: string;
 }
 
 export interface FetchAppointmentsParams {
