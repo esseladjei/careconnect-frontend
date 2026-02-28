@@ -7,8 +7,18 @@ import MFAVerificationModal from '../components/MFAVerificationModal';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { CheckBadgeIcon, ShieldCheckIcon, UserCircleIcon, } from '@heroicons/react/24/outline';
-import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
+import {
+  CheckBadgeIcon,
+  ShieldCheckIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
+import type {
+  PatientProfile,
+  ProviderProfile,
+  UserPassword,
+  UserProfile,
+  UserResponse,
+} from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
