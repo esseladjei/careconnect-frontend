@@ -9,6 +9,8 @@ import {
   type Role,
   useRegisterUser,
 } from '../hooks/useRegisterUser';
+import { validateGhanaPhoneNumber } from '../utils/phoneValidation';
+import PhoneInput from '../components/PhoneInput';
 
 interface FormData extends RegisterFormData {
   patientProfile: PatientProfile;
@@ -35,7 +37,6 @@ const SPECIALTIES = [
   'Orthopedics',
   'Pediatrics',
   'Psychiatry',
-  'Telemedicine',
 ];
 
 const Register: React.FC = () => {
@@ -208,10 +209,33 @@ const Register: React.FC = () => {
       }
       if (!formData.providerProfile.phone.trim()) {
         providerErrors.phone = 'Phone number is required';
+      } else {
+        // Validate Ghana phone number format
+        const phoneValidation = validateGhanaPhoneNumber(
+          formData.providerProfile.phone
+        );
+        if (!phoneValidation.isValid) {
+          providerErrors.phone = phoneValidation.message;
+        }
       }
 
       if (Object.keys(providerErrors).length > 0) {
         newErrors.providerProfile = providerErrors;
+      }
+    }
+
+    // Patient-specific validations (phone is optional but if provided, must be valid)
+    if (formData.role === 'patient' && formData.patientProfile?.phone?.trim()) {
+      const patientErrors: Record<string, string> = {};
+      const phoneValidation = validateGhanaPhoneNumber(
+        formData.patientProfile.phone
+      );
+      if (!phoneValidation.isValid) {
+        patientErrors.phone = phoneValidation.message;
+      }
+
+      if (Object.keys(patientErrors).length > 0) {
+        newErrors.patientProfile = patientErrors;
       }
     }
 
@@ -599,32 +623,23 @@ const Register: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label
-                    htmlFor="provider_phone"
-                    className="block text-sm font-medium text-gray-600 mb-1"
-                  >
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    id="provider_phone"
-                    name="provider_phone"
-                    placeholder="e.g., +1234567890"
-                    value={formData.providerProfile.phone}
-                    onChange={handleChange}
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-colors ${
-                      errors.providerProfile?.phone
-                        ? 'border-red-500 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
-                  />
-                  {errors.providerProfile?.phone && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.providerProfile.phone}
-                    </p>
-                  )}
-                </div>
+                <PhoneInput
+                  id="provider_phone"
+                  name="provider_phone"
+                  value={formData.providerProfile.phone}
+                  onChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      providerProfile: {
+                        ...prev.providerProfile,
+                        phone: value,
+                      },
+                    }))
+                  }
+                  error={errors.providerProfile?.phone}
+                  required={true}
+                  showOperatorInfo={true}
+                />
               </div>
 
               <div className="mb-4">
@@ -694,23 +709,24 @@ const Register: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label
-                    htmlFor="patient_phone"
-                    className="block text-sm font-medium text-gray-600 mb-1"
-                  >
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="patient_phone"
-                    name="patient_phone"
-                    placeholder="e.g., +1234567890"
-                    value={formData.patientProfile.phone}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  />
-                </div>
+                <PhoneInput
+                  id="patient_phone"
+                  name="patient_phone"
+                  value={formData.patientProfile.phone || ''}
+                  onChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      patientProfile: {
+                        ...prev.patientProfile,
+                        phone: value,
+                      },
+                    }))
+                  }
+                  error={errors.patientProfile?.phone}
+                  required={false}
+                  showOperatorInfo={true}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
 
                 <div>
                   <label

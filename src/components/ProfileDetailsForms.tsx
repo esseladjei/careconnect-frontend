@@ -1,6 +1,7 @@
 import React from 'react';
 import type { UserProfile } from '../types/user.ts';
 import { useGetMaxDate } from '../hooks/useDate.ts';
+import PhoneInput from './PhoneInput';
 import {
   CalendarIcon,
   EnvelopeIcon,
@@ -192,24 +193,15 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
           </div>
 
           {/* Phone */}
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1"
-            >
-              <PhoneIcon className="h-3.5 w-3.5" />
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={user.phone || ''}
-              onChange={(e) => onChange('phone', e.target.value)}
-              placeholder="+233 20 123 4567"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
+          <PhoneInput
+            id="phone"
+            name="phone"
+            value={user.phone || ''}
+            onChange={(value) => onChange('phone', value)}
+            required={false}
+            showOperatorInfo={true}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
 
           {/* Location */}
           <div>
