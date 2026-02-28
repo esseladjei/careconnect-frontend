@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useResetPassword } from '../hooks/useResetPassword';
 import toast from 'react-hot-toast';
-import { validatePasswordMatch, } from '../utils/passwordValidation';
+import { validatePasswordMatch } from '../utils/passwordValidation';
 import PasswordInput from '../components/PasswordInput';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, } from '@heroicons/react/24/outline';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  LockClosedIcon,
+} from '@heroicons/react/24/outline';
 
 interface FormData {
   newPassword: string;
@@ -31,11 +35,7 @@ const ResetPassword: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<
-    'weak' | 'medium' | 'strong'
-  >('weak');
 
   // Validate URL parameters
   useEffect(() => {
@@ -44,20 +44,6 @@ const ResetPassword: React.FC = () => {
       setTimeout(() => navigate('/login'), 2000);
     }
   }, [role, userId, timestamp, navigate]);
-
-  // Calculate password strength
-  const calculatePasswordStrength = (password: string) => {
-    if (password.length < 6) return 'weak';
-    if (password.length < 10) return 'medium';
-    if (
-      /[A-Z]/.test(password) &&
-      /[0-9]/.test(password) &&
-      /[!@#$%^&*]/.test(password)
-    ) {
-      return 'strong';
-    }
-    return 'medium';
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,11 +58,6 @@ const ResetPassword: React.FC = () => {
         ...prev,
         [name]: undefined,
       }));
-    }
-
-    // Update password strength
-    if (name === 'newPassword') {
-      setPasswordStrength(calculatePasswordStrength(value));
     }
   };
 
@@ -136,34 +117,21 @@ const ResetPassword: React.FC = () => {
     );
   };
 
-  const getPasswordStrengthColor = () => {
-    switch (passwordStrength) {
-      case 'weak':
-        return 'bg-red-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'strong':
-        return 'bg-green-500';
-    }
-  };
-
-  const getPasswordStrengthLabel = () => {
-    switch (passwordStrength) {
-      case 'weak':
-        return 'Weak';
-      case 'medium':
-        return 'Medium';
-      case 'strong':
-        return 'Strong';
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-700 via-blue-700 to-blue-800 text-white relative overflow-hidden flex items-center justify-center p-4">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-white/20 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
+            <LockClosedIcon className="h-6 w-6 text-blue-600" />
+          </div>
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
             Reset Password
           </h1>
           <p className="text-gray-600 text-sm">
@@ -171,7 +139,7 @@ const ResetPassword: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* New Password Field */}
           <PasswordInput
             id="newPassword"
@@ -189,12 +157,12 @@ const ResetPassword: React.FC = () => {
           />
 
           {/* Confirm Password Field */}
-          <div>
+          <div className="flex flex-col">
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs font-semibold text-gray-900 mb-1.5"
             >
-              Confirm Password *
+              Confirm Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -204,26 +172,39 @@ const ResetPassword: React.FC = () => {
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-colors pr-10 ${
+                aria-required="true"
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={
+                  errors.confirmPassword ? 'confirmPassword-error' : undefined
+                }
+                className={`w-full px-3 py-2 pr-10 border-2 rounded-lg text-sm font-medium text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none ${
                   errors.confirmPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                    ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
+                    : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 transition-colors"
+                aria-label={
+                  showConfirmPassword
+                    ? 'Hide confirm password'
+                    : 'Show confirm password'
+                }
               >
                 {showConfirmPassword ? (
-                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                  <EyeSlashIcon className="h-4 w-4" />
                 ) : (
-                  <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                  <EyeIcon className="h-4 w-4" />
                 )}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">
+              <p
+                id="confirmPassword-error"
+                className="text-red-600 text-xs font-medium mt-1"
+              >
                 {errors.confirmPassword}
               </p>
             )}
@@ -231,14 +212,14 @@ const ResetPassword: React.FC = () => {
             {/* Password Match Indicator */}
             {formData.confirmPassword &&
               formData.newPassword === formData.confirmPassword && (
-                <p className="text-green-600 text-sm mt-1 flex items-center">
-                  <span className="mr-1">✅</span> Passwords match
+                <p className="text-green-600 text-xs font-medium mt-2 flex items-center gap-1">
+                  ✅ Passwords match
                 </p>
               )}
             {formData.confirmPassword &&
               formData.newPassword !== formData.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <span className="mr-1">❌</span> Passwords do not match
+                <p className="text-red-500 text-xs font-medium mt-2 flex items-center gap-1">
+                  ❌ Passwords do not match
                 </p>
               )}
           </div>
@@ -247,16 +228,16 @@ const ResetPassword: React.FC = () => {
           <button
             type="submit"
             disabled={isPending}
-            className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 mt-6 ${
+            className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 mt-6 inline-flex items-center justify-center gap-2 group ${
               isPending
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95'
             }`}
           >
             {isPending ? (
-              <span className="flex items-center justify-center">
+              <>
                 <svg
-                  className="animate-spin h-5 w-5 mr-2"
+                  className="animate-spin h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -276,18 +257,18 @@ const ResetPassword: React.FC = () => {
                   ></path>
                 </svg>
                 Resetting...
-              </span>
+              </>
             ) : (
               'Reset Password'
             )}
           </button>
 
           {/* Back to Login Link */}
-          <div className="text-center mt-6">
+          <div className="text-center mt-4">
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
             >
               ← Back to Login
             </button>
@@ -298,10 +279,12 @@ const ResetPassword: React.FC = () => {
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-2">
             <LockClosedIcon
-              className="h-4 w-4 text-gray-600"
+              className="h-4 w-4 text-blue-600"
               aria-hidden="true"
             />
-            <span className="font-semibold">Security Tip:</span>
+            <span className="font-semibold text-sm text-gray-900">
+              Security Tip:
+            </span>
           </div>
           <p className="text-xs text-gray-600 mt-1">
             Use a strong password with uppercase letters, numbers, and special

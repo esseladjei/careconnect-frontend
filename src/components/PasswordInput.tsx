@@ -80,9 +80,9 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-xs font-semibold text-gray-900 mb-1.5"
+          className="block text-xs font-semibold text-gray-600 mb-1"
         >
-          {label} {required ? '*' : ''}
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
@@ -101,10 +101,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           aria-required={required}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`w-full px-3 py-2 pr-10 border-2 rounded-lg text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none transition-all duration-200 ${
-            error
-              ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-              : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+          className={`w-full px-3 py-2 pr-10 border rounded-lg text-sm  text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors focus:outline-none ${
+            error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
           } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
 

@@ -492,7 +492,7 @@ const Register: React.FC = () => {
                   <div className="flex flex-col">
                     <label
                       htmlFor="firstName"
-                      className="block text-xs font-semibold text-gray-900 mb-1.5"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
                     >
                       First Name <span className="text-red-500">*</span>
                     </label>
@@ -508,10 +508,10 @@ const Register: React.FC = () => {
                       aria-describedby={
                         errors.firstName ? 'firstName-error' : undefined
                       }
-                      className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                         errors.firstName
-                          ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                          : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 bg-white'
                       }`}
                     />
                     {errors.firstName && (
@@ -528,7 +528,7 @@ const Register: React.FC = () => {
                   <div className="flex flex-col">
                     <label
                       htmlFor="lastName"
-                      className="block text-xs font-semibold text-gray-900 mb-1.5"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
                     >
                       Last Name <span className="text-red-500">*</span>
                     </label>
@@ -544,10 +544,10 @@ const Register: React.FC = () => {
                       aria-describedby={
                         errors.lastName ? 'lastName-error' : undefined
                       }
-                      className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                         errors.lastName
-                          ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                          : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 bg-white'
                       }`}
                     />
                     {errors.lastName && (
@@ -566,7 +566,7 @@ const Register: React.FC = () => {
                 <div className="mb-4 flex flex-col">
                   <label
                     htmlFor="email"
-                    className="block text-xs font-semibold text-gray-900 mb-1.5 flex items-center gap-2"
+                    className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-2"
                   >
                     <EnvelopeIcon className="h-3.5 w-3.5 text-gray-600" />
                     Email Address <span className="text-red-500">*</span>
@@ -581,10 +581,10 @@ const Register: React.FC = () => {
                     aria-required="true"
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? 'email-error' : undefined}
-                    className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                    className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.email
-                        ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                        : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-300 bg-white'
                     }`}
                   />
                   {errors.email && (
@@ -625,7 +625,7 @@ const Register: React.FC = () => {
                   <div className="flex flex-col h-full">
                     <label
                       htmlFor="confirmPassword"
-                      className="block text-xs font-semibold text-gray-900 mb-1.5"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
                     >
                       Confirm Password <span className="text-red-500">*</span>
                     </label>
@@ -644,10 +644,10 @@ const Register: React.FC = () => {
                             ? 'confirmPassword-error'
                             : undefined
                         }
-                        className={`w-full px-3 py-2 pr-10 border-2 rounded-lg text-sm font-medium text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none ${
+                        className={`w-full px-3 py-2 pr-10 border rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                           errors.confirmPassword
-                            ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                            : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 bg-white'
                         }`}
                       />
                       <button
@@ -695,7 +695,7 @@ const Register: React.FC = () => {
                     <div className="flex flex-col">
                       <label
                         htmlFor="provider_practiceName"
-                        className="block text-xs font-semibold text-gray-900 mb-1.5"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         Practice Name <span className="text-red-500">*</span>
                       </label>
@@ -708,10 +708,10 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         aria-required="true"
                         aria-invalid={!!errors.providerProfile?.practiceName}
-                        className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                        className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                           errors.providerProfile?.practiceName
-                            ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                            : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 bg-white'
                         }`}
                       />
                       {errors.providerProfile?.practiceName && (
@@ -725,7 +725,7 @@ const Register: React.FC = () => {
                     <div className="flex flex-col">
                       <label
                         htmlFor="provider_licenseNumber"
-                        className="block text-xs font-semibold text-gray-900 mb-1.5"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         License Number <span className="text-red-500">*</span>
                       </label>
@@ -738,10 +738,10 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         aria-required="true"
                         aria-invalid={!!errors.providerProfile?.licenseNumber}
-                        className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                        className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                           errors.providerProfile?.licenseNumber
-                            ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                            : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 bg-white'
                         }`}
                       />
                       {errors.providerProfile?.licenseNumber && (
@@ -757,7 +757,7 @@ const Register: React.FC = () => {
                   <div className="mb-4 flex flex-col">
                     <label
                       htmlFor="provider_servicerDescription"
-                      className="block text-xs font-semibold text-gray-900 mb-1.5"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
                     >
                       Service Description{' '}
                       <span className="text-red-500">*</span>
@@ -773,10 +773,10 @@ const Register: React.FC = () => {
                       aria-invalid={
                         !!errors.providerProfile?.serviceDescription
                       }
-                      className={`w-full px-3 py-2 border-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ${
+                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                         errors.providerProfile?.serviceDescription
-                          ? 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
-                          : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 bg-white'
                       }`}
                     />
                     {errors.providerProfile?.serviceDescription && (
@@ -789,7 +789,7 @@ const Register: React.FC = () => {
 
                   {/* Specialties */}
                   <div className="mb-4">
-                    <label className="block text-xs font-semibold text-gray-900 mb-2 flex items-center gap-2 uppercase tracking-wide">
+                    <label className="flex items-center gap-2  text-sm  text-gray-900 mb-2 uppercase tracking-wide">
                       <span>
                         Specialties <span className="text-red-500">*</span>
                       </span>
@@ -803,7 +803,7 @@ const Register: React.FC = () => {
                       {SPECIALTIES.map((specialty) => (
                         <label
                           key={specialty}
-                          className={`group relative flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          className={`group relative flex items-center p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
                             formData.providerProfile.specialties.includes(
                               specialty
                             )
@@ -820,7 +820,7 @@ const Register: React.FC = () => {
                             className="w-4 h-4 text-blue-600 cursor-pointer"
                             aria-label={`Select ${specialty}`}
                           />
-                          <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                          <span className="ml-2 text-sm font-medium text-gray-900 group-hover:text-gray-900">
                             {specialty}
                           </span>
                         </label>
@@ -846,14 +846,15 @@ const Register: React.FC = () => {
                       error={errors.providerProfile?.phone}
                       required={true}
                       showOperatorInfo={true}
+                      variant="registration"
                     />
 
                     <div className="flex flex-col">
                       <label
                         htmlFor="referralCode"
-                        className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-2"
                       >
-                        <GiftIcon className="h-4 w-4 text-amber-600" />
+                        <GiftIcon className="h-3.5 w-3.5 text-amber-600" />
                         Referral Code (Optional)
                       </label>
                       <input
@@ -863,9 +864,9 @@ const Register: React.FC = () => {
                         placeholder="e.g., FRIEND2024"
                         value={formData.referralCode || ''}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       />
-                      <p className="text-xs text-gray-600 mt-2">
+                      <p className="text-xs text-gray-600 mt-1">
                         Get discounts on your first booking with a referral code
                       </p>
                     </div>
@@ -875,7 +876,7 @@ const Register: React.FC = () => {
                   <div className="flex flex-col">
                     <label
                       htmlFor="provider_clinicAddress"
-                      className="block text-sm font-semibold text-gray-900 mb-2"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
                     >
                       Clinic Address (Optional)
                     </label>
@@ -886,7 +887,7 @@ const Register: React.FC = () => {
                       placeholder="e.g., 123 Main St, Accra, Ghana"
                       value={formData.providerProfile.clinicAddress}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                     />
                   </div>
                 </div>
@@ -894,8 +895,8 @@ const Register: React.FC = () => {
 
               {/* Patient-Specific Fields */}
               {!isProvider && (
-                <div className="mb-8 pb-8 border-t border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-6 mt-8 flex items-center gap-2">
+                <div className="mb-6 border-t border-gray-200">
+                  <h3 className="text-xs font-semibold text-gray-900 mb-6 mt-8 flex items-center gap-2 uppercase tracking-wide">
                     <UserIcon className="h-4 w-4 text-blue-600" />
                     Health Information (Optional)
                   </h3>
@@ -905,7 +906,7 @@ const Register: React.FC = () => {
                     <div className="flex flex-col">
                       <label
                         htmlFor="patient_dateOfBirth"
-                        className="block text-sm font-semibold text-gray-900 mb-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         Date of Birth
                       </label>
@@ -915,14 +916,14 @@ const Register: React.FC = () => {
                         name="patient_dateOfBirth"
                         value={formData.patientProfile.dateOfBirth}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-3 py-2 tex-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       />
                     </div>
 
                     <div className="flex flex-col">
                       <label
                         htmlFor="patient_gender"
-                        className="block text-sm font-semibold text-gray-900 mb-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         Gender
                       </label>
@@ -931,7 +932,7 @@ const Register: React.FC = () => {
                         name="patient_gender"
                         value={formData.patientProfile.gender}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium bg-white"
+                        className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors  bg-white"
                       >
                         <option value="">Select gender</option>
                         <option value="Male">Male</option>
@@ -959,14 +960,15 @@ const Register: React.FC = () => {
                       error={errors.patientProfile?.phone}
                       required={false}
                       showOperatorInfo={true}
+                      variant="registration"
                     />
 
                     <div className="flex flex-col">
                       <label
                         htmlFor="referralCode"
-                        className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-2"
                       >
-                        <GiftIcon className="h-4 w-4 text-amber-600" />
+                        <GiftIcon className="h-3.5 w-3.5 text-amber-600" />
                         Referral Code (Optional)
                       </label>
                       <input
@@ -976,9 +978,9 @@ const Register: React.FC = () => {
                         placeholder="e.g., FRIEND2024"
                         value={formData.referralCode || ''}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-3 py-2 border text-sm text-gray-900 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors "
                       />
-                      <p className="text-xs text-gray-600 mt-2">
+                      <p className="text-xs text-gray-600 mt-1">
                         Get discounts on your first booking with a referral code
                       </p>
                     </div>
@@ -989,7 +991,7 @@ const Register: React.FC = () => {
                     <div className="flex flex-col">
                       <label
                         htmlFor="patient_insuranceProvider"
-                        className="block text-sm font-semibold text-gray-900 mb-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         Insurance Provider
                       </label>
@@ -1000,14 +1002,14 @@ const Register: React.FC = () => {
                         placeholder="e.g., Blue Cross, NHIA"
                         value={formData.patientProfile.insuranceProvider}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-3 py-2  text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       />
                     </div>
 
                     <div className="flex flex-col">
                       <label
                         htmlFor="patient_insuranceNumber"
-                        className="block text-sm font-semibold text-gray-900 mb-2"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
                       >
                         Insurance Number
                       </label>
@@ -1018,7 +1020,7 @@ const Register: React.FC = () => {
                         placeholder="Your member ID"
                         value={formData.patientProfile.insuranceNumber}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
                       />
                     </div>
                   </div>
@@ -1026,7 +1028,7 @@ const Register: React.FC = () => {
               )}
 
               {/* Submit Button */}
-              <div className="mt-5">
+              <div className="mt-6 mb-6">
                 <button
                   type="submit"
                   disabled={isPending}

@@ -7,18 +7,8 @@ import MFAVerificationModal from '../components/MFAVerificationModal';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import {
-  CheckBadgeIcon,
-  ShieldCheckIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import type {
-  PatientProfile,
-  ProviderProfile,
-  UserPassword,
-  UserProfile,
-  UserResponse,
-} from '../types/user.ts';
+import { CheckBadgeIcon, ShieldCheckIcon, UserCircleIcon, } from '@heroicons/react/24/outline';
+import type { PatientProfile, ProviderProfile, UserPassword, UserProfile, UserResponse, } from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -134,12 +124,16 @@ const UserProfilePage: React.FC = () => {
     },
     onSuccess: () => {
       toast.success('Password updated successfully!');
+      localStorage.removeItem('mfa-token'); // Clean up after success
+      // Clear password fields
       setUserPassword({
         newPassword: '',
         confirmNewPassword: '',
         oldPassword: '',
       });
       setSavePasswordStatus(true);
+      // Reset status after 3 seconds
+      setTimeout(() => setSavePasswordStatus(false), 3000);
     },
     onError: async (err: any) => {
       // Check if MFA verification is required

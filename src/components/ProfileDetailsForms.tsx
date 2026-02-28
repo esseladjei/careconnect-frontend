@@ -193,15 +193,17 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
           </div>
 
           {/* Phone */}
-          <PhoneInput
-            id="phone"
-            name="phone"
-            value={user.phone || ''}
-            onChange={(value) => onChange('phone', value)}
-            required={false}
-            showOperatorInfo={true}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
+          <div>
+            <PhoneInput
+              id="phone"
+              name="phone"
+              value={user.phone || ''}
+              onChange={(value) => onChange('phone', value)}
+              required={false}
+              showOperatorInfo={true}
+              variant="compact"
+            />
+          </div>
 
           {/* Location */}
           <div>
