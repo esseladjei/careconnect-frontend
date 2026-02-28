@@ -33,3 +33,29 @@ export const getFormattedDate = (daysOffset: number = 0): string => {
   date.setDate(date.getDate() + daysOffset);
   return date.toISOString().split('T')[0];
 };
+
+export const validateDateOfBirth = (dateString: string): string | undefined => {
+  if (!dateString) return undefined;
+
+  const birthDate = new Date(dateString);
+  const today = new Date();
+
+  // Calculate age
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  // Adjust age if birthday hasn't occurred this year
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  // Check if at least 18 years old
+  if (age < 18) {
+    return 'You must be at least 18 years old';
+  }
+
+  return undefined;
+};

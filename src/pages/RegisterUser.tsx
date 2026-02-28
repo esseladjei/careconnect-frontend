@@ -25,6 +25,7 @@ import { validatePasswordMatch } from '../utils/passwordValidation';
 import PhoneInput from '../components/PhoneInput';
 import PasswordInput from '../components/PasswordInput';
 import SEO from '../components/SEO';
+import { validateDateOfBirth } from '../hooks/useDate.ts';
 
 interface FormData extends RegisterFormData {
   patientProfile: PatientProfile;
@@ -33,9 +34,12 @@ interface FormData extends RegisterFormData {
 }
 
 interface FormErrors {
+  title?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
+  gender?: string;
+  dateOfBirth?: string;
   password?: string;
   confirmPassword?: string;
   role?: string;
@@ -51,6 +55,9 @@ const SPECIALTIES = [
   'Orthopedics',
   'Pediatrics',
   'Psychiatry',
+  'Gynecologist',
+  'Midwifery and Obstetrical',
+  'Telemedicine & Others',
 ];
 
 const Register: React.FC = () => {
@@ -59,9 +66,12 @@ const Register: React.FC = () => {
   const { mutate: registerUser, isPending } = useRegisterUser();
 
   const [formData, setFormData] = useState<FormData>({
+    title: '',
     firstName: '',
     lastName: '',
     email: '',
+    gender: '',
+    dateOfBirth: '',
     password: '',
     confirmPassword: '',
     role: 'patient',
@@ -80,6 +90,8 @@ const Register: React.FC = () => {
       specialties: [],
       clinicAddress: '',
       phone: '',
+      dateOfBirth: '',
+      gender: '',
     },
   });
 
@@ -106,9 +118,12 @@ const Register: React.FC = () => {
     // Handle top-level fields
     if (
       [
+        'title',
         'firstName',
         'lastName',
         'email',
+        'gender',
+        'dateOfBirth',
         'password',
         'confirmPassword',
         'referralCode',
@@ -187,8 +202,14 @@ const Register: React.FC = () => {
     const newErrors: FormErrors = {};
 
     // Common validations
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    }
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
+    }
+    if (!formData.gender.trim()) {
+      newErrors.gender = 'Gender is required';
     }
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
@@ -198,7 +219,14 @@ const Register: React.FC = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    // ...existing code...
+    const dobError = validateDateOfBirth(formData.dateOfBirth);
+    if (!formData.dateOfBirth.trim()) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+    } else if (dobError) {
+      newErrors.dateOfBirth =
+        'Please enter a valid date. You must be at least 18 years old.';
+    }
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else {
@@ -210,7 +238,6 @@ const Register: React.FC = () => {
         newErrors.password = passwordValidation.error;
       }
     }
-    // ...existing code...
 
     // Provider-specific validations
     if (formData.role === 'provider') {
@@ -218,6 +245,10 @@ const Register: React.FC = () => {
 
       if (!formData.providerProfile.practiceName.trim()) {
         providerErrors.practiceName = 'Practice name is required';
+      }
+      if (!formData.providerProfile.serviceDescription.trim()) {
+        providerErrors.serviceDescription =
+          'Service description is required. Describe the healthcare services you offer in 100 characters or less.';
       }
       if (!formData.providerProfile.licenseNumber.trim()) {
         providerErrors.licenseNumber = 'License number is required';
@@ -270,11 +301,14 @@ const Register: React.FC = () => {
     }
 
     registerUser(formData, {
-      onSuccess: (response) => {
+      onSuccess: () => {
         // Reset form
         setFormData({
+          title: '',
           firstName: '',
           lastName: '',
+          gender: '',
+          dateOfBirth: '',
           email: '',
           password: '',
           confirmPassword: '',
@@ -295,22 +329,7 @@ const Register: React.FC = () => {
             phone: '',
           },
         });
-
-        // Navigate based on role
-        if (response.role === 'provider') {
-          setTimeout(
-            () =>
-              navigate(`/provider/onboarding/${response.userId}`, {
-                state: {
-                  status: response.providerStatus,
-                  userId: response.userId,
-                },
-              }),
-            1500
-          );
-        } else {
-          setTimeout(() => navigate('/login'), 1500);
-        }
+        setTimeout(() => navigate('/login'), 1500);
       },
     });
   };
@@ -457,19 +476,21 @@ const Register: React.FC = () => {
                     className="sr-only"
                     aria-label="Register as a healthcare provider"
                   />
-                  <div
-                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
-                      formData.role === 'provider'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-600 group-hover:bg-blue-200'
-                    }`}
-                  >
-                    <CheckCircleIcon className="h-4 w-4" />
-                  </div>
                   <div className="flex items-center gap-2 w-full mb-1">
-                    <span className="text-sm font-semibold text-gray-900">
-                      I'm a Provider
-                    </span>
+                    <div
+                      className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
+                        formData.role === 'provider'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 text-gray-600 group-hover:bg-blue-200'
+                      }`}
+                    >
+                      <CheckCircleIcon className="h-4 w-4" />
+                    </div>
+                    <div className="flex items-center gap-2 w-full mb-1">
+                      <span className="text-sm font-semibold text-gray-900">
+                        I'm a Provider
+                      </span>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-600 ml-9">
                     Offering healthcare services and building your practice
@@ -487,8 +508,56 @@ const Register: React.FC = () => {
                   Account Information
                 </h3>
 
-                {/* First Name and Last Name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {/* Title, First Name and Last Name */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  {/* Title */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="title"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
+                    >
+                      Title<span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="title"
+                      name="title"
+                      value={formData.title || ''}
+                      onChange={handleChange}
+                      aria-invalid={!!errors.title}
+                      aria-describedby={
+                        errors.title ? 'title-error' : undefined
+                      }
+                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors  ${
+                        errors.title
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      <option value="">Select</option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Mrs.">Mrs.</option>
+                      <option value="Miss.">Miss.</option>
+                      <option value="Ms.">Ms.</option>
+                      <option value="Dr.">Dr.</option>
+                      <option value="Prof.">Prof.</option>
+                      <option value="Rev.">Rev.</option>
+                      <option value="Sir.">Sir.</option>
+                      <option value="Lady.">Lady.</option>
+                      <option value="Madam.">Madam.</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    {errors.title && (
+                      <p
+                        id="title-error"
+                        className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
+                      >
+                        <ExclamationCircleIcon className="h-3 w-3" />
+                        {errors.title}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* First Name */}
                   <div className="flex flex-col">
                     <label
                       htmlFor="firstName"
@@ -690,34 +759,154 @@ const Register: React.FC = () => {
                     Practice Information
                   </h3>
 
-                  {/* Practice Name and License */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Practice Name */}
+                  <div className="mb-4 flex flex-col">
+                    <label
+                      htmlFor="provider_practiceName"
+                      className="block text-xs font-semibold text-gray-600 mb-1"
+                    >
+                      Practice Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="provider_practiceName"
+                      name="provider_practiceName"
+                      placeholder="e.g., Downtown Clinic"
+                      value={formData.providerProfile.practiceName}
+                      onChange={handleChange}
+                      aria-required="true"
+                      aria-invalid={!!errors.providerProfile?.practiceName}
+                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                        errors.providerProfile?.practiceName
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    />
+                    {errors.providerProfile?.practiceName && (
+                      <p className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1">
+                        <ExclamationCircleIcon className="h-3 w-3" />
+                        {errors.providerProfile.practiceName}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Gender, Date of Birth, Phone number - Row 1 */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div className="flex flex-col">
                       <label
-                        htmlFor="provider_practiceName"
+                        htmlFor="provider_gender"
                         className="block text-xs font-semibold text-gray-600 mb-1"
                       >
-                        Practice Name <span className="text-red-500">*</span>
+                        Gender <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="provider_gender"
+                        name="provider_gender"
+                        value={formData.providerProfile.gender || ''}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 
+                         ${
+                           errors.firstName
+                             ? 'border-red-500 bg-red-50'
+                             : 'border-gray-300 bg-white'
+                         }`}
+                      >
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {errors.gender && (
+                        <p
+                          id="title-error"
+                          className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
+                        >
+                          <ExclamationCircleIcon className="h-3 w-3" />
+                          {errors.gender}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="provider_dateOfBirth"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
+                      >
+                        Date of Birth <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        id="provider_dateOfBirth"
+                        name="provider_dateOfBirth"
+                        value={formData.providerProfile.dateOfBirth || ''}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 
+                         ${
+                           errors.firstName
+                             ? 'border-red-500 bg-red-50'
+                             : 'border-gray-300 bg-white'
+                         }`}
+                      />
+                      {errors.dateOfBirth && (
+                        <p
+                          id="title-error"
+                          className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
+                        >
+                          <ExclamationCircleIcon className="h-3 w-3" />
+                          {errors.dateOfBirth}
+                        </p>
+                      )}
+                    </div>
+                    <PhoneInput
+                      id="provider_phone"
+                      name="provider_phone"
+                      value={formData.providerProfile.phone}
+                      onChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          providerProfile: {
+                            ...prev.providerProfile,
+                            phone: value,
+                          },
+                        }))
+                      }
+                      error={errors.providerProfile?.phone}
+                      required={false}
+                      showOperatorInfo={true}
+                      variant="registration"
+                    />
+                  </div>
+
+                  {/* Service Description, Phone Number, Clinic Address - Row 2 */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="provider_servicerDescription"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
+                      >
+                        Service Description{' '}
+                        <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        id="provider_practiceName"
-                        name="provider_practiceName"
-                        placeholder="e.g., Downtown Clinic"
-                        value={formData.providerProfile.practiceName}
+                        id="provider_servicerDescription"
+                        name="provider_serviceDescription"
+                        placeholder="Describe the services you offer"
+                        value={formData.providerProfile.serviceDescription}
                         onChange={handleChange}
                         aria-required="true"
-                        aria-invalid={!!errors.providerProfile?.practiceName}
+                        aria-invalid={
+                          !!errors.providerProfile?.serviceDescription
+                        }
                         className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                          errors.providerProfile?.practiceName
+                          errors.providerProfile?.serviceDescription
                             ? 'border-red-500 bg-red-50'
                             : 'border-gray-300 bg-white'
                         }`}
                       />
-                      {errors.providerProfile?.practiceName && (
+                      {errors.providerProfile?.serviceDescription && (
                         <p className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1">
                           <ExclamationCircleIcon className="h-3 w-3" />
-                          {errors.providerProfile.practiceName}
+                          {errors.providerProfile?.serviceDescription}
                         </p>
                       )}
                     </div>
@@ -751,45 +940,29 @@ const Register: React.FC = () => {
                         </p>
                       )}
                     </div>
-                  </div>
 
-                  {/* Service Description */}
-                  <div className="mb-4 flex flex-col">
-                    <label
-                      htmlFor="provider_servicerDescription"
-                      className="block text-xs font-semibold text-gray-600 mb-1"
-                    >
-                      Service Description{' '}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="provider_servicerDescription"
-                      name="provider_serviceDescription"
-                      placeholder="Describe the services you offer"
-                      value={formData.providerProfile.serviceDescription}
-                      onChange={handleChange}
-                      aria-required="true"
-                      aria-invalid={
-                        !!errors.providerProfile?.serviceDescription
-                      }
-                      className={`w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                        errors.providerProfile?.serviceDescription
-                          ? 'border-red-500 bg-red-50'
-                          : 'border-gray-300 bg-white'
-                      }`}
-                    />
-                    {errors.providerProfile?.serviceDescription && (
-                      <p className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1">
-                        <ExclamationCircleIcon className="h-3 w-3" />
-                        {errors.providerProfile?.serviceDescription}
-                      </p>
-                    )}
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="provider_clinicAddress"
+                        className="block text-xs font-semibold text-gray-600 mb-1"
+                      >
+                        Clinic Address (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        id="provider_clinicAddress"
+                        name="provider_clinicAddress"
+                        placeholder="e.g., 123 Main St, Accra, Ghana"
+                        value={formData.providerProfile.clinicAddress}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
+                      />
+                    </div>
                   </div>
 
                   {/* Specialties */}
                   <div className="mb-4">
-                    <label className="flex items-center gap-2  text-sm  text-gray-900 mb-2 uppercase tracking-wide">
+                    <label className="block text-xs font-semibold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wide">
                       <span>
                         Specialties <span className="text-red-500">*</span>
                       </span>
@@ -828,67 +1001,27 @@ const Register: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Phone and Referral Code */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <PhoneInput
-                      id="provider_phone"
-                      name="provider_phone"
-                      value={formData.providerProfile.phone}
-                      onChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          providerProfile: {
-                            ...prev.providerProfile,
-                            phone: value,
-                          },
-                        }))
-                      }
-                      error={errors.providerProfile?.phone}
-                      required={true}
-                      showOperatorInfo={true}
-                      variant="registration"
-                    />
-
-                    <div className="flex flex-col">
-                      <label
-                        htmlFor="referralCode"
-                        className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-2"
-                      >
-                        <GiftIcon className="h-3.5 w-3.5 text-amber-600" />
-                        Referral Code (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        id="referralCode"
-                        name="referralCode"
-                        placeholder="e.g., FRIEND2024"
-                        value={formData.referralCode || ''}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      />
-                      <p className="text-xs text-gray-600 mt-1">
-                        Get discounts on your first booking with a referral code
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Clinic Address */}
+                  {/* Referral Code */}
                   <div className="flex flex-col">
                     <label
-                      htmlFor="provider_clinicAddress"
-                      className="block text-xs font-semibold text-gray-600 mb-1"
+                      htmlFor="referralCode"
+                      className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-2"
                     >
-                      Clinic Address (Optional)
+                      <GiftIcon className="h-3.5 w-3.5 text-amber-600" />
+                      Referral Code (Optional)
                     </label>
                     <input
                       type="text"
-                      id="provider_clinicAddress"
-                      name="provider_clinicAddress"
-                      placeholder="e.g., 123 Main St, Accra, Ghana"
-                      value={formData.providerProfile.clinicAddress}
+                      id="referralCode"
+                      name="referralCode"
+                      placeholder="e.g., FRIEND2024"
+                      value={formData.referralCode || ''}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
                     />
+                    <p className="text-xs text-gray-600 mt-1">
+                      Get discounts on your first booking with a referral code
+                    </p>
                   </div>
                 </div>
               )}
@@ -908,7 +1041,7 @@ const Register: React.FC = () => {
                         htmlFor="patient_dateOfBirth"
                         className="block text-xs font-semibold text-gray-600 mb-1"
                       >
-                        Date of Birth
+                        Date of Birth <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="date"
@@ -916,8 +1049,22 @@ const Register: React.FC = () => {
                         name="patient_dateOfBirth"
                         value={formData.patientProfile.dateOfBirth}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 tex-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className={`w-full px-3 py-2 tex-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors
+                        ${
+                          errors.firstName
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 bg-white'
+                        }`}
                       />
+                      {errors.dateOfBirth && (
+                        <p
+                          id="title-error"
+                          className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
+                        >
+                          <ExclamationCircleIcon className="h-3 w-3" />
+                          {errors.dateOfBirth}
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex flex-col">
@@ -925,20 +1072,33 @@ const Register: React.FC = () => {
                         htmlFor="patient_gender"
                         className="block text-xs font-semibold text-gray-600 mb-1"
                       >
-                        Gender
+                        Gender <span className="text-red-500">*</span>
                       </label>
                       <select
                         id="patient_gender"
                         name="patient_gender"
                         value={formData.patientProfile.gender}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors  bg-white"
+                        className={`w-full px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors   ${
+                          errors.firstName
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 bg-white'
+                        }`}
                       >
                         <option value="">Select gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </select>
+                      {errors.gender && (
+                        <p
+                          id="title-error"
+                          className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
+                        >
+                          <ExclamationCircleIcon className="h-3 w-3" />
+                          {errors.gender}
+                        </p>
+                      )}
                     </div>
                   </div>
 
