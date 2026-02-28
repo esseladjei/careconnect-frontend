@@ -1,12 +1,15 @@
 import React from 'react';
 import {
   BuildingOffice2Icon,
+  CalendarIcon,
   ChatBubbleLeftEllipsisIcon,
   CheckBadgeIcon,
   EnvelopeIcon,
   LanguageIcon,
   MapPinIcon,
   ShieldCheckIcon,
+  SparklesIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import useCapitalizeFirst from '../../hooks/useCapitalizeFirst';
 import type { IProviderListing } from '../../types/providerListing.ts';
@@ -29,9 +32,11 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
         </h2>
         <p className="text-gray-700 leading-relaxed">
           {offer.user.title} {useCapitalizeFirst(offer.user.lastName)} is a
-          highly qualified {primarySpecialty} with {offer.provider.experience}{' '}
-          years of professional experience in the healthcare industry. Dedicated
-          to providing exceptional patient care and maintaining the highest
+          highly qualified{' '}
+          <span className="font-bold italic">{primarySpecialty}</span> with{' '}
+          {offer.provider.experience < 2 ? '' : offer.provider.experience} years
+          of professional experience in the healthcare industry. Dedicated to
+          providing exceptional patient care and maintaining the highest
           standards of medical practice.
         </p>
       </section>
@@ -43,14 +48,14 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {offer.provider.practiceName && (
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-gradient-to-br from-slate-50 to-blue-100 rounded-lg p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start gap-3">
-                <BuildingOffice2Icon className="w-5 h-5 text-gray-600 mt-0.5" />
+                <BuildingOffice2Icon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <dt className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                  <dt className="text-xs font-semibold text-slate-600 uppercase mb-1 tracking-wide">
                     Practice
                   </dt>
-                  <dd className="text-gray-900 font-semibold">
+                  <dd className="text-slate-900 font-semibold">
                     {offer.provider.practiceName}
                   </dd>
                 </div>
@@ -58,19 +63,19 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
             </div>
           )}
 
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="bg-gradient-to-br from-slate-50 to-emerald-100 rounded-lg p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
-              <ShieldCheckIcon className="w-5 h-5 text-green-600 mt-0.5" />
+              <ShieldCheckIcon className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
               <div>
-                <dt className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                <dt className="text-xs font-semibold text-slate-600 uppercase mb-1 tracking-wide">
                   Status
                 </dt>
-                <dd className="text-gray-900 font-semibold flex items-center gap-2">
+                <dd className="text-slate-900 font-semibold flex items-center gap-2">
                   {useCapitalizeFirst(
                     offer.provider.providerStatus || 'Active'
                   )}
                   {offer.provider.providerStatus === 'verified' && (
-                    <CheckBadgeIcon className="w-5 h-5 text-green-600" />
+                    <CheckBadgeIcon className="w-5 h-5 text-emerald-600" />
                   )}
                 </dd>
               </div>
@@ -78,14 +83,14 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
           </div>
 
           {offer.user.gender && (
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-gradient-to-br from-slate-50 to-violet-100 rounded-lg p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start gap-3">
-                <span className="text-xl mt-0.5">👤</span>
+                <UserIcon className="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <dt className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                  <dt className="text-xs font-semibold text-slate-600 uppercase mb-1 tracking-wide">
                     Gender
                   </dt>
-                  <dd className="text-gray-900 font-semibold">
+                  <dd className="text-slate-900 font-semibold">
                     {offer.user.gender}
                   </dd>
                 </div>
@@ -93,17 +98,28 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
             </div>
           )}
 
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="bg-gradient-to-br from-slate-50 to-amber-100 rounded-lg p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
-              <span className="text-xl mt-0.5">
-                {offer.appointmentType === 'Phone call' ? '📞' : '🏥'}
-              </span>
+              <CalendarIcon className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
-                <dt className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                <dt className="text-xs font-semibold text-slate-600 uppercase mb-1 tracking-wide">
                   Appointment Type
                 </dt>
-                <dd className="text-gray-900 font-semibold">
+                <dd className="text-slate-900 font-semibold">
                   {offer.appointmentType}
+                </dd>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-slate-50 to-fuchsia-100 rounded-lg p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+              <SparklesIcon className="w-5 h-5 text-fuchsia-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <dt className="text-xs font-semibold text-slate-600 uppercase mb-1 tracking-wide">
+                  Service Description
+                </dt>
+                <dd className="text-slate-900 font-semibold">
+                  {offer.provider.serviceDescription}
                 </dd>
               </div>
             </div>

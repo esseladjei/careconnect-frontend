@@ -72,7 +72,7 @@ const BookingSidebar: React.FC<Props> = ({
                 </span>
               </div>
               <p className="text-center text-sm text-gray-600 mt-1 font-medium">
-                per session ({offer.sessionDuration || 30} min)
+                per session ({offer.sessionDuration || 30} mins)
               </p>
             </div>
             {/* Health Information Section */}
@@ -189,18 +189,18 @@ const BookingSidebar: React.FC<Props> = ({
                       Selected
                     </p>
                     <p className="text-lg font-bold text-gray-900">
-                      {selectedDate.toLocaleDateString('en-US', {
+                      {selectedDate.toLocaleDateString('en-GB', {
                         weekday: 'long',
                       })}
                     </p>
                     <p className="text-2xl font-extrabold text-blue-600 my-1">
-                      {selectedDate.toLocaleDateString('en-US', {
+                      {selectedDate.toLocaleDateString('en-GB', {
                         month: 'short',
                         day: 'numeric',
                       })}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {selectedDate.toLocaleDateString('en-US', {
+                      {selectedDate.toLocaleDateString('en-GB', {
                         year: 'numeric',
                       })}
                     </p>

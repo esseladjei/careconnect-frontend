@@ -6,6 +6,8 @@ import {
   CheckCircleIcon,
   DocumentArrowDownIcon,
   DocumentTextIcon,
+  ExclamationCircleIcon,
+  HeartIcon,
   MapPinIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
@@ -140,139 +142,39 @@ const AppointmentDetailsPage: React.FC = () => {
       </section>
 
       <main className="container mx-auto px-4 md:px-8 py-10">
-        {/* Main Details Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {/* Left Column - Appointment Details */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        {/* Main Layout - Responsive Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Sidebar (2/3 width on desktop, full width on mobile) */}
+          <div className="lg:col-span-2">
+            {/* Main Details Card */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
+              {/* Heading */}
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 mb-6">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <CalendarDaysIcon className="h-6 w-6 text-blue-600" />
                 </div>
-                Appointment & Consultation Information
+                Appointment Details
               </h2>
 
-              {/* Consultation Notes and Prescription */}
-              <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-                {/* Header with Icon */}
-                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white/20 p-2.5 rounded-lg">
-                        <DocumentTextIcon className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-white/80 uppercase tracking-wide">
-                          Medical Documentation
-                        </p>
-                        <p className="text-lg font-bold text-white">
-                          Consultation & Prescription
-                        </p>
-                      </div>
-                    </div>
-                    {(appointment.consultationNotes ||
-                      appointment.prescriptions) && (
-                      <button
-                        onClick={() =>
-                          prescriptionPdfGenerator(role, {
-                            appointmentId: appointment._id,
-                            patientName: patientName,
-                            providerName: providerName,
-                            consultationNotes:
-                              appointment.consultationNotes || '',
-                            prescriptions: appointment.prescriptions || '',
-                            appointmentDate: new Date(
-                              appointment.scheduledAt
-                            ).toLocaleDateString('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            }),
-                            appointmentTime: new Date(
-                              appointment.scheduledAt
-                            ).toLocaleTimeString('en-GB', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            }),
-                          })
-                        }
-                        title="Download PDF"
-                        className="cursor-grab flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
-                      >
-                        <DocumentArrowDownIcon className="h-5 w-5" />
-                        <span className="hidden sm:inline">Download PDF</span>
-                        <span className="sm:hidden">PDF</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 space-y-6">
-                  {/* Consultation Notes Section */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="h-1 w-1 bg-emerald-500 rounded-full"></div>
-                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
-                        Consultation Notes
-                      </h3>
-                    </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4">
-                      <p className="text-gray-800 leading-relaxed text-sm">
-                        {appointment.consultationNotes ? (
-                          appointment.consultationNotes
-                        ) : (
-                          <span className="text-gray-400 italic">
-                            No consultation notes provided
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Prescription Info Section */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="h-1 w-1 bg-emerald-500 rounded-full"></div>
-                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
-                        Prescription Information
-                      </h3>
-                    </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4">
-                      <p className="text-gray-800 leading-relaxed text-sm whitespace-pre-line">
-                        {appointment.prescriptions ? (
-                          appointment.prescriptions
-                        ) : (
-                          <span className="text-gray-400 italic">
-                            No prescription information provided
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 1: Date & Time and Location */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Row 1: Date & Time, Location, Type, Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {/* Date & Time */}
-                <div className="p-4 bg-linear-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                  <p className="text-sm text-blue-600 font-semibold uppercase mb-2">
+                <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <p className="text-xs text-blue-600 font-semibold uppercase mb-2 tracking-wide">
                     Date & Time
                   </p>
                   <div className="space-y-1">
-                    <p className="text-base font-bold text-gray-900">
+                    <p className="text-sm font-bold text-gray-900">
                       {new Date(appointment.scheduledAt).toLocaleDateString(
                         'en-US',
                         {
                           weekday: 'short',
                           month: 'short',
                           day: 'numeric',
-                          year: 'numeric',
                         }
                       )}
                     </p>
-                    <p className="text-base font-bold text-blue-700">
+                    <p className="text-sm font-bold text-blue-700">
                       {appointment?.slotId?.startTime} -{' '}
                       {appointment?.slotId?.endTime}
                     </p>
@@ -281,143 +183,266 @@ const AppointmentDetailsPage: React.FC = () => {
 
                 {/* Location */}
                 <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-                  <p className="text-sm text-orange-600 font-semibold uppercase mb-2">
+                  <p className="text-xs text-orange-600 font-semibold uppercase mb-2 tracking-wide">
                     Location
                   </p>
-                  <p className="text-base font-bold text-gray-900 flex items-center gap-2">
-                    <MapPinIcon className="h-5 w-5 text-orange-600" />
+                  <p className="text-sm font-bold text-gray-900 line-clamp-3">
+                    <MapPinIcon className="h-4 w-4 text-orange-600 inline mr-1" />
                     {appointment?.availabilityId?.location}
                   </p>
                 </div>
-              </div>
 
-              {/* Row 2: Appointment Type and Status */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Appointment Type */}
+                {/* Type */}
                 <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-                  <p className="text-sm text-purple-600 font-semibold uppercase mb-2">
+                  <p className="text-xs text-purple-600 font-semibold uppercase mb-2 tracking-wide">
                     Type
                   </p>
-                  <p className="text-base font-bold text-gray-900">
+                  <p className="text-sm font-bold text-gray-900 line-clamp-2">
                     {appointment.appointmentType}
                   </p>
                 </div>
 
                 {/* Status */}
                 <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <p className="text-sm text-gray-600 font-semibold uppercase mb-2">
+                  <p className="text-xs text-gray-600 font-semibold uppercase mb-2 tracking-wide">
                     Status
                   </p>
-                  <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                    <span className="text-base font-bold text-gray-900 capitalize">
+                  <div className="flex items-center gap-1">
+                    <CheckCircleIcon className="h-4 w-4 text-green-600 flex-shrink-0" />
+                    <span className="text-sm font-bold text-gray-900 capitalize">
                       {appointment.status}
                     </span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right Column - Provider/Patient Info */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              {/* Row 2: Participants (Provider & Patient) */}
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 mb-6 pt-4 border-t border-gray-200">
                 <div className="p-2 bg-purple-100 rounded-lg">
                   <UserIcon className="h-6 w-6 text-purple-600" />
                 </div>
                 Participants
               </h2>
 
-              {/* Provider Info */}
-              <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                <p className="text-sm text-blue-600 font-semibold uppercase mb-3">
-                  Healthcare Provider
-                </p>
-                <div className="space-y-2">
-                  <p className="text-lg font-bold text-gray-900">
-                    {provider?.title} {provider?.firstName} {provider?.lastName}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Provider Info */}
+                <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <p className="text-sm text-blue-600 font-semibold uppercase mb-3 tracking-wide">
+                    Healthcare Provider
                   </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Service Name:</span>{' '}
-                    {appointment.providerId.serviceDescription}
+                  <div className="space-y-2">
+                    <p className="text-base font-bold text-gray-900">
+                      {provider?.title} {provider?.firstName}{' '}
+                      {provider?.lastName}
+                    </p>
+                    <p className="text-xs text-gray-700 line-clamp-2">
+                      <span className="font-semibold">Service:</span>{' '}
+                      {appointment.providerId.serviceDescription}
+                    </p>
+                    {role === 'patient' && (
+                      <>
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Gender:</span>{' '}
+                          {provider.gender}
+                        </p>
+                      </>
+                    )}
+                    <p className="text-xs text-gray-700 line-clamp-1">
+                      <span className="font-semibold">Specialties:</span>{' '}
+                      {appointment.providerId.specialties.join(', ')}
+                    </p>
+                    <p className="text-xs text-gray-700 truncate">
+                      <span className="font-semibold">Email:</span>{' '}
+                      {provider?.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Patient Info */}
+                <div className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
+                  <p className="text-sm text-yellow-600 font-semibold uppercase mb-3 tracking-wide">
+                    Patient
                   </p>
-                  {role === 'patient' && (
-                    <>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Gender:</span>{' '}
-                        {provider.gender}
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Languages:</span>{' '}
-                        {provider.languages.join(', ')}
-                      </p>
-                    </>
-                  )}
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Specialties:</span>{' '}
-                    {appointment.providerId.specialties.join(', ')}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Email:</span>{' '}
-                    {provider?.email}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Phone:</span>{' '}
-                    {appointment?.providerId.clinicPhone}
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-base font-bold text-gray-900">
+                      {patient?.title} {patient?.firstName} {patient?.lastName}
+                    </p>
+                    {role === 'provider' && (
+                      <>
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Gender:</span>{' '}
+                          {patient?.gender}
+                        </p>
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">DOB:</span>{' '}
+                          {new Date(patient?.dateOfBirth).toLocaleDateString(
+                            'en-GB',
+                            {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            }
+                          )}
+                        </p>
+                      </>
+                    )}
+                    <p className="text-xs text-gray-700 truncate">
+                      <span className="font-semibold">Email:</span>{' '}
+                      {patient?.email}
+                    </p>
+                    <p className="text-xs text-gray-700">
+                      <span className="font-semibold">Phone:</span>{' '}
+                      {patient?.phone}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Patient Info */}
-              <div className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
-                <p className="text-sm text-yellow-600 font-semibold uppercase mb-3">
-                  Patient
-                </p>
-                <div className="space-y-2">
-                  <p className="text-lg font-bold text-gray-900">
-                    {patient?.title} {patient?.firstName} {patient?.lastName}
-                  </p>
-                  {role === 'provider' && (
-                    <>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Gender:</span>{' '}
-                        {patient?.gender}
+              {/* Row 3: Health Information (Full Width) */}
+              {(appointment?.patientCondition ||
+                appointment?.knownAllergies) && (
+                <div className="p-5 bg-gradient-to-br from-slate-50 to-red-50 rounded-xl border-2 border-red-300 shadow-md">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <HeartIcon className="w-5 h-5 text-red-600" />
+                    </div>
+                    <p className="text-base font-bold text-red-700 uppercase tracking-wide">
+                      Health Information
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {appointment?.patientCondition && (
+                      <div className="bg-white rounded-lg p-3 border-2 border-red-100">
+                        <p className="text-xs font-bold text-red-700 uppercase mb-2 tracking-widest">
+                          Current Condition
+                        </p>
+                        <p className="text-sm text-gray-800 line-clamp-3">
+                          {appointment.patientCondition}
+                        </p>
+                      </div>
+                    )}
+                    {appointment?.knownAllergies && (
+                      <div className="bg-red-50 rounded-lg p-3 border-2 border-red-300">
+                        <p className="text-xs font-bold text-red-700 uppercase mb-2 tracking-widest flex items-center gap-2">
+                          <ExclamationCircleIcon className="w-4 h-4 flex-shrink-0" />
+                          Known Allergies
+                        </p>
+                        <p className="text-sm text-red-900 font-bold line-clamp-3">
+                          {appointment.knownAllergies}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Sidebar (1/3 width on desktop, full width on mobile) */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8 p-8 mb-8 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden h-fit">
+              {/* Medical Documentation Section - Full Width */}
+
+              {/* Header with Icon */}
+              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-5 -m-8 mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2.5 rounded-lg">
+                      <DocumentTextIcon className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white/80 uppercase tracking-wide">
+                        Medical Documentation
                       </p>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Date of Birth:</span>{' '}
-                        {new Date(patient?.dateOfBirth).toLocaleDateString(
-                          'en-GB',
-                          {
+                      <p className="text-lg font-bold text-white">
+                        Consultation & Prescription
+                      </p>
+                    </div>
+                  </div>
+                  {(appointment.consultationNotes ||
+                    appointment.prescriptions) && (
+                    <button
+                      onClick={() =>
+                        prescriptionPdfGenerator(role, {
+                          appointmentId: appointment._id,
+                          patientName: patientName,
+                          providerName: providerName,
+                          consultationNotes:
+                            appointment.consultationNotes || '',
+                          prescriptions: appointment.prescriptions || '',
+                          appointmentDate: new Date(
+                            appointment.scheduledAt
+                          ).toLocaleDateString('en-GB', {
                             day: '2-digit',
                             month: 'short',
                             year: 'numeric',
-                          }
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Languages:</span>{' '}
-                        {patient?.languages.join(', ')}
-                      </p>
-                    </>
+                          }),
+                          appointmentTime: new Date(
+                            appointment.scheduledAt
+                          ).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }),
+                        })
+                      }
+                      title="Download PDF"
+                      className="cursor-grab flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+                    >
+                      <DocumentArrowDownIcon className="h-5 w-5" />
+                      <span className="hidden sm:inline">Download PDF</span>
+                      <span className="sm:hidden">PDF</span>
+                    </button>
                   )}
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Email:</span>{' '}
-                    {patient?.email}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Phone:</span>{' '}
-                    {patient?.phone}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Location:</span>{' '}
-                    {patient?.location}
-                  </p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-6">
+                {/* Consultation Notes Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-1 w-1 bg-emerald-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                      Consultation Notes
+                    </h3>
+                  </div>
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4">
+                    <p className="text-gray-800 leading-relaxed text-sm">
+                      {appointment.consultationNotes ? (
+                        appointment.consultationNotes
+                      ) : (
+                        <span className="text-gray-400 italic">
+                          No consultation notes provided
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Prescription Info Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-1 w-1 bg-emerald-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                      Prescription Information
+                    </h3>
+                  </div>
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4">
+                    <p className="text-gray-800 leading-relaxed text-sm whitespace-pre-line">
+                      {appointment.prescriptions ? (
+                        appointment.prescriptions
+                      ) : (
+                        <span className="text-gray-400 italic">
+                          No prescription information provided
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Prescription & Notes Section (Provider Only) */}
         {isProvider && !hasNotesOrPrescriptions && (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -487,7 +512,6 @@ const AppointmentDetailsPage: React.FC = () => {
             </div>
           </div>
         )}
-
         {/* Patient View - Summary Section */}
         {!isProvider && (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
