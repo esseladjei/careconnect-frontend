@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useResetPassword } from '../hooks/useResetPassword';
 import toast from 'react-hot-toast';
-import {
-  EyeIcon,
-  EyeSlashIcon,
-  LightBulbIcon,
-  LockClosedIcon,
-} from '@heroicons/react/24/outline';
+import { validatePasswordMatch, } from '../utils/passwordValidation';
+import PasswordInput from '../components/PasswordInput';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, } from '@heroicons/react/24/outline';
 
 interface FormData {
   newPassword: string;
@@ -85,17 +82,17 @@ const ResetPassword: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-
+    // ...existing code...
     if (!formData.newPassword) {
       newErrors.newPassword = 'Password is required';
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = 'Password must be at least 6 characters';
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+    } else {
+      const passwordValidation = validatePasswordMatch(
+        formData.newPassword,
+        formData.confirmPassword
+      );
+      if (!passwordValidation.isValid) {
+        newErrors.newPassword = passwordValidation.error;
+      }
     }
 
     setErrors(newErrors);
@@ -176,95 +173,20 @@ const ResetPassword: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* New Password Field */}
-          <div>
-            <label
-              htmlFor="newPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              New Password *
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="newPassword"
-                name="newPassword"
-                placeholder="Enter your new password"
-                value={formData.newPassword}
-                onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-colors pr-10 ${
-                  errors.newPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                {showPassword ? (
-                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
-                ) : (
-                  <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-            {errors.newPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
-            )}
-
-            {/* Password Strength Indicator */}
-            {formData.newPassword && (
-              <div className="mt-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-xs font-medium text-gray-600">
-                    Password strength:
-                  </span>
-                  <span
-                    className={`text-xs font-semibold ${
-                      passwordStrength === 'strong'
-                        ? 'text-green-600'
-                        : passwordStrength === 'medium'
-                          ? 'text-yellow-600'
-                          : 'text-red-600'
-                    }`}
-                  >
-                    {getPasswordStrengthLabel()}
-                  </span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all ${getPasswordStrengthColor()}`}
-                    style={{
-                      width:
-                        passwordStrength === 'weak'
-                          ? '33%'
-                          : passwordStrength === 'medium'
-                            ? '66%'
-                            : '100%',
-                    }}
-                  ></div>
-                </div>
-                <ul className="mt-2 text-xs text-gray-600 space-y-1">
-                  <li
-                    className={
-                      formData.newPassword.length >= 6 ? 'text-green-600' : ''
-                    }
-                  >
-                    ✓ At least 6 characters
-                  </li>
-                  <li className="inline-flex items-center gap-2 font-semibold">
-                    <LightBulbIcon
-                      className="h-4 w-4 text-amber-500"
-                      aria-hidden="true"
-                    />
-                    Tip: Use uppercase, numbers, and special characters for
-                    stronger password
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
+          <PasswordInput
+            id="newPassword"
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={(value) =>
+              setFormData((prev) => ({ ...prev, newPassword: value }))
+            }
+            label="New Password"
+            placeholder="Enter your new password"
+            error={errors.newPassword}
+            required={true}
+            showStrengthMeter={true}
+            showChecklist={true}
+          />
 
           {/* Confirm Password Field */}
           <div>
