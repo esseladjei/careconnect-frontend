@@ -16,6 +16,8 @@ import {
 import Spinner from '../components/Spinner';
 import { useAuth } from '../hooks/useAuth.ts';
 import AppointmentCard from '../components/AppointmentCard.tsx';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 // Set default date range: 3 months ago to 3 months from now
 const getDefaultStartDate = () => {
@@ -37,6 +39,7 @@ const AppointmentHistoryPage: React.FC = () => {
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
   const { userId, role, actorId } = useAuth();
+  const timezone = useTimezone();
   // Fetch appointments with TanStack Query
   const {
     data: appointments = [],
@@ -211,7 +214,7 @@ const AppointmentHistoryPage: React.FC = () => {
             <p className="text-xs text-blue-900">
               <span className="font-semibold">📅 Showing:</span>{' '}
               <span className="font-medium">
-                {new Date(startDate).toLocaleDateString('en-US', {
+                {formatDateInTimezone(startDate, timezone, {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
@@ -219,7 +222,7 @@ const AppointmentHistoryPage: React.FC = () => {
               </span>
               <span className="mx-1">→</span>
               <span className="font-medium">
-                {new Date(endDate).toLocaleDateString('en-US', {
+                {formatDateInTimezone(endDate, timezone, {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',

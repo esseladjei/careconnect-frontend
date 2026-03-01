@@ -1,5 +1,5 @@
 import React from 'react';
-import type { UserProfile } from '../types/user.ts';
+import type { IUserProfile } from '../types/user.ts';
 import { useGetMaxDate } from '../hooks/useDate.ts';
 import PhoneInput from './PhoneInput';
 import {
@@ -13,8 +13,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 interface ProfileDetailsProp {
-  user: UserProfile;
-  onChange: (field: keyof UserProfile, value: string | string[]) => void;
+  user: IUserProfile;
+  onChange: (field: keyof IUserProfile, value: string | string[]) => void;
   onSave: () => void;
   saveStatus: boolean;
 }

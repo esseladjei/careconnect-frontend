@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { UserPassword } from '../types/user.ts';
+import type { IUserPassword } from '../types/user.ts';
 import PasswordInput from './PasswordInput';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 interface SecuritySettingsProps {
-  onChange: (field: keyof UserPassword, value: string) => void;
+  onChange: (field: keyof IUserPassword, value: string) => void;
   onPasswordSave: () => void;
   savePasswordStatus: boolean;
   onLogoutAll: () => void;

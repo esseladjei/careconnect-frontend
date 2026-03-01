@@ -5,6 +5,7 @@ import type { Appointment } from '../types/appointment.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import type { IUser } from '../types/user.ts';
 import {
+  BuildingOffice2Icon,
   CalendarDaysIcon,
   ChevronRightIcon,
   MapPinIcon,
@@ -13,6 +14,8 @@ import {
   useCheckExistingFlag,
   useCheckExistingReview,
 } from '../hooks/useAppointments';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateShortInTimezone } from '../utils/timezoneUtils';
 // --- Status Styling Helper ---
 const getStatusClasses = (status: Appointment['status']) => {
   switch (status) {
@@ -46,6 +49,7 @@ const AppointmentCard: React.FC<{
   isLoading = false,
 }) => {
   const { role } = useAuth();
+  const timezone = useTimezone();
   const [showFlagModal, setShowFlagModal] = useState(false);
   const patientId = appointment.patientId?.userId?._id;
   const providerId = appointment.providerId?.userId?._id;
@@ -97,8 +101,8 @@ const AppointmentCard: React.FC<{
               to={`/appointments/${appointment._id}/details`}
               className="group/link inline-flex items-center gap-1 hover:gap-2 transition-all"
             >
-              <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                {appointment.doctor}
+              <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 truncate transition-colors">
+                {appointment.providerId.serviceDescription}
               </h3>
               <ChevronRightIcon className="h-4 w-4 text-gray-400 group-hover/link:text-blue-600 transition-all" />
             </Link>
@@ -118,14 +122,7 @@ const AppointmentCard: React.FC<{
               <div className="flex items-center gap-1.5 text-gray-700">
                 <CalendarDaysIcon className="h-3.5 w-3.5 text-blue-600" />
                 <span className="font-medium">
-                  {new Date(appointment.scheduledAt).toLocaleDateString(
-                    'en-GB',
-                    {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    }
-                  )}
+                  {formatDateShortInTimezone(appointment.scheduledAt, timezone)}
                 </span>
               </div>
 
@@ -144,9 +141,8 @@ const AppointmentCard: React.FC<{
                 </span>
               </div>
             </div>
-
             {/* Provider/Patient Info - Compact */}
-            <div className="pt-2">
+            <div className="flex gap-2 pt-2">
               <div className="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-50 rounded-lg">
                 <span className="text-sm">👤</span>
                 <div>
@@ -155,6 +151,20 @@ const AppointmentCard: React.FC<{
                   </span>
                   <span className="text-sm font-semibold text-gray-900">
                     {target?.firstName} {target?.lastName}
+                  </span>
+                </div>
+              </div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-50 rounded-lg">
+                <span className="text-sm">
+                  {' '}
+                  <BuildingOffice2Icon className="h-3.5 w-3.5 text-orange-600" />
+                </span>
+                <div>
+                  <span className="text-xs text-gray-600 font-medium">
+                    Normal Practice facility:{' '}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {appointment.providerId.practiceName}
                   </span>
                 </div>
               </div>

@@ -4,42 +4,50 @@ import ProfileDetailsForm from '../components/ProfileDetailsForms';
 import SecuritySettings from '../components/SecuritySettings';
 import MFASettings from '../components/MFASettings';
 import MFAVerificationModal from '../components/MFAVerificationModal';
+import TimezoneSelector from '../components/TimezoneSelector';
 import Spinner from '../components/Spinner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
   CheckBadgeIcon,
+  ClockIcon,
   ShieldCheckIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import type {
-  PatientProfile,
-  ProviderProfile,
-  UserPassword,
-  UserProfile,
-  UserResponse,
+  IPatientProfile,
+  IProviderProfile,
+  IUserPassword,
+  IUserProfile,
+  IUserResponse,
 } from '../types/user.ts';
 import axiosClient from '../api/axiosClient.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSendMFACode } from '../hooks/useSendMFACode.ts';
 import { logoutAll } from '../api/authApi';
-
-type SaveStatus = boolean;
-type savePasswordStatus = boolean;
+import { useUpdateTimezone } from '../hooks/useUpdateTimezone';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 // --- Main Component ---
 const UserProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'mfa'>(
-    'profile'
-  );
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>(false);
+  // UI State
+  const [activeTab, setActiveTab] = useState<
+    'profile' | 'security' | 'mfa' | 'timezone'
+  >('profile');
+  const [saveStatus, setSaveStatus] = useState(false);
+  const [savePasswordStatus, setSavePasswordStatus] = useState(false);
+
+  // MFA State
   const [mfaVerificationOpen, setMFAVerificationOpen] = useState(false);
   const [mfaAction, setMFAAction] = useState<
     'login' | 'password-change' | 'profile-update'
   >('login');
   const [method, setMethod] = useState<'email' | 'totp'>('email');
-  const [userResponse, setUserResponse] = useState<UserResponse>({
+
+  // Form State
+  const [userResponse, setUserResponse] = useState<IUserResponse>({
     user: {
       userId: '',
       title: '',
@@ -53,25 +61,43 @@ const UserProfilePage: React.FC = () => {
       dateOfBirth: new Date(),
       languages: [],
       address: '',
+      timezone: '',
       createdAt: undefined,
     },
-    profile: {} as PatientProfile | ProviderProfile,
+    profile: {} as IPatientProfile | IProviderProfile,
   });
-  const { userId } = useAuth();
-  const [savePasswordStatus, setSavePasswordStatus] =
-    useState<savePasswordStatus>(false);
-  const [userPassword, setUserPassword] = useState<UserPassword>({
+
+  const [userPassword, setUserPassword] = useState<IUserPassword>({
     newPassword: '',
     confirmNewPassword: '',
     oldPassword: '',
   });
+
+  // Hooks
+  const { userId } = useAuth();
+  const timezone = useTimezone();
   const { sendCode } = useSendMFACode();
 
+  // Timezone mutation
+  const saveTimezoneMutation = useUpdateTimezone(userId || '', {
+    onSuccess: (savedTimezone) => {
+      // Update the userResponse to match saved timezone so hasUnsavedChanges becomes false
+      setUserResponse((prev) => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          timezone: savedTimezone,
+        },
+      }));
+      setSaveStatus(true);
+    },
+  });
+
+  // Mutations
   const saveUserMutation = useMutation({
     mutationFn: async () => {
       if (!userId) return;
       const headers: Record<string, string> = {};
-      // Add MFA token if available (from previous verification)
       const mfaToken = localStorage.getItem('mfa-token');
       if (mfaToken) {
         headers['x-mfa-token'] = mfaToken;
@@ -85,11 +111,10 @@ const UserProfilePage: React.FC = () => {
     },
     onSuccess: (_, __, toastId) => {
       toast.success('Profile updated successfully!', { id: toastId });
-      localStorage.removeItem('mfa-token'); // Clean up after success
+      localStorage.removeItem('mfa-token');
       setSaveStatus(true);
     },
     onError: async (err: any, __, toastId) => {
-      // Check if MFA verification is required
       if (
         err.response?.status === 403 &&
         err.response?.data?.data.requiresMFA
@@ -116,16 +141,16 @@ const UserProfilePage: React.FC = () => {
   const savePasswordMutation = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      if (userPassword.newPassword !== userPassword.confirmNewPassword)
+      if (userPassword.newPassword !== userPassword.confirmNewPassword) {
         return toast.error("Passwords don't match");
+      }
 
       const headers: Record<string, string> = {};
-
-      // Add MFA token if available (from previous verification)
       const mfaToken = localStorage.getItem('mfa-token');
       if (mfaToken) {
         headers['x-mfa-token'] = mfaToken;
       }
+
       return axiosClient.patch(
         `/user/update/password/${userId}`,
         userPassword,
@@ -134,19 +159,16 @@ const UserProfilePage: React.FC = () => {
     },
     onSuccess: () => {
       toast.success('Password updated successfully!');
-      localStorage.removeItem('mfa-token'); // Clean up after success
-      // Clear password fields
+      localStorage.removeItem('mfa-token');
       setUserPassword({
         newPassword: '',
         confirmNewPassword: '',
         oldPassword: '',
       });
       setSavePasswordStatus(true);
-      // Reset status after 3 seconds
       setTimeout(() => setSavePasswordStatus(false), 3000);
     },
     onError: async (err: any) => {
-      // Check if MFA verification is required
       if (
         err.response?.status === 403 &&
         err.response?.data?.data?.requiresMFA
@@ -169,6 +191,7 @@ const UserProfilePage: React.FC = () => {
     },
   });
 
+  // Fetch user data with TanStack Query
   const {
     data: userData,
     isLoading,
@@ -178,7 +201,7 @@ const UserProfilePage: React.FC = () => {
     queryKey: ['user', userId],
     queryFn: async () => {
       const response = await axiosClient.get(`/user/${userId}`);
-      return response.data as UserResponse;
+      return response.data as IUserResponse;
     },
     enabled: !!userId,
   });
@@ -199,24 +222,24 @@ const UserProfilePage: React.FC = () => {
     'createdAt',
     'password',
     'confirmPassword',
+    'timezone',
   ]);
 
+  // Handlers
   const handleChange = (
-    field: keyof UserProfile | keyof (PatientProfile | ProviderProfile),
+    field: keyof IUserProfile | keyof (IPatientProfile | IProviderProfile),
     value: string | string[] | Date | number | boolean
   ) => {
-    setUserResponse((prev) => {
-      // Check if field belongs to user object
+    setUserResponse((prev: { user: IUserProfile; profile: any }) => {
       if (userFields.has(field as string)) {
         return {
           ...prev,
           user: {
             ...prev.user,
             [field]: value,
-          } as UserProfile,
+          } as IUserProfile,
         };
       }
-      // Otherwise update in profile object
       return {
         ...prev,
         profile: {
@@ -228,7 +251,7 @@ const UserProfilePage: React.FC = () => {
     setSaveStatus(false);
   };
 
-  const handlePasswordChange = (field: keyof UserPassword, value: string) => {
+  const handlePasswordChange = (field: keyof IUserPassword, value: string) => {
     setUserPassword((prev) => ({
       ...prev,
       [field]: value,
@@ -236,12 +259,26 @@ const UserProfilePage: React.FC = () => {
     setSavePasswordStatus(false);
   };
 
+  // Initialize user data
   useEffect(() => {
     if (userData) {
-      setUserResponse(userData);
+      const userTimezone =
+        userData.user.timezone ||
+        localStorage.getItem('userTimezone') ||
+        timezone;
+
+      setUserResponse({
+        ...userData,
+        user: {
+          ...userData.user,
+          timezone: userTimezone,
+        },
+      });
     }
-    if (isError) toast.error(error.message || 'Failed to fetch user data');
-  }, [userData, isError]);
+    if (isError) {
+      toast.error(error.message || 'Failed to fetch user data');
+    }
+  }, [userData, isError, timezone]);
 
   const user = userResponse.user;
 
@@ -345,7 +382,7 @@ const UserProfilePage: React.FC = () => {
                 <p className="text-gray-500 text-xs mb-3">
                   Member since{' '}
                   {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                    ? formatDateInTimezone(user.createdAt, timezone, {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
@@ -356,7 +393,7 @@ const UserProfilePage: React.FC = () => {
             </div>
 
             {/* Tab Navigation with Icons - Cursor Pointer */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group ${
@@ -420,6 +457,27 @@ const UserProfilePage: React.FC = () => {
                   2FA
                 </span>
               </button>
+              <button
+                onClick={() => setActiveTab('timezone')}
+                className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group ${
+                  activeTab === 'timezone'
+                    ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-500 shadow-md'
+                    : 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                }`}
+              >
+                <ClockIcon
+                  className={`h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                    activeTab === 'timezone' ? 'text-blue-600' : 'text-gray-500'
+                  }`}
+                />
+                <span
+                  className={`font-semibold text-sm transition-colors ${
+                    activeTab === 'timezone' ? 'text-blue-700' : 'text-gray-700'
+                  }`}
+                >
+                  Timezone
+                </span>
+              </button>
             </div>
 
             {/* Tab Content with Loading Indicator */}
@@ -464,6 +522,15 @@ const UserProfilePage: React.FC = () => {
                   )}
                   {activeTab === 'mfa' && userId && (
                     <MFASettings userId={userId} userEmail={user.email} />
+                  )}
+                  {activeTab === 'timezone' && (
+                    <TimezoneSelector
+                      currentTimezone={userResponse.user.timezone || timezone}
+                      onSave={(timezoneToSave) => {
+                        saveTimezoneMutation.mutate(timezoneToSave);
+                      }}
+                      isSaving={saveTimezoneMutation.isPending}
+                    />
                   )}
                 </>
               )}

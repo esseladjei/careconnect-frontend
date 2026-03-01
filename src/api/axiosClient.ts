@@ -1,6 +1,16 @@
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
+// Helper to get user's timezone
+const getTimezone = (): string => {
+  // Try to get from localStorage first
+  const stored = localStorage.getItem('userTimezone');
+  if (stored) return stored;
+
+  // Otherwise detect automatically
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
 const axiosClient = axios.create({
   baseURL: 'http://localhost:5500/api',
   withCredentials: true,
@@ -20,6 +30,16 @@ const clearStoredAuth = () => {
   localStorage.removeItem('patientId');
   localStorage.removeItem('role');
 };
+
+/**
+ * Request interceptor to add timezone header to all API requests
+ * This ensures the backend knows which timezone to use for time calculations
+ */
+axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const timezone = getTimezone();
+  config.headers['X-Timezone'] = timezone;
+  return config;
+});
 
 /**
  * Refresh session with queuing to prevent concurrent refresh requests
@@ -93,5 +113,13 @@ axiosClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * Update the timezone used in API requests
+ * Call this when user changes their timezone in settings
+ */
+export const setTimezone = (timezone: string): void => {
+  localStorage.setItem('userTimezone', timezone);
+};
 
 export default axiosClient;

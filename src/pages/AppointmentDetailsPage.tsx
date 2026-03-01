@@ -21,11 +21,14 @@ import {
 import Spinner from '../components/Spinner';
 import toast from 'react-hot-toast';
 import { prescriptionPdfGenerator } from '../utils/prescriptionPdfGenerator';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 const AppointmentDetailsPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
   const { userId, role, actorId } = useAuth();
+  const timezone = useTimezone();
   const [prescriptionNotes, setPrescriptionNotes] = useState('');
   const [consultationNotes, setConsultationNotes] = useState('');
 
@@ -165,14 +168,11 @@ const AppointmentDetailsPage: React.FC = () => {
                   </p>
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-gray-900">
-                      {new Date(appointment.scheduledAt).toLocaleDateString(
-                        'en-US',
-                        {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric',
-                        }
-                      )}
+                      {formatDateInTimezone(appointment.scheduledAt, timezone, {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </p>
                     <p className="text-sm font-bold text-blue-700">
                       {appointment?.slotId?.startTime} -{' '}
@@ -275,8 +275,9 @@ const AppointmentDetailsPage: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-700">
                           <span className="font-semibold">DOB:</span>{' '}
-                          {new Date(patient?.dateOfBirth).toLocaleDateString(
-                            'en-GB',
+                          {formatDateInTimezone(
+                            patient?.dateOfBirth,
+                            timezone,
                             {
                               day: '2-digit',
                               month: 'short',

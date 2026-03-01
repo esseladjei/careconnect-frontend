@@ -9,6 +9,8 @@ import {
 import Spinner from '../Spinner';
 import type { IProviderListing } from '../../types/providerListing.ts';
 import type { BookingFormErrors } from '../../pages/BookingPage.tsx';
+import { useTimezone } from '../../hooks/useTimezone';
+import { formatDateInTimezone } from '../../utils/timezoneUtils';
 
 interface TimeSlot {
   time: string;
@@ -53,6 +55,7 @@ const BookingSidebar: React.FC<Props> = ({
   onDateRangeChange,
   errors,
 }) => {
+  const timezone = useTimezone();
   return (
     <aside className="lg:col-span-1">
       <div className="sticky top-4 space-y-6">
@@ -189,18 +192,18 @@ const BookingSidebar: React.FC<Props> = ({
                       Selected
                     </p>
                     <p className="text-lg font-bold text-gray-900">
-                      {selectedDate.toLocaleDateString('en-GB', {
+                      {formatDateInTimezone(selectedDate, timezone, {
                         weekday: 'long',
                       })}
                     </p>
                     <p className="text-2xl font-extrabold text-blue-600 my-1">
-                      {selectedDate.toLocaleDateString('en-GB', {
+                      {formatDateInTimezone(selectedDate, timezone, {
                         month: 'short',
                         day: 'numeric',
                       })}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {selectedDate.toLocaleDateString('en-GB', {
+                      {formatDateInTimezone(selectedDate, timezone, {
                         year: 'numeric',
                       })}
                     </p>
