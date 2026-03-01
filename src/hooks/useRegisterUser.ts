@@ -20,14 +20,20 @@ export interface ProviderProfile {
   clinicAddress?: string;
   phone: string;
   hourlyRate?: number;
+  dateOfBirth?: string;
+  gender?: string;
 }
 
 export interface RegisterFormData {
+  title: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
+  dateOfBirth: string;
+  gender: string;
+  phone?: string;
   role: Role;
   referralCode?: string;
   patientProfile?: PatientProfile;

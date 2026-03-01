@@ -13,10 +13,13 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Spinner from '../components/Spinner';
 import { useReferralStats } from '../hooks/useReferrals';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 const ReferralPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const { data, isLoading, error } = useReferralStats(userId || '');
+  const timezone = useTimezone();
   const [isCopied, setIsCopied] = useState(false);
   const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
 
@@ -363,8 +366,9 @@ const ReferralPage: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className="text-sm text-gray-600">
                           {referral.completedAt &&
-                            new Date(referral.completedAt).toLocaleDateString(
-                              'en-GB',
+                            formatDateInTimezone(
+                              referral.completedAt,
+                              timezone,
                               {
                                 day: 'numeric',
                                 month: 'short',

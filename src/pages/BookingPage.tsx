@@ -81,14 +81,13 @@ const BookingPage: React.FC = () => {
   const bookAppointmentMutation = useMutation({
     mutationFn: async (slotId: string) => {
       if (!providerOfferData) throw new Error('Provider ID is required');
-      const { start, end } = providerOfferData;
       return await appointmentsApi.bookAppointment({
         slotId,
         availabilityId: availabilityId!,
         providerId: providerOfferData.providerId!,
         patientId: actorId!,
         appointmentType: providerOfferData?.appointmentType,
-        duration: getDuration(start, end),
+        duration: providerOfferData.sessionDuration!,
         scheduledAt: selectedDate,
         status: 'pending',
         knownAllergies: knownAllergy,
@@ -163,23 +162,6 @@ const BookingPage: React.FC = () => {
     if (now < start) return false; //'upcoming';
     if (now > end) return true; //'past';
     return false; //'ongoing';
-  }
-
-  function getDuration(startTime: string, endTime: string): number {
-    const now = new Date();
-
-    // Build Date objects for today with the given times
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
-
-    const start = new Date(now);
-    start.setHours(startHour, startMinute, 0, 0);
-
-    const end = new Date(now);
-    end.setHours(endHour, endMinute, 0, 0);
-    const diffMs = end.getTime() - start.getTime();
-    const diffMinutes = diffMs / (1000 * 60);
-    return diffMinutes / 60;
   }
 
   // Generate time slots from fetched slots data

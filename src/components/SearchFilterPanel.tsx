@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CalendarDaysIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { filterLocations, useLocations } from '../hooks/useLocations';
 import type { FilterParams, SearchParams } from '../types/search.ts';
-import { useGetMonth, useGetToday } from '../hooks/useDate.ts';
+import { useGetThreeMonthsFromNow, useGetToday } from '../hooks/useDate.ts';
 
 interface Props {
   value: SearchParams;
@@ -161,6 +161,7 @@ const SearchFilterPanel: React.FC<Props> = ({ value, filters, onChange }) => {
                   id="start-date-filter"
                   type="date"
                   min={useGetToday()}
+                  max={value.endDate || useGetThreeMonthsFromNow()}
                   value={value.startDate}
                   onChange={(e) =>
                     onChange({ ...value, startDate: e.target.value })
@@ -186,7 +187,8 @@ const SearchFilterPanel: React.FC<Props> = ({ value, filters, onChange }) => {
                 <input
                   id="end-date-filter"
                   type="date"
-                  max={useGetMonth()}
+                  min={value.startDate || useGetToday()}
+                  max={useGetThreeMonthsFromNow()}
                   value={value.endDate}
                   onChange={(e) =>
                     onChange({ ...value, endDate: e.target.value })

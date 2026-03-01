@@ -11,6 +11,8 @@ import {
   verifyMFAEnrollment,
 } from '../api/mfaApi';
 import Spinner from './Spinner';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 interface MFASettingsProps {
   userId: string;
@@ -18,6 +20,7 @@ interface MFASettingsProps {
 }
 
 const MFASettings: React.FC<MFASettingsProps> = ({ userId, userEmail }) => {
+  const timezone = useTimezone();
   const [mfaSettings, setMFASettings] = useState<MFAStateSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -354,7 +357,15 @@ const MFASettings: React.FC<MFASettingsProps> = ({ userId, userEmail }) => {
                           {method.enrolledAt && (
                             <>
                               {' · Enrolled '}
-                              {new Date(method.enrolledAt).toLocaleDateString()}
+                              {formatDateInTimezone(
+                                method.enrolledAt,
+                                timezone,
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                }
+                              )}
                             </>
                           )}
                         </>

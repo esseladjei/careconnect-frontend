@@ -4,6 +4,7 @@ import {
   BeakerIcon,
   BuildingOffice2Icon,
   MapPinIcon,
+  PencilSquareIcon,
   PhoneIcon,
   UserCircleIcon,
   UserIcon,
@@ -48,7 +49,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
       </div>
 
       {/* Header Section with Avatar - Overlapping */}
-      <div className="px-6 pb-4 pt-0 relative">
+      <div className="px-6 pb-2 pt-0 relative">
         <div className="flex items-start gap-4 -mt-10 mb-3">
           {/* Avatar */}
           <div
@@ -89,6 +90,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
         {/* Quick Info Badges */}
         <div className="flex flex-wrap gap-2">
           {/* Gender Badge */}
+
           {result.user.gender && (
             <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-gray-700 font-semibold text-xs">
               <UserIcon
@@ -111,16 +113,26 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
               <span>✓</span> Verified
             </span>
           )}
+          {/* Location */}
+          {result.availability.location && (
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 rounded-full text-orange-700 font-semibold text-xs">
+              <MapPinIcon
+                className="h-5 w-5 text-gray-500 shrink-0 text-orange-700"
+                aria-hidden="true"
+              />{' '}
+              {result.availability.location}
+            </span>
+          )}
         </div>
         {/* Location */}
-        <div className="flex items-start gap-2 py-2 px-3 bg-gray-50 rounded-xl">
-          <MapPinIcon
+        <div className="flex items-start gap-2 py-2 px-3 -bg-linear-60 from-orange-100 to-sky-200 rounded-xl">
+          <PencilSquareIcon
             className="h-5 w-5 text-gray-500 shrink-0"
             aria-hidden="true"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-gray-700 font-medium truncate">
-              {result.availability.location}
+            <p className="text-sm text-gray-700 font-medium">
+              {result.provider.serviceDescription || 'No description available'}
             </p>
           </div>
         </div>{' '}
@@ -136,8 +148,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
                     Experience
                   </span>
                   <span className="text-sm font-bold text-gray-900">
-                    {result.provider.experience} year
-                    {result.provider.experience !== 1 ? 's' : ''}
+                    {Number(result.provider.experience) > 2
+                      ? `${result.provider.experience} year${result.provider.experience !== 1 ? 's' : ''}`
+                      : 'Early‑career practitioner'}
                   </span>
                 </div>
               )}

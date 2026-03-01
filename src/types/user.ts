@@ -1,4 +1,4 @@
-export interface UserProfile {
+export interface IUserProfile {
   userId: string;
   title: string;
   firstName: string;
@@ -14,24 +14,23 @@ export interface UserProfile {
   languages?: string[];
   address?: string;
   createdAt?: Date;
+  timezone?: string;
 }
 
-export interface UserPassword {
+export interface IUserPassword {
   oldPassword: string;
   newPassword: string;
   confirmNewPassword: string;
 }
 
-export type Role = 'patient' | 'provider';
-
-export interface PatientProfile {
+export interface IPatientProfile {
   gender?: string;
   phone?: string;
   insuranceProvider?: string;
   insuranceNumber?: string;
 }
 
-export interface ProviderProfile {
+export interface IProviderProfile {
   practiceName: string;
   licenseNumber: string;
   specialties: string[];
@@ -40,7 +39,9 @@ export interface ProviderProfile {
   hourlyRate?: number;
 }
 
-export interface RegisterFormData {
+//export type Role = 'patient' | 'provider';
+
+/*export interface RegisterFormData {
   firstName: string;
   lastName: string;
   email: string;
@@ -57,11 +58,11 @@ export interface RegisterResponse {
   role: Role;
   providerStatus?: 'pending' | 'verified' | 'rejected';
   message: string;
-}
+}*/
 
-export interface UserResponse {
-  user: UserProfile;
-  profile: ProviderProfile | PatientProfile;
+export interface IUserResponse {
+  user: IUserProfile;
+  profile: IProviderProfile | IPatientProfile;
 }
 
 export interface IUser {
@@ -79,4 +80,5 @@ export interface IUser {
   location: string;
   phone: string;
   languages: string[];
+  timezone: string;
 }

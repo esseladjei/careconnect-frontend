@@ -85,8 +85,8 @@ const SearchPage: React.FC = () => {
       <div className="container mx-auto px-4 md:px-8">
         {/* Main Content: Sidebar + Results */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 -mt-24 relative z-10">
-          {/* Column 1: Filter Sidebar (Hidden on small screens, 1/4 width on large screens) */}
-          <aside className="lg:col-span-1 hidden lg:block">
+          {/* Column 1: Filter Sidebar (Hidden on small screens, 1/4 width on large screens) currently the hidden class is removed , */}
+          <aside className="lg:col-span-1 lg:block">
             <div className="sticky top-24">
               <SideBarFilter
                 filters={query.filters}

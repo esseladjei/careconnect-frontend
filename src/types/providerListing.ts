@@ -11,7 +11,7 @@ export interface IProviderListing {
   workingDays?: number[]; // Array of working days (1=Mon, 2=Tue, ..., 7=Sun)
   dailyStartTime?: string; // Format: "HH:MM" (e.g., "09:00")
   dailyEndTime?: string; // Format: "HH:MM" (e.g., "17:00")
-  sessionDuration?: number; // Duration in minutes (e.g., 30)
+  sessionDuration: number; // Duration in minutes (e.g., 30)
   createdAt: string; // ISO 8601 date string
   updatedAt: string; // ISO 8601 date string
   provider: IProvider;

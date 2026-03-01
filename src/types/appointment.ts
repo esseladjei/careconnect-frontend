@@ -31,6 +31,8 @@ export interface Appointment {
   paymentStatus?: 'pending' | 'paid' | 'failed';
   consultationNotes?: string;
   prescriptions?: string;
+  patientCondition?: string;
+  knownAllergies?: string;
 }
 
 export interface FetchAppointmentsParams {
