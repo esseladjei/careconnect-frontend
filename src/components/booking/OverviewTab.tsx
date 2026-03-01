@@ -33,10 +33,15 @@ const OverviewTab: React.FC<Props> = ({ offer }) => {
         <p className="text-gray-700 leading-relaxed">
           {offer.user.title} {useCapitalizeFirst(offer.user.lastName)} is a
           highly qualified{' '}
-          <span className="font-bold italic">{primarySpecialty}</span> with{' '}
-          {offer.provider.experience < 2 ? '' : offer.provider.experience} years
-          of professional experience in the healthcare industry. Dedicated to
-          providing exceptional patient care and maintaining the highest
+          <span className="font-bold italic">{primarySpecialty}</span>
+          {offer.provider.experience >= 2 && (
+            <>
+              {' '}with {offer.provider.experience} years of professional
+              experience
+            </>
+          )}{' '}
+          in the healthcare industry. Dedicated to providing exceptional
+          patient care and maintaining the highest
           standards of medical practice.
         </p>
       </section>
