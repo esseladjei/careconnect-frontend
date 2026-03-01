@@ -216,7 +216,7 @@ const ProviderHeader: React.FC<Props> = ({ offer, ratingSummary }) => {
 
         {/* Quick Info Pills */}
         <div className="flex flex-wrap gap-3 mt-6">
-          {offer.provider.experience && (
+          {offer.provider.experience > 2 && (
             <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-200">
               <AcademicCapIcon className="w-5 h-5 text-blue-600" />
               <span className="text-sm font-semibold text-blue-900">

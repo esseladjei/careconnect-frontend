@@ -27,7 +27,5 @@ export const useSpecialties = () => {
       console.warn('Unexpected specialties response structure:', data);
       return [];
     },
-    staleTime: 1000 * 60 * 60,
-    gcTime: 1000 * 60 * 60 * 24,
   });
 };

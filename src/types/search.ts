@@ -27,6 +27,7 @@ export interface SearchResult {
     available: string;
     experience?: string | number;
     practiceName?: string;
+    serviceDescription?: string;
     providerStatus?: string;
   };
   user: {

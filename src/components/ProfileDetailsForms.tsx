@@ -1,6 +1,7 @@
 import React from 'react';
-import type { UserProfile } from '../types/user.ts';
+import type { IUserProfile } from '../types/user.ts';
 import { useGetMaxDate } from '../hooks/useDate.ts';
+import PhoneInput from './PhoneInput';
 import {
   CalendarIcon,
   EnvelopeIcon,
@@ -12,8 +13,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 interface ProfileDetailsProp {
-  user: UserProfile;
-  onChange: (field: keyof UserProfile, value: string | string[]) => void;
+  user: IUserProfile;
+  onChange: (field: keyof IUserProfile, value: string | string[]) => void;
   onSave: () => void;
   saveStatus: boolean;
 }
@@ -193,21 +194,14 @@ const ProfileDetailsForm: React.FC<ProfileDetailsProp> = ({
 
           {/* Phone */}
           <div>
-            <label
-              htmlFor="phone"
-              className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1"
-            >
-              <PhoneIcon className="h-3.5 w-3.5" />
-              Phone Number
-            </label>
-            <input
-              type="tel"
+            <PhoneInput
               id="phone"
               name="phone"
               value={user.phone || ''}
-              onChange={(e) => onChange('phone', e.target.value)}
-              placeholder="+233 20 123 4567"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              onChange={(value) => onChange('phone', value)}
+              required={false}
+              showOperatorInfo={true}
+              variant="compact"
             />
           </div>
 

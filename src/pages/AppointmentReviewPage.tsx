@@ -7,11 +7,14 @@ import StarRatingInput from '../components/reviews/StarRatingInput';
 import { useAuth } from '../hooks/useAuth';
 import { useGetAppointment } from '../hooks/useAppointments';
 import { useSubmitReview } from '../hooks/useReviews';
+import { useTimezone } from '../hooks/useTimezone';
+import { formatDateInTimezone } from '../utils/timezoneUtils';
 
 const AppointmentReviewPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
   const { userId, role } = useAuth();
+  const timezone = useTimezone();
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -157,10 +160,11 @@ const AppointmentReviewPage: React.FC = () => {
                   {appointment.patientId.userId.firstName}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {new Date(appointment.scheduledAt).toLocaleDateString(
-                    'en-US',
-                    { year: 'numeric', month: 'long', day: 'numeric' }
-                  )}
+                  {formatDateInTimezone(appointment.scheduledAt, timezone, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
                 </div>
               </div>
 
