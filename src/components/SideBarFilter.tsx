@@ -276,7 +276,7 @@ const SideBarFilter: React.FC<SideBarFilterProps> = ({
           aria-controls="price-range-content"
         >
           <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-            Consultation Fee (₵)
+            Consultation Fee (GH₵)
           </h4>
           <ChevronDownIcon
             className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
@@ -288,56 +288,59 @@ const SideBarFilter: React.FC<SideBarFilterProps> = ({
 
         {expandedSections.priceRange && (
           <div id="price-range-content" className="mt-4 space-y-3">
-            {/* Min Price */}
-            <div>
-              <label
-                htmlFor="min-price"
-                className="block text-xs font-semibold text-gray-600 mb-2"
-              >
-                Minimum
-              </label>
-              <input
-                type="number"
-                id="min-price"
-                placeholder="₵50"
-                value={filters.minPrice}
-                onChange={(e) =>
-                  onChange({
-                    ...filters,
-                    minPrice: e.target.value as any,
-                  })
-                }
-                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-medium
-                    focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200
-                    transition-all hover:border-gray-400"
-                aria-label="Minimum consultation fee"
-              />
-            </div>
+            {/* Min and Max Price - Single Row */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* Min Price */}
+              <div>
+                <label
+                  htmlFor="min-price"
+                  className="block text-xs font-semibold text-gray-600 mb-2"
+                >
+                  Min. (GH¢)
+                </label>
+                <input
+                  type="number"
+                  id="min-price"
+                  placeholder="₵50"
+                  value={filters.minPrice}
+                  onChange={(e) =>
+                    onChange({
+                      ...filters,
+                      minPrice: e.target.value as any,
+                    })
+                  }
+                  className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-medium
+                      focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200
+                      transition-all hover:border-gray-400"
+                  aria-label="Minimum consultation fee"
+                />
+              </div>
 
-            {/* Max Price */}
-            <div>
-              <label
-                htmlFor="max-price"
-                className="block text-xs font-semibold text-gray-600 mb-2"
-              >
-                Maximum
-              </label>
-              <input
-                type="number"
-                id="max-price"
-                placeholder="₵500"
-                value={filters.maxPrice}
-                onChange={(e) =>
-                  onChange({
-                    ...filters,
-                    maxPrice: e.target.value as any,
-                  })
-                }
-                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-medium
-                    focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200
-                    transition-all hover:border-gray-400"
-                aria-label="Maximum consultation fee"
-              />
+              {/* Max Price */}
+              <div>
+                <label
+                  htmlFor="max-price"
+                  className="block text-xs font-semibold text-gray-600 mb-2"
+                >
+                  Max. (GH¢)
+                </label>
+                <input
+                  type="number"
+                  id="max-price"
+                  placeholder="₵500"
+                  value={filters.maxPrice}
+                  onChange={(e) =>
+                    onChange({
+                      ...filters,
+                      maxPrice: e.target.value as any,
+                    })
+                  }
+                  className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-medium
+                      focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200
+                      transition-all hover:border-gray-400"
+                  aria-label="Maximum consultation fee"
+                />
+              </div>
             </div>
 
             {/* Price Range Display */}
@@ -346,7 +349,7 @@ const SideBarFilter: React.FC<SideBarFilterProps> = ({
                 Selected Range
               </p>
               <p className="text-base font-bold text-blue-600 mt-1">
-                ₵{filters.minPrice} — ₵{filters.maxPrice}
+                GH₵ {filters.minPrice} — GH₵ {filters.maxPrice}
               </p>
             </div>
           </div>
