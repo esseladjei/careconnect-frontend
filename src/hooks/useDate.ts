@@ -1,3 +1,15 @@
+/**
+ * Format a date to YYYY-MM-DD in local timezone
+ * @param date - The date to format
+ * @returns Date string in YYYY-MM-DD format
+ */
+const formatLocalDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // Calculate the max date (18 years ago from today)
 export const useGetMaxDate = () => {
   const today = new Date();
@@ -6,18 +18,18 @@ export const useGetMaxDate = () => {
     today.getMonth(),
     today.getDate()
   );
-  return maxDate.toISOString().split('T')[0];
+  return formatLocalDate(maxDate);
 };
 
 export const useGetToday = () => {
-  return new Date().toISOString().split('T')[0];
+  return formatLocalDate(new Date());
 };
 
-export const useGetMonth = () => {
+export const useGetThreeMonthsFromNow = () => {
   const today = new Date();
-  return new Date(today.setMonth(today.getMonth() + 3))
-    .toISOString()
-    .split('T')[0];
+  const futureDate = new Date(today);
+  futureDate.setMonth(today.getMonth() + 3);
+  return formatLocalDate(futureDate);
 };
 
 export const useGetDayMonthOnly = (dateString: string) => {
@@ -31,7 +43,7 @@ export const useGetDayMonthOnly = (dateString: string) => {
 export const getFormattedDate = (daysOffset: number = 0): string => {
   const date = new Date();
   date.setDate(date.getDate() + daysOffset);
-  return date.toISOString().split('T')[0];
+  return formatLocalDate(date);
 };
 
 export const validateDateOfBirth = (dateString: string): string | undefined => {
