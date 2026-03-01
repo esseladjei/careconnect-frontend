@@ -49,7 +49,18 @@ export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
   // Remove all non-digit characters except leading +
   let cleaned = phoneNumber.replace(/[\s\-()]/g, '');
 
-  if (/^\+233(2[0-9]|24|25|26|27|28|29|54|55|59)\d{7}$/.test(cleaned)) {
+  // Remove leading +
+  if (cleaned.startsWith('+')) {
+    cleaned = cleaned.substring(1);
+  }
+
+  // Handle country code 233 (Ghana)
+  if (cleaned.startsWith('233')) {
+    cleaned = '0' + cleaned.substring(3);
+  }
+
+  // Must be exactly 10 digits starting with 0
+  if (!/^0\d{9}$/.test(cleaned)) {
     return null;
   }
 
