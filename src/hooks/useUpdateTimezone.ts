@@ -30,13 +30,14 @@ export const useUpdateTimezone = (
     onMutate: () => {
       return toast.loading('Saving timezone…');
     },
-    onSuccess: (_, timezone, toastId) => {
+    onSuccess: (data, _timezone, toastId) => {
       toast.success('Timezone updated successfully!', { id: toastId });
+      const updatedTimezone = data.timezone;
       // Update localStorage for immediate effect across the app
-      setTimezone(timezone);
+      setTimezone(updatedTimezone);
 
       // Call custom onSuccess callback if provided
-      options?.onSuccess?.(timezone);
+      options?.onSuccess?.(updatedTimezone);
 
       // Auto-reload if enabled (default: false for profile page)
       const shouldReload = options?.autoReload === true;

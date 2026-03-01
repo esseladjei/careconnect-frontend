@@ -46,8 +46,8 @@ export interface IPhoneValidationResult {
 export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
   if (!phoneNumber) return null;
 
-  // Remove all non-digit characters except leading +
-  let cleaned = phoneNumber.replace(/[\s\-()]/g, '');
+  // Strip all non-digit characters
+  const digits = phoneNumber.replace(/\D/g, '');
 
   // Remove leading +
   if (cleaned.startsWith('+')) {
@@ -64,7 +64,7 @@ export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
     return null;
   }
 
-  return cleaned;
+  return normalized;
 };
 
 /**
