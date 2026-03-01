@@ -143,7 +143,7 @@ export const validatePassword = (
   }
 
   // Check for common patterns (weak patterns)
-  const weakPatterns = [/^123/, /^abc/i, /^password/i, /^\d{8,}/, /(.)\\1{2,}/];
+  const weakPatterns = [/^123/, /^abc/i, /^password/i, /^\d{8,}/, /(.)\1{2,}/];
 
   let hasWeakPattern = false;
   for (const pattern of weakPatterns) {
