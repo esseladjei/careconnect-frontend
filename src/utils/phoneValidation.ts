@@ -47,7 +47,7 @@ export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
   if (!phoneNumber) return null;
 
   // Strip all non-digit characters
-  const digits = phoneNumber.replace(/\D/g, '');
+  let cleaned = phoneNumber.replace(/\D/g, '');
 
   // Remove leading +
   if (cleaned.startsWith('+')) {
@@ -64,7 +64,7 @@ export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
     return null;
   }
 
-  return normalized;
+  return cleaned;
 };
 
 /**
