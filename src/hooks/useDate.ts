@@ -246,7 +246,17 @@ export const validateDateOfBirth = (dateString: string): string | undefined => {
   if (!dateString) return undefined;
 
   const birthDate = new Date(dateString);
+
+  if (Number.isNaN(birthDate.getTime())) {
+    return 'Invalid date of birth';
+  }
+
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (birthDate > today) {
+    return 'Date of birth cannot be in the future';
+  }
 
   // Calculate age
   let age = today.getFullYear() - birthDate.getFullYear();
