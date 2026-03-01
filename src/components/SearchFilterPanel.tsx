@@ -161,6 +161,7 @@ const SearchFilterPanel: React.FC<Props> = ({ value, filters, onChange }) => {
                   id="start-date-filter"
                   type="date"
                   min={useGetToday()}
+                  max={value.endDate || useGetMonth()}
                   value={value.startDate}
                   onChange={(e) =>
                     onChange({ ...value, startDate: e.target.value })
@@ -186,6 +187,7 @@ const SearchFilterPanel: React.FC<Props> = ({ value, filters, onChange }) => {
                 <input
                   id="end-date-filter"
                   type="date"
+                  min={value.startDate || useGetToday()}
                   max={useGetMonth()}
                   value={value.endDate}
                   onChange={(e) =>
