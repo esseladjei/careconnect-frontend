@@ -49,13 +49,18 @@ export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
   // Strip all non-digit characters
   const digits = phoneNumber.replace(/\D/g, '');
 
-  // Convert +233XXXXXXXXX or 233XXXXXXXXX to 0XXXXXXXXX
-  const normalized = digits.startsWith('233')
-    ? '0' + digits.substring(3)
-    : digits;
+  // Remove leading +
+  if (cleaned.startsWith('+')) {
+    cleaned = cleaned.substring(1);
+  }
 
-  // Validate: must be exactly 10 digits starting with 0
-  if (!/^0\d{9}$/.test(normalized)) {
+  // Handle country code 233 (Ghana)
+  if (cleaned.startsWith('233')) {
+    cleaned = '0' + cleaned.substring(3);
+  }
+
+  // Must be exactly 10 digits starting with 0
+  if (!/^0\d{9}$/.test(cleaned)) {
     return null;
   }
 
