@@ -142,24 +142,15 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result }) => {
           result.provider.providerStatus) && (
           <div className="border-t border-gray-200 pt-4">
             <div className="grid grid-cols-1 gap-2">
-              {result.provider.experience !== undefined &&
-              Number(result.provider.experience) > 2 ? (
+              {result.provider.experience !== undefined && (
                 <div className="flex items-center justify-between py-2 px-0">
                   <span className="text-sm font-semibold text-gray-600">
                     Experience
                   </span>
                   <span className="text-sm font-bold text-gray-900">
-                    {result.provider.experience} year
-                    {result.provider.experience !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between py-2 px-0">
-                  <span className="text-sm font-semibold text-gray-600">
-                    Experience
-                  </span>
-                  <span className="text-sm font-bold text-gray-900">
-                    Early‑career practitioner
+                    {Number(result.provider.experience) > 2
+                      ? `${result.provider.experience} year${result.provider.experience !== 1 ? 's' : ''}`
+                      : 'Early‑career practitioner'}
                   </span>
                 </div>
               )}
