@@ -107,10 +107,14 @@ const Register: React.FC = () => {
       setFormData((prev) => ({
         ...prev,
         role: value as Role,
+        gender: '',
+        dateOfBirth: '',
       }));
       setErrors((prev) => ({
         ...prev,
         role: undefined,
+        gender: undefined,
+        dateOfBirth: undefined,
       }));
       return;
     }
@@ -145,21 +149,23 @@ const Register: React.FC = () => {
     // Handle patient profile fields
     if (name.startsWith('patient_')) {
       const fieldName = name.replace('patient_', '');
+      const rootUpdate: Partial<FormData> =
+        fieldName === 'gender' || fieldName === 'dateOfBirth'
+          ? { [fieldName]: value }
+          : {};
       setFormData((prev) => ({
         ...prev,
+        ...rootUpdate,
         patientProfile: {
           ...prev.patientProfile,
           [fieldName]: value,
         },
       }));
-      if (errors.patientProfile?.[fieldName]) {
-        setErrors((prev) => ({
-          ...prev,
-          patientProfile: {
-            ...prev.patientProfile,
-            // [fieldName]: undefined,
-          },
-        }));
+      if (
+        (fieldName === 'gender' || fieldName === 'dateOfBirth') &&
+        errors[fieldName as keyof FormErrors]
+      ) {
+        setErrors((prev) => ({ ...prev, [fieldName]: undefined }));
       }
       return;
     }
@@ -167,21 +173,23 @@ const Register: React.FC = () => {
     // Handle provider profile fields
     if (name.startsWith('provider_')) {
       const fieldName = name.replace('provider_', '');
+      const rootUpdate: Partial<FormData> =
+        fieldName === 'gender' || fieldName === 'dateOfBirth'
+          ? { [fieldName]: value }
+          : {};
       setFormData((prev) => ({
         ...prev,
+        ...rootUpdate,
         providerProfile: {
           ...prev.providerProfile,
           [fieldName]: value,
         },
       }));
-      if (errors.providerProfile?.[fieldName]) {
-        setErrors((prev) => ({
-          ...prev,
-          providerProfile: {
-            ...prev.providerProfile,
-            // [fieldName]: undefined,
-          },
-        }));
+      if (
+        (fieldName === 'gender' || fieldName === 'dateOfBirth') &&
+        errors[fieldName as keyof FormErrors]
+      ) {
+        setErrors((prev) => ({ ...prev, [fieldName]: undefined }));
       }
     }
   };
@@ -806,7 +814,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 
                          ${
-                           errors.firstName
+                           errors.gender
                              ? 'border-red-500 bg-red-50'
                              : 'border-gray-300 bg-white'
                          }`}
@@ -818,7 +826,7 @@ const Register: React.FC = () => {
                       </select>
                       {errors.gender && (
                         <p
-                          id="title-error"
+                          id="provider_gender-error"
                           className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
                         >
                           <ExclamationCircleIcon className="h-3 w-3" />
@@ -841,7 +849,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 
                          ${
-                           errors.firstName
+                           errors.dateOfBirth
                              ? 'border-red-500 bg-red-50'
                              : 'border-gray-300 bg-white'
                          }`}
@@ -1051,14 +1059,14 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`w-full px-3 py-2 tex-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors
                         ${
-                          errors.firstName
+                          errors.dateOfBirth
                             ? 'border-red-500 bg-red-50'
                             : 'border-gray-300 bg-white'
                         }`}
                       />
                       {errors.dateOfBirth && (
                         <p
-                          id="title-error"
+                          id="patient_dateOfBirth-error"
                           className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
                         >
                           <ExclamationCircleIcon className="h-3 w-3" />
@@ -1080,7 +1088,7 @@ const Register: React.FC = () => {
                         value={formData.patientProfile.gender}
                         onChange={handleChange}
                         className={`w-full px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors   ${
-                          errors.firstName
+                          errors.gender
                             ? 'border-red-500 bg-red-50'
                             : 'border-gray-300 bg-white'
                         }`}
@@ -1092,7 +1100,7 @@ const Register: React.FC = () => {
                       </select>
                       {errors.gender && (
                         <p
-                          id="title-error"
+                          id="patient_gender-error"
                           className="text-red-600 text-xs font-medium mt-1 flex items-center gap-1"
                         >
                           <ExclamationCircleIcon className="h-3 w-3" />
