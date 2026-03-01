@@ -258,7 +258,7 @@ export const getSupportedOperators = (): string[] => {
  * @returns Regex pattern string for Ghana phone numbers
  */
 export const getGhanaPhoneRegexPattern = (): string => {
-  // Pattern: 0 followed by 2 digits from supported prefixes, then 7 more digits
+  // Pattern: 0 followed by a digit from supported prefixes (2, 3, or 5), then 8 more digits
   // This matches all Ghana mobile and landline formats
-  return '^0[2,3,5,6][0-9]{8}$';
+  return '^0[235][0-9]{8}$';
 };
