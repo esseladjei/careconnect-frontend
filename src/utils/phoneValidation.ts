@@ -46,14 +46,20 @@ export interface IPhoneValidationResult {
 export const formatGhanaPhoneNumber = (phoneNumber: string): string | null => {
   if (!phoneNumber) return null;
 
-  // Remove all non-digit characters except leading +
-  let cleaned = phoneNumber.replace(/[\s\-()]/g, '');
+  // Strip all non-digit characters
+  const digits = phoneNumber.replace(/\D/g, '');
 
-  if (/^\+233(2[0-9]|24|25|26|27|28|29|54|55|59)\d{7}$/.test(cleaned)) {
+  // Convert +233XXXXXXXXX or 233XXXXXXXXX to 0XXXXXXXXX
+  const normalized = digits.startsWith('233')
+    ? '0' + digits.substring(3)
+    : digits;
+
+  // Validate: must be exactly 10 digits starting with 0
+  if (!/^0\d{9}$/.test(normalized)) {
     return null;
   }
 
-  return cleaned;
+  return normalized;
 };
 
 /**
